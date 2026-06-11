@@ -535,6 +535,17 @@ function updateBarracksUI() {
     `;
 }
 
+// 触发数值变动背景微光闪烁
+function flashStatCard(statId, isIncrease) {
+    const card = document.getElementById(statId)?.parentElement;
+    if (!card) return;
+    const flashClass = isIncrease ? "flash-green" : "flash-red";
+    card.classList.add(flashClass);
+    setTimeout(() => {
+        card.classList.remove(flashClass);
+    }, 450);
+}
+
 // 渲染玩家数值看板 (三兵种拆分)
 function renderStats(change = { people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 }) {
     const fields = ["people", "avator", "army_shield", "army_cavalry", "army_spear", "cash", "food", "means"];
