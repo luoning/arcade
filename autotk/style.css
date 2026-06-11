@@ -78,7 +78,7 @@ body {
 .game-container {
     flex: 1;
     display: grid;
-    grid-template-columns: 280px 1fr 300px;
+    grid-template-columns: 310px 1fr 310px;
     gap: 15px;
     padding: 15px;
     overflow: hidden;
@@ -120,7 +120,7 @@ body {
     overflow-y: auto;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 10px;
     padding-bottom: 30px;
 }
 
@@ -135,9 +135,10 @@ body {
     border-radius: 2px;
 }
 
+/* 日志分级样式 */
 .message-log .line {
-    background: rgba(255, 255, 255, 0.02);
-    border-left: 3px solid #45f3ff;
+    background: rgba(255, 255, 255, 0.01);
+    border-left: 3px solid rgba(197, 198, 199, 0.3);
     padding: 8px 10px;
     border-radius: 0 6px 6px 0;
     font-size: 0.8rem;
@@ -146,7 +147,51 @@ body {
 }
 
 .message-log .line:hover {
-    background: rgba(102, 252, 241, 0.05);
+    background: rgba(255, 255, 255, 0.03);
+}
+
+/* 战争日志 - 红 */
+.message-log .line.war {
+    border-left-color: #ff4e50;
+    background: rgba(255, 78, 80, 0.05);
+    color: #ffd6d6;
+}
+.message-log .line.war i {
+    color: #ff4e50;
+    font-weight: bold;
+}
+
+/* 经济日志 - 绿 */
+.message-log .line.econ {
+    border-left-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.05);
+    color: #d6ffd8;
+}
+.message-log .line.econ i {
+    color: #2ecc71;
+}
+
+/* 胜利日志 - 渐变 */
+.message-log .line.victory {
+    border-left-width: 4px;
+    border-left-color: #f9d423;
+    background: linear-gradient(90deg, rgba(249, 212, 35, 0.1), transparent);
+    color: #fffdf5;
+}
+.message-log .line.victory i {
+    color: #f9d423;
+    text-shadow: 0 0 5px rgba(249, 212, 35, 0.5);
+    font-weight: bold;
+}
+
+/* 系统日志 - 蓝 */
+.message-log .line.system {
+    border-left-color: #00f5d4;
+    background: rgba(0, 245, 212, 0.05);
+    color: #e3fffc;
+}
+.message-log .line.system i {
+    color: #00f5d4;
 }
 
 .mask-fade {
@@ -181,6 +226,15 @@ body {
     display: flex;
     flex-direction: column;
     gap: 4px;
+    transition: background-color 0.4s ease;
+}
+
+/* 闪烁动效类 */
+.data-card.flash-green {
+    background-color: rgba(46, 204, 113, 0.25) !important;
+}
+.data-card.flash-red {
+    background-color: rgba(231, 76, 60, 0.25) !important;
 }
 
 .card-label {
@@ -190,7 +244,7 @@ body {
 }
 
 .card-value {
-    font-size: 1.1rem;
+    font-size: 1rem;
     font-weight: bold;
     color: #fff;
     display: flex;
@@ -271,11 +325,35 @@ body {
     border-radius: 4px;
     height: 60px;
     transition: transform 0.2s, box-shadow 0.2s;
+    position: relative;
 }
 
 .map_gird:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+/* 视点高亮 */
+.map_gird.focused {
+    border: 2px solid #66fcf1 !important;
+    box-shadow: 0 0 8px rgba(102, 252, 241, 0.6);
+    animation: pulseBorder 1.5s infinite alternate;
+}
+
+@keyframes pulseBorder {
+    0% { border-color: rgba(102, 252, 241, 0.4); }
+    100% { border-color: rgba(102, 252, 241, 1); }
+}
+
+/* 战火脉冲波纹 */
+.map_gird.war-active {
+    animation: warFlash 0.5s infinite alternate;
+    border: 1.5px solid #ff4e50 !important;
+}
+
+@keyframes warFlash {
+    0% { box-shadow: 0 0 2px rgba(255, 78, 80, 0.3); background-color: rgba(255, 78, 80, 0.1); }
+    100% { box-shadow: 0 0 12px rgba(255, 78, 80, 0.8); background-color: rgba(255, 78, 80, 0.35); }
 }
 
 .map_item {
@@ -352,13 +430,25 @@ body {
     text-align: center;
     border-radius: 4px;
     cursor: not-allowed;
-    opacity: 0.65;
+    opacity: 0.45;
     border: 1px solid rgba(255, 255, 255, 0.05);
-    transition: background 0.2s;
+    transition: all 0.2s;
 }
 
-.cmd-btn:hover {
-    background: rgba(102, 252, 241, 0.05);
+/* 激活的微操按钮样式 */
+.cmd-btn.active-cmd {
+    opacity: 1;
+    cursor: pointer;
+    background: #12343f;
+    border-color: #00f5d4;
+    color: #00f5d4;
+    font-weight: 600;
+}
+
+.cmd-btn.active-cmd:hover {
+    background: #00f5d4;
+    color: #000;
+    box-shadow: 0 0 10px rgba(0, 245, 212, 0.5);
 }
 
 /* 右侧面板 - 剧本与管理 */
