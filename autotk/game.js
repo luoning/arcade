@@ -59,74 +59,19 @@ const cityConnections = {
     "夷洲":{"connect":["建安"]}
 };
 
-// 2D 坐标配置（基于三国历史地图的相对百分比 X, Y 坐标）
+// 2D 坐标配置
 const cityCoords = {
-    // 关中 / 西北
-    "武威": { x: 5, y: 12 },
-    "金城": { x: 7, y: 22 },
-    "天水": { x: 13, y: 32 },
-    "安定": { x: 20, y: 20 },
-    "武都": { x: 13, y: 45 },
-    "长安": { x: 30, y: 32 },
-    "弘农": { x: 37, y: 32 },
-
-    // 河北 / 中原 / 北疆
-    "洛阳": { x: 44, y: 32 },
-    "晋阳": { x: 41, y: 14 },
-    "上党": { x: 45, y: 22 },
-    "中山": { x: 51, y: 8 },
-    "邺": { x: 51, y: 19 },
-    "南皮": { x: 61, y: 12 },
-    "蓟": { x: 62, y: 4 },
-    "北平": { x: 74, y: 4 },
-    "襄平": { x: 86, y: 4 },
-    "乐浪": { x: 94, y: 6 },
-    "平原": { x: 59, y: 20 },
-    "濮阳": { x: 58, y: 28 },
-    "北海": { x: 67, y: 24 },
-    "陈留": { x: 51, y: 36 },
-    "许昌": { x: 48, y: 44 },
-    "宛": { x: 41, y: 49 },
-    "汝南": { x: 52, y: 52 },
-
-    // 徐州 / 淮南 / 江东
-    "下邳": { x: 65, y: 36 },
-    "广陵": { x: 71, y: 40 },
-    "寿春": { x: 60, y: 46 },
-    "庐江": { x: 62, y: 56 },
-    "建业": { x: 74, y: 56 },
-    "吴": { x: 84, y: 62 },
-    "会稽": { x: 89, y: 70 },
-    "建安": { x: 81, y: 82 },
-    "夷洲": { x: 94, y: 88 },
-
-    // 荆襄 / 华中 / 华南
-    "新野": { x: 44, y: 59 },
-    "上庸": { x: 34, y: 52 },
-    "襄阳": { x: 44, y: 68 },
-    "江陵": { x: 47, y: 77 },
-    "江夏": { x: 57, y: 70 },
-    "豫章": { x: 67, y: 78 },
-    "长沙": { x: 51, y: 86 },
-    "武陵": { x: 41, y: 84 },
-    "零陵": { x: 43, y: 92 },
-    "桂阳": { x: 51, y: 94 },
-    "南海": { x: 60, y: 96 },
-
-    // 巴蜀 / 大西南
-    "汉中": { x: 27, y: 46 },
-    "梓潼": { x: 20, y: 57 },
-    "成都": { x: 13, y: 67 },
-    "江州": { x: 25, y: 72 },
-    "永安": { x: 34, y: 72 },
-    "永昌": { x: 4, y: 78 },
-    "建宁": { x: 11, y: 86 },
-    "交趾": { x: 9, y: 95 },
-    "合浦": { x: 21, y: 96 },
-    "朱崖洲": { x: 21, y: 99 }
+    "武威": { x: 5, y: 12 }, "金城": { x: 7, y: 22 }, "天水": { x: 13, y: 32 }, "安定": { x: 20, y: 20 }, "武都": { x: 13, y: 45 }, "长安": { x: 30, y: 32 }, "弘农": { x: 37, y: 32 },
+    "洛阳": { x: 44, y: 32 }, "晋阳": { x: 41, y: 14 }, "上党": { x: 45, y: 22 }, "中山": { x: 51, y: 8 }, "邺": { x: 51, y: 19 }, "南皮": { x: 61, y: 12 }, "蓟": { x: 62, y: 4 },
+    "北平": { x: 74, y: 4 }, "襄平": { x: 86, y: 4 }, "乐浪": { x: 94, y: 6 }, "平原": { x: 59, y: 20 }, "濮阳": { x: 58, y: 28 }, "北海": { x: 67, y: 24 }, "陈留": { x: 51, y: 36 },
+    "许昌": { x: 48, y: 44 }, "宛": { x: 41, y: 49 }, "汝南": { x: 52, y: 52 }, "下邳": { x: 65, y: 36 }, "广陵": { x: 71, y: 40 }, "寿春": { x: 60, y: 46 }, "庐江": { x: 62, y: 56 },
+    "建业": { x: 74, y: 56 }, "吴": { x: 84, y: 62 }, "会稽": { x: 89, y: 70 }, "建安": { x: 81, y: 82 }, "夷洲": { x: 94, y: 88 }, "新野": { x: 44, y: 59 }, "上庸": { x: 34, y: 52 },
+    "襄阳": { x: 44, y: 68 }, "江陵": { x: 47, y: 77 }, "江夏": { x: 57, y: 70 }, "豫章": { x: 67, y: 78 }, "长沙": { x: 51, y: 86 }, "武陵": { x: 41, y: 84 }, "零陵": { x: 43, y: 92 },
+    "桂阳": { x: 51, y: 94 }, "南海": { x: 60, y: 96 }, "汉中": { x: 27, y: 46 }, "梓潼": { x: 20, y: 57 }, "成都": { x: 13, y: 67 }, "江州": { x: 25, y: 72 }, "永安": { x: 34, y: 72 },
+    "永昌": { x: 4, y: 78 }, "建宁": { x: 11, y: 86 }, "交趾": { x: 9, y: 95 }, "合浦": { x: 21, y: 96 }, "朱崖洲": { x: 21, y: 99 }
 };
 
-// 3. 势力配置数据
+// 3. 势力配置
 const rolesConfig = {
     "无主": { flag: "circle-o", color: "blank", winByGod: ["混沌", "从零开始吧."] },
     "刘备": { flag: "bookmark", color: "gird1", winByGod: ["刘备", "终于，大汉的江山还是姓刘."] },
@@ -158,16 +103,20 @@ let gameState = {
     running: false,
     timer: null,
     script: "三分天下",
+    speed: 1000, // 默认推演周期毫秒
     stats: {
         people: 1000000,
         avator: 576,
-        army: 730,
+        army_shield: 300, // 虎贲军
+        army_cavalry: 150, // 南蛮象兵
+        army_spear: 280,   // 长枪兵
         cash: 4875231,
         food: 74112453,
         means: 254
     },
     cities: {},
     cityNow: "新野",
+    selectedCity: null, // 当前鼠标点选中的城市
     history: []
 };
 
@@ -180,7 +129,6 @@ function randChoice(arr) {
     return arr[Math.floor(Math.random() * arr.length)];
 }
 
-// 模拟 Python updown HTML
 function getUpDownHTML(n) {
     if (n < 0) return `<span class="updown warning">-${Math.abs(n)}</span>`;
     if (n > 0) return `<span class="updown running">+${Math.abs(n)}</span>`;
@@ -191,8 +139,11 @@ function getUpDownHTML(n) {
 function initGame(scriptName) {
     gameState.script = scriptName;
     gameState.history = [];
+    gameState.selectedCity = null;
     
-    // 初始化城市归属
+    // 清空选中信息显示
+    updateSelectedCityUI();
+    
     const citiesList = Object.keys(cityConnections);
     gameState.cities = {};
     citiesList.forEach(c => {
@@ -215,7 +166,7 @@ function initGame(scriptName) {
     
     addLog("system", `${scriptName}时代，天下割据，狼烟四起。`, "system");
     renderMap();
-    renderStats({ people: 0, avator: 0, army: 0, cash: 0, food: 0, means: 0 });
+    renderStats({ people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 });
 }
 
 // 一键强制统一
@@ -231,6 +182,10 @@ function setAllCity(unitName) {
     addLog("victory", `${unitName}：${winMsg}`, "victory");
     renderMap();
     checkVictory();
+    
+    // 关闭设置弹窗
+    const modal = document.getElementById("settingsModal");
+    if (modal) modal.classList.remove("active");
 }
 
 // 动态绘制 SVG 连线
@@ -250,15 +205,12 @@ function drawConnections() {
             const endCoord = cityCoords[endCity];
             if (!endCoord) return;
 
-            // 避免重复画线 (A-B 和 B-A 只画一次)
             const lineKey = [startCity, endCity].sort().join("-");
             if (drawn.has(lineKey)) return;
             drawn.add(lineKey);
 
-            // 检查线条属性 (如是否涉及战火)
             const isWarLine = gameState.cities[startCity]?.isWar || gameState.cities[endCity]?.isWar;
             
-            // 构造 SVG line 标签
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
             line.setAttribute("x1", `${startCoord.x}%`);
             line.setAttribute("y1", `${startCoord.y}%`);
@@ -275,12 +227,11 @@ function drawConnections() {
     });
 }
 
-// 绝对定位 2D 渲染地图关卡与连线
+// 绝对定位 2D 渲染地图关卡
 function renderMap() {
     const container = document.getElementById("content");
     if (!container) return;
     
-    // 清理除 SVG 画布层以外的所有旧城市节点
     const oldNodes = container.querySelectorAll(".city-wrapper");
     oldNodes.forEach(node => node.remove());
 
@@ -295,7 +246,6 @@ function renderMap() {
         cityEl.id = cityName;
         cityEl.className = "city-wrapper";
         
-        // 核心：绝对定位
         cityEl.style.left = `${coord.x}%`;
         cityEl.style.top = `${coord.y}%`;
 
@@ -305,6 +255,9 @@ function renderMap() {
         }
         if (cityData.isWar) {
             cardClasses += " war-active";
+        }
+        if (cityName === gameState.selectedCity) {
+            cardClasses += " selected"; // 点选高亮
         }
 
         const contentHTML = `
@@ -325,16 +278,215 @@ function renderMap() {
             </span>
         `;
         cityEl.innerHTML = contentHTML;
+        
+        // 绑定点击选中事件
+        cityEl.onclick = function(e) {
+            e.stopPropagation();
+            gameState.selectedCity = cityName;
+            renderMap(); // 重新画出高亮圈
+            updateSelectedCityUI();
+        };
+
         container.appendChild(cityEl);
     });
 
-    // 渲染动态连线
     drawConnections();
+}
+
+// 刷新右侧选定城市交互 UI
+function updateSelectedCityUI() {
+    const box = document.getElementById("selectedCityBox");
+    if (!box) return;
+
+    if (!gameState.selectedCity) {
+        box.innerHTML = `
+            <div style="text-align: center; color: #888; padding: 20px 0;">
+                <i class="fa fa-hand-pointer-o" style="font-size: 1.5rem; margin-bottom: 8px;"></i>
+                <br/>请在堪舆图中点选任一城市关隘进行布防指挥
+            </div>
+        `;
+        return;
+    }
+
+    const cName = gameState.selectedCity;
+    const cData = gameState.cities[cName];
+    const isMine = cData.union === "刘备";
+    
+    // 计算是否可达 (接壤)
+    const myCities = getOwnedCities("刘备");
+    const neighbours = getNeighbours(myCities);
+    const isReachable = neighbours.includes(cName);
+
+    let actionsHTML = "";
+    if (isMine) {
+        actionsHTML = `
+            <div class="city-action-grid">
+                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_shield')">募虎贲军 (-15万金)</button>
+                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_spear')">募长枪兵 (-8万金)</button>
+                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_cavalry')">募象骑兵 (-25万金)</button>
+                <button class="action-trigger-btn cbtn-econ" onclick="cityAction('farm')">屯田修水利 (-5万金)</button>
+            </div>
+        `;
+    } else {
+        actionsHTML = `
+            <div class="city-action-grid">
+                <button class="action-trigger-btn cbtn-war ${isReachable ? '' : 'disabled'}" ${isReachable ? '' : 'disabled'} onclick="cityAction('attack')">亲征强攻 (需兵将与金)</button>
+                <button class="action-trigger-btn cbtn-plot" onclick="cityAction('plot')">流言破坏 (-5珍宝)</button>
+            </div>
+            ${!isReachable ? '<p style="font-size:0.7rem; color:#ff4e50; margin-top:6px; text-align:center;">提示：非接壤关隘，无法出兵强攻</p>' : ''}
+        `;
+    }
+
+    box.innerHTML = `
+        <div class="city-info-card">
+            <div class="city-info-header">
+                <span class="c-name">${cName}</span>
+                <span class="c-union badge-${cData.union === '无主' ? 'gray' : 'color'}">${cData.union}</span>
+            </div>
+            <div class="city-info-body">
+                <div>繁荣度：<strong>${cData.value}</strong></div>
+                <div style="font-size: 0.75rem; color: #888; margin-top: 4px;">地缘邻接：${cityConnections[cName].connect.join(", ")}</div>
+            </div>
+            <div class="city-info-actions">
+                ${actionsHTML}
+            </div>
+        </div>
+    `;
+}
+
+// 城市操作指令响应
+function cityAction(type) {
+    const cName = gameState.selectedCity;
+    if (!cName) return;
+
+    const cData = gameState.cities[cName];
+
+    if (type === "recruit_shield") {
+        if (gameState.stats.cash < 150000 || gameState.stats.food < 50000) {
+            addLog("募兵失败", "国库资金（需15万）或粮草（需5万）不足！", "system");
+            return;
+        }
+        gameState.stats.cash -= 150000;
+        gameState.stats.food -= 50000;
+        gameState.stats.army_shield += 100;
+        cData.value += 3000;
+        addLog("增兵布守", `在【${cName}】征发钱粮，编练招募了 100 名重装【虎贲军】驻防！`, "econ");
+        renderStats({ cash: -150000, food: -50000, army_shield: 100, people: 0, avator: 0, means: 0, army_cavalry: 0, army_spear: 0 });
+
+    } else if (type === "recruit_spear") {
+        if (gameState.stats.cash < 80000 || gameState.stats.food < 30000) {
+            addLog("募兵失败", "国库资金（需8万）或粮草（需3万）不足！", "system");
+            return;
+        }
+        gameState.stats.cash -= 80000;
+        gameState.stats.food -= 30000;
+        gameState.stats.army_spear += 100;
+        cData.value += 1500;
+        addLog("增兵布守", `在【${cName}】募民兵，编训了 100 名【精锐长枪兵】！`, "econ");
+        renderStats({ cash: -80000, food: -3000, army_spear: 100, people: 0, avator: 0, means: 0, army_cavalry: 0, army_shield: 0 });
+
+    } else if (type === "recruit_cavalry") {
+        if (gameState.stats.cash < 250000 || gameState.stats.food < 120000) {
+            addLog("募兵失败", "招募野象装甲兵费高，资金（需25万）或粮草（需12万）不足！", "system");
+            return;
+        }
+        gameState.stats.cash -= 250000;
+        gameState.stats.food -= 120000;
+        gameState.stats.army_cavalry += 50;
+        cData.value += 5000;
+        addLog("巨兽营房", `在【${cName}】重金引进象群，训练了 50 名重装【南蛮象兵】！`, "victory");
+        renderStats({ cash: -250000, food: -120000, army_cavalry: 50, people: 0, avator: 0, means: 0, army_shield: 0, army_spear: 0 });
+
+    } else if (type === "farm") {
+        if (gameState.stats.cash < 50000) {
+            addLog("修水利失败", "资金不足（需5万金）！", "system");
+            return;
+        }
+        gameState.stats.cash -= 50000;
+        cData.value += 12000;
+        gameState.stats.food += 300000;
+        addLog("修生养息", `在【${cName}】大兴民夫屯田水利，使该城繁荣度显著飙升！`, "econ");
+        renderStats({ cash: -50000, food: 300000, people: 0, avator: 0, means: 0, army_shield: 0, army_spear: 0, army_cavalry: 0 });
+
+    } else if (type === "attack") {
+        // 出征：象兵开路 (消耗兵马+资金)
+        const myCities = getOwnedCities("刘备");
+        const neighbours = getNeighbours(myCities);
+        if (!neighbours.includes(cName)) {
+            addLog("出征失败", "非接壤关隘，无法强袭！", "system");
+            return;
+        }
+
+        if (gameState.stats.army_cavalry < 30 || gameState.stats.cash < 500000) {
+            addLog("出征失败", "需要至少 30 名南蛮突击象兵作为攻坚，且战费需 50万金！", "system");
+            return;
+        }
+
+        gameState.stats.army_cavalry -= 30; // 战损与动员
+        gameState.stats.cash -= 500000;
+
+        cData.isWar = true;
+        // 象兵攻城，战力极强：75% 胜率
+        const success = Math.random() < 0.75;
+        if (success) {
+            const old = cData.union;
+            cData.union = "刘备";
+            cData.value = Math.floor(cData.value * 0.95);
+            addLog("亲征大捷", `【战报】刘皇叔率领精装象兵大举突破【${cName}】，瞬间踩平【${old}】防御，收复失地！`, "victory");
+        } else {
+            addLog("亲征受挫", `【战报】强攻【${cName}】遭遇激烈反抗，象兵被枪兵伏击折损，被迫收兵。`, "war");
+        }
+        renderStats({ army_cavalry: -30, cash: -500000, people: 0, avator: 0, means: 0, army_shield: 0, army_spear: 0, food: 0 });
+        renderMap();
+        updateSelectedCityUI();
+
+    } else if (type === "plot") {
+        if (gameState.stats.means < 5) {
+            addLog("破坏失败", "缺少收买奸细的名器珍宝（需 5 个珍宝）！", "system");
+            return;
+        }
+
+        gameState.stats.means -= 5;
+        const loss = Math.floor(cData.value * 0.5);
+        cData.value = Math.max(1000, cData.value - loss);
+
+        addLog("刺客与破坏", `暗中派死士刺客混入【${cName}】密谋纵火并收买内奸，该城经济被重创！`, "war");
+        renderStats({ means: -5, people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0 });
+        renderMap();
+        updateSelectedCityUI();
+    }
+
+    // 更新兵种营房列表
+    updateBarracksUI();
+}
+
+// 刷新右侧兵种列表UI
+function updateBarracksUI() {
+    const list = document.getElementById("barracksList");
+    if (!list) return;
+
+    list.innerHTML = `
+        <div class="info-item spec-barrack">
+            <span>🛡️ 虎贲重步 (防守)</span> 
+            <strong>${gameState.stats.army_shield} 名</strong>
+        </div>
+        <div class="info-item spec-barrack">
+            <span>🐘 南蛮骑象 (攻坚)</span> 
+            <strong>${gameState.stats.army_cavalry} 骑</strong>
+        </div>
+        <div class="info-item spec-barrack">
+            <span>🔱 精锐枪兵 (反骑)</span> 
+            <strong>${gameState.stats.army_spear} 杆</strong>
+        </div>
+        <div style="font-size:0.7rem; color:#888; margin-top:8px; line-height:1.3;">
+            注：攻城战会优先调遣象兵开路，守城战时虎贲军有 30% 几率免疫城市易主。
+        </div>
+    `;
 }
 
 // 触发数值变动背景微光闪烁
 function flashStatCard(statId, isIncrease) {
-    const card = document.getElementById(statId).parentElement;
+    const card = document.getElementById(statId)?.parentElement;
     if (!card) return;
     const flashClass = isIncrease ? "flash-green" : "flash-red";
     card.classList.add(flashClass);
@@ -343,22 +495,29 @@ function flashStatCard(statId, isIncrease) {
     }, 450);
 }
 
-// 渲染玩家数值看板
-function renderStats(change = { people: 0, avator: 0, army: 0, cash: 0, food: 0, means: 0 }) {
-    const fields = ["people", "avator", "army", "cash", "food", "means"];
+// 渲染玩家数值看板 (三兵种拆分)
+function renderStats(change = { people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 }) {
+    const fields = ["people", "avator", "army_shield", "army_cavalry", "army_spear", "cash", "food", "means"];
     fields.forEach(field => {
         const val = change[field];
-        if (val !== 0) {
+        if (val && val !== 0) {
             flashStatCard(field, val > 0);
         }
     });
 
+    // 拼合总兵力
+    const totalArmy = gameState.stats.army_shield + gameState.stats.army_cavalry + gameState.stats.army_spear;
+    const totalChange = (change.army_shield || 0) + (change.army_cavalry || 0) + (change.army_spear || 0);
+
     document.getElementById("people").innerHTML = `${gameState.stats.people} ${getUpDownHTML(change.people)}`;
     document.getElementById("avator").innerHTML = `${gameState.stats.avator} ${getUpDownHTML(change.avator)}`;
-    document.getElementById("army").innerHTML = `${gameState.stats.army} ${getUpDownHTML(change.army)}`;
+    document.getElementById("army").innerHTML = `${totalArmy} ${getUpDownHTML(totalChange)}`;
     document.getElementById("cash").innerHTML = `${gameState.stats.cash} ${getUpDownHTML(change.cash)}`;
     document.getElementById("food").innerHTML = `${gameState.stats.food} ${getUpDownHTML(change.food)}`;
     document.getElementById("means").innerHTML = `${gameState.stats.means} ${getUpDownHTML(change.means)}`;
+
+    // 同步刷新右侧军备
+    updateBarracksUI();
 }
 
 // 添加分级日志
@@ -408,7 +567,7 @@ function getNeighbours(citiesArr) {
     return Array.from(neighbours);
 }
 
-// 单次推演动作
+// 单次推演动作 (兵种克制与守城战判定)
 function nextStep() {
     Object.keys(gameState.cities).forEach(c => {
         gameState.cities[c].isWar = false;
@@ -429,7 +588,7 @@ function nextStep() {
     const isAggressive = Math.random() < 0.65 && neighbours.length > 0;
 
     let targetCity = "";
-    let change = { people: 0, avator: 0, army: 0, cash: 0, food: 0, means: 0 };
+    let change = { people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 };
     let logMsg = "";
     let logType = "normal";
 
@@ -437,27 +596,37 @@ function nextStep() {
         targetCity = randChoice(neighbours);
         gameState.cities[targetCity].isWar = true;
 
-        const isSuccess = Math.random() < 0.55;
-        if (isSuccess) {
-            const oldOwner = gameState.cities[targetCity].union;
-            gameState.cities[targetCity].union = targetUnit;
-            gameState.cities[targetCity].value = Math.max(5000, Math.floor(gameState.cities[targetCity].value * 0.7));
-            
-            logMsg = `挥师强攻【${targetCity}】，击溃了【${oldOwner}】的守军，成功夺取城池！`;
+        const defender = gameState.cities[targetCity].union;
+        
+        // 核心：若防守方是玩家刘备，且拥有【虎贲重步】防御力量，30%几率强力抵挡免予城市易主
+        if (defender === "刘备" && gameState.stats.army_shield > 100 && Math.random() < 0.3) {
+            logMsg = `派遣兵马大肆入侵我方【${targetCity}】，但遭到驻防的【虎贲重步兵】誓死抵抗，强行守住了要塞关隘！`;
             logType = "war";
+            change.army_shield = -randInt(10, 30); // 守军消耗
         } else {
-            logMsg = `企图强攻【${targetCity}】，但在强力城防下丢盔弃甲，无功而返。`;
-            logType = "normal";
+            // 常规争夺
+            const isSuccess = Math.random() < 0.55;
+            if (isSuccess) {
+                gameState.cities[targetCity].union = targetUnit;
+                gameState.cities[targetCity].value = Math.max(5000, Math.floor(gameState.cities[targetCity].value * 0.7));
+                
+                logMsg = `挥师强攻【${targetCity}】，击溃了【${defender}】的守备部队，成功将城池夺回！`;
+                logType = "war";
+                
+                // 玩家被夺走领地时的连带损失
+                if (defender === "刘备") {
+                    change.people = -randInt(50, 200);
+                    change.army_spear = -randInt(5, 15);
+                }
+            } else {
+                logMsg = `妄图图谋攻占【${targetCity}】，结果遭遇强力城防防线，退回本部。`;
+                logType = "normal";
+            }
         }
 
-        change = {
-            people: randInt(-300, 100),
-            avator: randInt(-2, 1),
-            army: randInt(-20, 5),
-            cash: randInt(-8000, 2000),
-            food: randInt(-50000, 10000),
-            means: Math.random() < 0.1 ? 1 : 0
-        };
+        // 战火余波导致资金消耗
+        change.cash = randInt(-6000, 1000);
+        change.food = randInt(-20000, 2000);
     } else {
         targetCity = randChoice(owned);
         const randEvent = Math.random();
@@ -470,10 +639,12 @@ function nextStep() {
             change.food = addedFood;
             change.cash = randInt(5000, 20000);
         } else if (randEvent < 0.75) {
-            const addedArmy = randInt(10, 35);
-            logMsg = `在【${targetCity}】开设校场，发布布告，招募到了大批乡勇加入。`;
-            change.army = addedArmy;
-            change.people = randInt(50, 500);
+            const recruitCount = randInt(5, 15);
+            logMsg = `在【${targetCity}】开设校场募集乡勇，获得 10 名长枪步兵入伍。`;
+            if (targetUnit === "刘备") {
+                change.army_spear = recruitCount;
+            }
+            change.people = randInt(20, 200);
         } else {
             logMsg = `派遣偏师在【${targetCity}】郊野深山行军，意外掘出了一箱上古珍宝。`;
             logType = "econ";
@@ -482,12 +653,15 @@ function nextStep() {
         }
     }
 
-    gameState.stats.people += change.people;
-    gameState.stats.avator += change.avator;
-    gameState.stats.army += change.army;
-    gameState.stats.cash += change.cash;
-    gameState.stats.food += change.food;
-    gameState.stats.means += change.means;
+    // 状态更新并重绘
+    gameState.stats.people += (change.people || 0);
+    gameState.stats.avator += (change.avator || 0);
+    gameState.stats.army_shield += (change.army_shield || 0);
+    gameState.stats.army_cavalry += (change.army_cavalry || 0);
+    gameState.stats.army_spear += (change.army_spear || 0);
+    gameState.stats.cash += (change.cash || 0);
+    gameState.stats.food += (change.food || 0);
+    gameState.stats.means += (change.means || 0);
 
     const currentConns = cityConnections[gameState.cityNow]?.connect || ["新野"];
     gameState.cityNow = randChoice(currentConns);
@@ -495,6 +669,12 @@ function nextStep() {
     addLog(targetUnit, logMsg, logType);
     renderStats(change);
     renderMap();
+    
+    // 如果点中的城市恰好发生归属变更，刷新直控框
+    if (gameState.selectedCity) {
+        updateSelectedCityUI();
+    }
+    
     checkVictory();
 }
 
@@ -516,86 +696,6 @@ function checkVictory() {
     }
 }
 
-// 玩家军机阁微操
-function playerOrder(orderType) {
-    if (!gameState.running) {
-        addLog("阁臣上奏", "只有在回合推进中（时间流动），才能进行军机决策！", "system");
-        return;
-    }
-
-    const myCities = getOwnedCities("刘备");
-    if (myCities.length === 0) {
-        addLog("阁臣上奏", "主公已经丢失全部城池，无力回天！", "system");
-        return;
-    }
-
-    if (orderType === "attack") {
-        if (gameState.stats.army < 500 || gameState.stats.cash < 1000000) {
-            addLog("驱策失败", "军费不足（需 100万 资金）或兵力不足（需 500 部队）！", "system");
-            return;
-        }
-
-        const enemyTargets = getNeighbours(myCities);
-        if (enemyTargets.length === 0) {
-            addLog("驱策失败", "没有相邻可攻打的敌对或无主领土！", "system");
-            return;
-        }
-
-        gameState.stats.army -= 500;
-        gameState.stats.cash -= 1000000;
-        
-        const target = randChoice(enemyTargets);
-        gameState.cities[target].isWar = true;
-
-        const success = Math.random() < 0.8;
-        if (success) {
-            const old = gameState.cities[target].union;
-            gameState.cities[target].union = "刘备";
-            gameState.cities[target].value = Math.floor(gameState.cities[target].value * 0.9);
-            addLog("刘备亲征", `【驱策指令】主公御驾亲征突袭【${target}】，大破【${old}】偏师，成功收复失地！`, "victory");
-        } else {
-            addLog("刘备亲征", `【驱策指令】主公出兵强攻【${target}】受挫，敌方防备极深，只得鸣金收兵。`, "war");
-        }
-        
-        renderStats({ people: 0, avator: 0, army: -500, cash: -1000000, food: 0, means: 0 });
-        renderMap();
-
-    } else if (orderType === "plot") {
-        if (gameState.stats.means < 5) {
-            addLog("破坏失败", "缺少珍贵名器（需 5 个珍宝以上以收买内应）！", "system");
-            return;
-        }
-
-        const enemyCities = Object.keys(gameState.cities).filter(c => gameState.cities[c].union !== "刘备" && gameState.cities[c].union !== "无主");
-        if (enemyCities.length === 0) {
-            addLog("破坏失败", "天下已无其余割据势力！", "system");
-            return;
-        }
-
-        gameState.stats.means -= 5;
-        const target = randChoice(enemyCities);
-        const valLoss = Math.floor(gameState.cities[target].value * 0.5);
-        gameState.cities[target].value = Math.max(1000, gameState.cities[target].value - valLoss);
-
-        addLog("破坏阴谋", `【破坏指令】暗中向【${target}】派遣刺客与细作，火烧粮仓并散播流言，其繁荣度瞬间腰斩！`, "war");
-        renderStats({ people: 0, avator: 0, army: 0, cash: 0, food: 0, means: -5 });
-        renderMap();
-
-    } else if (orderType === "reward") {
-        if (gameState.stats.cash < 500000) {
-            addLog("求贤失败", "黄金不足以招募人才（需 50万 资金）！", "system");
-            return;
-        }
-
-        gameState.stats.cash -= 500000;
-        const gainedAvators = randInt(3, 5);
-        gameState.stats.avator += gainedAvators;
-
-        addLog("广纳贤才", `【求贤指令】主公大开国库，礼贤下士，重金招纳了【${gainedAvators}】位民间隐士及大将加盟！`, "victory");
-        renderStats({ people: 0, avator: gainedAvators, army: 0, cash: -500000, food: 0, means: 0 });
-    }
-}
-
 // 控制循环定时器
 function toggleTimer(forceState = null) {
     const playBtn = document.getElementById("pause");
@@ -612,8 +712,24 @@ function toggleTimer(forceState = null) {
         playBtn.innerHTML = `<i class="fa fa-play running"> 回合开始</i>`;
     } else {
         gameState.running = true;
-        gameState.timer = setInterval(nextStep, 1000);
+        gameState.timer = setInterval(nextStep, gameState.speed);
         playBtn.innerHTML = `<i class="fa fa-random stop"> 他势力进行中</i>`;
+    }
+}
+
+// 更改推演速度
+function changeSpeed(speedMs, btnEl) {
+    gameState.speed = speedMs;
+    
+    // 更改激活按钮高亮
+    const btns = document.querySelectorAll(".speed-btn");
+    btns.forEach(b => b.classList.remove("active"));
+    btnEl.classList.add("active");
+
+    if (gameState.running) {
+        // 重置定时器以应用新速度
+        clearInterval(gameState.timer);
+        gameState.timer = setInterval(nextStep, gameState.speed);
     }
 }
 
@@ -626,30 +742,59 @@ window.onload = function() {
         toggleTimer();
     };
 
-    const cmdList = document.querySelectorAll(".cmd-btn.active-cmd");
-    cmdList.forEach(btn => {
-        btn.onclick = function() {
-            const actionType = btn.getAttribute("data-action");
-            playerOrder(actionType);
-        };
-    });
+    // 绑定设置 Modal 弹窗
+    const settingsBtn = document.getElementById("settingsBtn");
+    const settingsModal = document.getElementById("settingsModal");
+    const closeSettings = document.getElementById("closeSettings");
 
-    const scriptLinks = [
-        { id: "war0", name: "都是逆贼", action: () => setAllCity("汉献帝") },
-        { id: "war1", name: "三国时代", action: () => initGame("三分天下") },
-        { id: "war2", name: "三分归晋", action: () => setAllCity("司马炎") },
-        { id: "war3", name: "曹操一统", action: () => setAllCity("曹操") },
-        { id: "war4", name: "刘备一统", action: () => setAllCity("刘备") },
-        { id: "war5", name: "孙权一统", action: () => setAllCity("孙权") },
-        { id: "war6", name: "群雄并起", action: () => initGame("群雄并起") }
+    settingsBtn.onclick = function(e) {
+        e.preventDefault();
+        settingsModal.classList.add("active");
+    };
+
+    closeSettings.onclick = function(e) {
+        e.preventDefault();
+        settingsModal.classList.remove("active");
+    };
+
+    settingsModal.onclick = function(e) {
+        if (e.target === settingsModal) {
+            settingsModal.classList.remove("active");
+        }
+    };
+
+    // 绑定作弊指令（位于设置 Modal 内）
+    const cheatActions = [
+        { id: "cheat_war0", action: () => setAllCity("汉献帝") },
+        { id: "cheat_war1", action: () => { initGame("三分天下"); settingsModal.classList.remove("active"); } },
+        { id: "cheat_war2", action: () => setAllCity("司马炎") },
+        { id: "cheat_war3", action: () => setAllCity("曹操") },
+        { id: "cheat_war4", action: () => setAllCity("刘备") },
+        { id: "cheat_war5", action: () => setAllCity("孙权") },
+        { id: "cheat_war6", action: () => { initGame("群雄并起"); settingsModal.classList.remove("active"); } }
     ];
 
-    scriptLinks.forEach(item => {
+    cheatActions.forEach(item => {
         const el = document.getElementById(item.id);
         if (el) {
             el.onclick = function(e) {
                 e.preventDefault();
                 item.action();
+            };
+        }
+    });
+
+    // 绑定设置内的推演速度调节按钮
+    const speedButtons = [
+        { id: "speed_1x", ms: 1000 },
+        { id: "speed_2x", ms: 400 },
+        { id: "speed_5x", ms: 150 }
+    ];
+    speedButtons.forEach(sb => {
+        const el = document.getElementById(sb.id);
+        if (el) {
+            el.onclick = function() {
+                changeSpeed(sb.ms, el);
             };
         }
     });
@@ -662,6 +807,5 @@ window.onload = function() {
         window.parent.postMessage({ type: "exit_cabinet" }, "*");
     };
 
-    // 窗口尺寸变化时重新画线，防止错位
     window.addEventListener("resize", drawConnections);
 };

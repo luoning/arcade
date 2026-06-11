@@ -16,6 +16,8 @@
         </div>
         <div class="header-right">
             <span class="user-tag"><i class="fa fa-user-circle"></i> 刘皇叔</span>
+            <!-- 新增设置按钮以收拢测试作弊指令 -->
+            <button id="settingsBtn" class="control-btn" style="border-color:#f9d423; color:#f9d423; margin-right:8px;"><i class="fa fa-cog"></i> 军政司</button>
             <button id="exit" class="exit-btn"><i class="fa fa-sign-out"></i> 返回大厅</button>
         </div>
     </header>
@@ -31,7 +33,7 @@
             <div class="mask-fade"></div>
         </section>
 
-        <!-- 中间面板: 观星知鉴 (数据看板) + 环世堪舆 (地图) + 动作面板 -->
+        <!-- 中间面板: 观星知鉴 (数据看板) + 环世堪舆 (2D地图) -->
         <section class="panel middle-panel">
             <!-- 观星知鉴 (数据看板) -->
             <div class="data-dashboard">
@@ -44,7 +46,7 @@
                     <span id="avator" class="card-value">--</span>
                 </div>
                 <div class="data-card">
-                    <span class="card-label">部队</span>
+                    <span class="card-label">部队 (总兵力)</span>
                     <span id="army" class="card-value">--</span>
                 </div>
                 <div class="data-card">
@@ -74,60 +76,79 @@
                 </div>
             </div>
 
-            <!-- 挥斥方遒 (静态指令面板，仅作视觉填充) -->
+            <!-- 军机阁改版：直接操作选中关隘的微操控制面板 -->
             <div class="command-panel">
-                <div class="command-title"><i class="fa fa-sliders"></i> 军机阁</div>
-                <div class="command-grid">
-                    <div class="cmd-btn">朝议</div>
-                    <div class="cmd-btn">情报</div>
-                    <div class="cmd-btn active-cmd" data-action="attack" title="消耗 500兵力+100万黄金：强攻刘备接壤的相邻敌方城市 (80%几率拿下)">驱策亲征</div>
-                    <div class="cmd-btn">联盟</div>
-                    <div class="cmd-btn">方针</div>
-                    <div class="cmd-btn">运输</div>
-                    <div class="cmd-btn">技术</div>
-                    <div class="cmd-btn">外交</div>
-                    <div class="cmd-btn">任免</div>
-                    <div class="cmd-btn active-cmd" data-action="reward" title="消耗 50万黄金：广纳贤才招收3-5名在野武将">赏罚求贤</div>
-                    <div class="cmd-btn active-cmd" data-action="plot" title="消耗 5珍宝：流言煽动使一个敌城繁荣度瞬间腰斩">流言破坏</div>
-                    <div class="cmd-btn">军团</div>
+                <div class="command-title"><i class="fa fa-sliders"></i> 关隘军务直控</div>
+                <div id="selectedCityBox">
+                    <!-- 动态渲染点选中的关卡信息及募兵/屯田/强攻交互按钮 -->
                 </div>
             </div>
         </section>
 
-        <!-- 右侧面板: 战略情报与剧本 -->
+        <!-- 右侧面板: 战略情报与兵种营房 -->
         <section class="panel right-panel">
             <!-- 剧本选择 -->
             <div class="section-box script-box">
                 <h2 class="panel-title"><i class="fa fa-book"></i> 天下大势 (剧本)</h2>
                 <div class="script-list">
-                    <button id="war1" class="script-btn active">三国时代 (三分天下)</button>
-                    <button id="war6" class="script-btn">群雄并起 (割据一方)</button>
+                    <button id="cheat_war1" class="script-btn active">三国时代 (三分天下)</button>
+                    <button id="cheat_war6" class="script-btn">群雄并起 (割据一方)</button>
                 </div>
             </div>
 
-            <!-- 调试/作弊面板 -->
-            <div class="section-box admin-box">
-                <h2 class="panel-title"><i class="fa fa-cogs"></i> 天命归一 (测试指令)</h2>
-                <div class="admin-grid">
-                    <button id="war3" class="admin-btn cmd-caocao">曹操一统</button>
-                    <button id="war4" class="admin-btn cmd-liubei">刘备一统</button>
-                    <button id="war5" class="admin-btn cmd-sunquan">孙权一统</button>
-                    <button id="war2" class="admin-btn cmd-sima">司马代魏</button>
-                    <button id="war0" class="admin-btn cmd-xiandi">汉室复兴</button>
-                </div>
-            </div>
-
-            <!-- 城市军备说明 -->
+            <!-- 兵种营房改版：实时兵力分布与克制优势说明 -->
             <div class="section-box info-box">
-                <h2 class="panel-title"><i class="fa fa-shield"></i> 兵种营房</h2>
-                <div class="info-list">
-                    <div class="info-item"><span>虎贲军</span> <span>重装步兵 / 善于守城</span></div>
-                    <div class="info-item"><span>南蛮象兵</span> <span>强力突破 / 战损较高</span></div>
-                    <div class="info-item"><span>精锐长枪兵</span> <span>克制骑兵 / 训练容易</span></div>
+                <h2 class="panel-title"><i class="fa fa-shield"></i> 兵力整备 (兵种配额)</h2>
+                <div id="barracksList" class="info-list">
+                    <!-- 动态渲染虎贲、象兵、长枪分布 -->
+                </div>
+            </div>
+
+            <!-- 兵种属性与相克指南 -->
+            <div class="section-box info-box">
+                <h2 class="panel-title"><i class="fa fa-info-circle"></i> 兵种克制关系</h2>
+                <div class="info-list" style="font-size: 0.7rem; line-height: 1.4; color: #888;">
+                    <div style="margin-bottom: 6px;"><strong style="color:#66fcf1;">🛡️ 虎贲重步：</strong> 高防御城防守备，驻守城市遭到敌对势力攻击吞并时，有 30% 几率坚守免于被夺取。</div>
+                    <div style="margin-bottom: 6px;"><strong style="color:#66fcf1;">🐘 南蛮骑象：</strong> 强力的突破性攻城器械，主动【亲征强攻】相邻敌城必带兵种，攻城胜率高达 75% 但每次出兵会有消耗。</div>
+                    <div><strong style="color:#66fcf1;">🔱 精锐枪兵：</strong> 基础平民兵种。招募成本极低，守城遭遇巨兽象兵攻击时，能发挥显著克制优势。</div>
                 </div>
             </div>
         </section>
     </main>
+
+    <!-- ⚙️ 军政司 (设置与测试指令 Modal 弹窗) -->
+    <div id="settingsModal" class="settings-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fa fa-cog"></i> 军政司 (系统配置与天命调试)</h2>
+                <button id="closeSettings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- 推演倍速设置 -->
+                <div class="settings-section">
+                    <h3><i class="fa fa-dashboard"></i> 沙盘推演流速调节</h3>
+                    <div class="speed-control-grid">
+                        <button id="speed_1x" class="speed-btn active">1.0x (常速推演)</button>
+                        <button id="speed_2x" class="speed-btn">2.5x (快速交火)</button>
+                        <button id="speed_5x" class="speed-btn">6.0x (挂机超频)</button>
+                    </div>
+                </div>
+
+                <!-- 收拢后的作弊测试指令 -->
+                <div class="settings-section">
+                    <h3><i class="fa fa-cogs"></i> 天命归一 (测试与作弊指令)</h3>
+                    <p style="font-size:0.75rem; color:#888; margin-bottom:8px;">测试统一结局，可直接强行把天命塞给指定的主公。</p>
+                    <div class="cheat-control-grid">
+                        <button id="cheat_war3" class="cheat-btn bg-caocao">曹操一统</button>
+                        <button id="cheat_war4" class="cheat-btn bg-liubei">刘备一统</button>
+                        <button id="cheat_war5" class="cheat-btn bg-sunquan">孙权一统</button>
+                        <button id="cheat_war2" class="cheat-btn bg-sima">司马代魏</button>
+                        <button id="cheat_war0" class="cheat-btn bg-xiandi">汉室复兴</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 
     <!-- 页脚版权 -->
     <footer class="cabinet-footer">
