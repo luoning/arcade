@@ -310,9 +310,21 @@ function updateSelectedCityUI() {
     const neighbours = getNeighbours(myCities);
     const isReachable = neighbours.includes(cName);
 
-    // 就地计算气泡位置：向右平移 6% 坐标以作避让
-    bubble.style.left = `${coord.x + 4.5}%`;
-    bubble.style.top = `${coord.y}%`;
+    // 智能计算气泡位置，防止超出沙盘边缘 (避让极端边界城市)
+    let finalLeft = coord.x + 4.5;
+    let finalTop = coord.y;
+
+    if (coord.x > 75) {
+        finalLeft = coord.x - 18.5; // 靠右侧的城市，气泡显示在左边
+    }
+    if (coord.y > 65) {
+        finalTop = coord.y - 18; // 靠下侧的城市 (交趾、朱崖洲等)，气泡往上提
+    } else if (coord.y < 15) {
+        finalTop = coord.y + 2; // 靠上侧的城市，气泡往下压
+    }
+
+    bubble.style.left = `${finalLeft}%`;
+    bubble.style.top = `${finalTop}%`;
     bubble.style.display = "block";
 
     let actionsHTML = "";
