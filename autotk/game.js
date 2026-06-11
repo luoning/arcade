@@ -80,9 +80,7 @@ const rolesConfig = {
     "董卓": { flag: "bookmark", color: "gird4", winByGod: ["董卓", "看吧，你们都给我敞开了吃！"] },
     "汉献帝": { flag: "bookmark", color: "gird5", winByGod: ["汉献帝", "高祖，让那些力挽狂澜的汉臣，夺回江山吧"] },
     "司马炎": { flag: "bookmark", color: "gird6", winByGod: ["司马炎", "三分天下？我才是真命天子！"] },
-    "吕布": { flag: "bookmark", color: "gird7", winByGod: ["吕布", "君不见辕门射戟乎！"] },
-    "红方": { flag: "bookmark", color: "red-team", winByGod: ["红方", "朱羽蔽日，红方最终完成了大一统！"] },
-    "蓝方": { flag: "bookmark", color: "blue-team", winByGod: ["蓝方", "北冥化鲲，蓝方成功扫平宇内，一统天下！"] }
+    "吕布": { flag: "bookmark", color: "gird7", winByGod: ["吕布", "君不见辕门射戟乎！"] }
 };
 
 const scriptUnits = {
@@ -97,19 +95,6 @@ const scriptUnits = {
         "孙权": { home: ["吴"] },
         "董卓": { home: ["洛阳"] },
         "吕布": { home: ["下邳"] }
-    },
-    "红蓝对抗": {
-        "红方": { home: [
-            "成都", "梓潼", "汉中", "建宁", "永昌", "交趾", "合浦", "朱崖洲", 
-            "南海", "桂阳", "零陵", "武陵", "长沙", "江陵", "永安", "江州", 
-            "豫章", "建安", "夷洲", "会稽", "吴", "建业", "庐江", "江夏"
-        ] },
-        "蓝方": { home: [
-            "长安", "武威", "金城", "天水", "安定", "武都", "上庸", "新野", 
-            "襄阳", "宛", "弘农", "洛阳", "许昌", "汝南", "寿春", "下邳", 
-            "广陵", "陈留", "濮阳", "小沛", "北海", "平原", "邺", "上党", 
-            "晋阳", "中山", "南皮", "蓟", "北平", "襄平", "乐浪"
-        ] }
     }
 };
 
@@ -132,8 +117,10 @@ let gameState = {
     cities: {},
     cityNow: "新野",
     selectedCity: null, 
-    playerUnion: "刘备",
     currentWar: null, 
+    cards: [], 
+    activeCardIndex: null, 
+    tacticRounds: 0,
     history: []
 };
 
@@ -158,36 +145,41 @@ function initGame(scriptName) {
     gameState.history = [];
     gameState.selectedCity = null;
     gameState.currentWar = null;
+    gameState.cards = [];
+    gameState.activeCardIndex = null;
+    gameState.tacticRounds = 0;
     
-    if (scriptName === "红蓝对抗") {
-        gameState.playerUnion = "红方";
-    } else {
-        gameState.playerUnion = "刘备";
-    }
-
-    const roleBadgeEl = document.querySelector(".role-badge");
-    if (roleBadgeEl) {
-        roleBadgeEl.innerHTML = `主公：${gameState.playerUnion === '红方' ? '红方统帅' : '刘皇叔'}`;
-    }
-
     updateSelectedCityUI();
+    updateTacticsUI();
     
     const citiesList = Object.keys(cityConnections);
     gameState.cities = {};
     citiesList.forEach(c => {
-        gameState.cities[c] = { value: 10000, union: "无主", isWar: false };
+        gameState.cities[c] = { 
+            value: 10000, 
+            union: "无主", 
+            isWar: false,
+            avoidWarTurns: 0,
+            lianhuanTurns: 0
+        };
     });
 
     const activeUnits = scriptUnits[scriptName] || scriptUnits["三分天下"];
     Object.keys(activeUnits).forEach(unitName => {
         activeUnits[unitName].home.forEach(hCity => {
             if (gameState.cities[hCity]) {
-                gameState.cities[hCity] = { value: 50000, union: unitName, isWar: false };
+                gameState.cities[hCity] = { 
+                    value: 50000, 
+                    union: unitName, 
+                    isWar: false,
+                    avoidWarTurns: 0,
+                    lianhuanTurns: 0
+                };
             }
         });
     });
 
-    gameState.cityNow = activeUnits[gameState.playerUnion] ? activeUnits[gameState.playerUnion].home[0] : "新野";
+    gameState.cityNow = activeUnits["刘备"] ? activeUnits["刘备"].home[0] : "新野";
     
     const msgContainer = document.getElementById("message");
     if (msgContainer) msgContainer.innerHTML = "";
@@ -301,10 +293,24 @@ function renderMap() {
             
             cityEl.onclick = function(e) {
                 e.stopPropagation();
+                
+                // 尝试释放卡牌计策，如果成功释放，直接返回不触发常规点选
+                if (gameState.activeCardIndex !== null) {
+                    const handled = applyTactic(cityName);
+                    if (handled) return;
+                }
+                
                 gameState.selectedCity = cityName;
                 renderMap(); 
                 updateSelectedCityUI();
             };
+        }
+
+        let nameSuffix = "";
+        if (cityData.avoidWarTurns > 0) {
+            nameSuffix = ` <span style="color:#66fcf1; font-weight:800;" title="免战保护中">[免]</span>`;
+        } else if (cityData.lianhuanTurns > 0) {
+            nameSuffix = ` <span style="color:#f9d423; font-weight:800;" title="混乱混乱中">[乱]</span>`;
         }
 
         let cardClasses = `map_gird ${role.color}`;
@@ -327,6 +333,10 @@ function renderMap() {
             if (itemEl) {
                 itemEl.className = `map_item tip ${role.color}`;
             }
+            const labelEl = cityEl.querySelector(".city-name-label");
+            if (labelEl) {
+                labelEl.innerHTML = `${cityName}${nameSuffix}`;
+            }
             const indexEl = cityEl.querySelector(".map_index");
             if (indexEl) {
                 indexEl.textContent = cityData.union[0];
@@ -342,7 +352,7 @@ function renderMap() {
             const contentHTML = `
                 <span class="${cardClasses}">
                     <div class="map_item tip ${role.color}">
-                        <span class="city-name-label">${cityName}</span>
+                        <span class="city-name-label">${cityName}${nameSuffix}</span>
                         <span class="map_index">${cityData.union[0]}</span>
                         <span class="prompt-box">
                             <strong>${cityName}</strong> - 归属: ${cityData.union}
@@ -379,8 +389,8 @@ function updateSelectedCityUI() {
     const coord = cityCoords[cName];
     if (!coord) return;
 
-    const isMine = cData.union === gameState.playerUnion;
-    const myCities = getOwnedCities(gameState.playerUnion);
+    const isMine = cData.union === "刘备";
+    const myCities = getOwnedCities("刘备");
     const neighbours = getNeighbours(myCities);
     const isReachable = neighbours.includes(cName);
 
@@ -486,7 +496,7 @@ function cityAction(type) {
         renderStats({ cash: -50000, food: 300000 });
 
     } else if (type === "attack") {
-        const myCities = getOwnedCities(gameState.playerUnion);
+        const myCities = getOwnedCities("刘备");
         const neighbours = getNeighbours(myCities);
         if (!neighbours.includes(cName)) {
             addLog("出征失败", "非接壤关隘，无法强袭！", "system");
@@ -506,13 +516,18 @@ function cityAction(type) {
         const myAttackers = myCities.filter(c => cityConnections[c]?.connect.includes(cName));
         const attackerCity = randChoice(myAttackers) || myCities[0];
         gameState.currentWar = { from: attackerCity, to: cName };
-        const success = Math.random() < 0.75;
+        const hasLianhuan = cData.lianhuanTurns > 0;
+        const success = hasLianhuan || Math.random() < 0.75;
         if (success) {
             const old = cData.union;
-            cData.union = gameState.playerUnion;
+            cData.union = "刘备";
             cData.value = Math.floor(cData.value * 0.95);
-            const leaderName = gameState.playerUnion === "红方" ? "红方统帅" : "刘皇叔";
-            addLog("亲征大捷", `【战报】${leaderName}率领精装象兵大举突破【${cName}】，瞬间踩平【${old}】防御，收复失地！`, "victory");
+            if (hasLianhuan) {
+                cData.lianhuanTurns = 0; // 解除连环计
+                addLog("亲征大捷", `【战报】乘【${cName}】受连环计防线混乱之际，皇叔挥师踏平防线，不费吹灰之力强攻收复！`, "victory");
+            } else {
+                addLog("亲征大捷", `【战报】刘皇叔率领精装象兵大举突破【${cName}】，瞬间踩平【${old}】防御，收复失地！`, "victory");
+            }
         } else {
             addLog("亲征受挫", `【战报】强攻【${cName}】遭遇激烈反抗，象兵被枪兵伏击折损，被迫收兵。`, "war");
         }
@@ -649,6 +664,9 @@ function nextStep() {
     gameState.currentWar = null; // 重置本回合战斗发起线路
     Object.keys(gameState.cities).forEach(c => {
         gameState.cities[c].isWar = false;
+        // 递减锦囊计策的回合计数器
+        if (gameState.cities[c].avoidWarTurns > 0) gameState.cities[c].avoidWarTurns--;
+        if (gameState.cities[c].lianhuanTurns > 0) gameState.cities[c].lianhuanTurns--;
     });
 
     const activeUnits = scriptUnits[gameState.script];
@@ -670,6 +688,20 @@ function nextStep() {
 
     if (isAggressive) {
         targetCity = randChoice(neighbours);
+        
+        // 拦截：如果敌军准备进攻的目标是我方且处于【免战】状态下
+        if (gameState.cities[targetCity].union === "刘备" && gameState.cities[targetCity].avoidWarTurns > 0) {
+            logMsg = `大举企图进犯我方防线，但行至【${targetCity}】时守军大开城门弹琴唱曲。敌方怀疑有诈被迫退兵。`;
+            addLog(targetUnit, logMsg, "system");
+            renderMap();
+            
+            // 扣除一些微量日常维持费
+            gameState.stats.cash += randInt(-2000, 500);
+            gameState.stats.food += randInt(-8000, 1000);
+            renderStats();
+            return;
+        }
+
         gameState.cities[targetCity].isWar = true;
 
         // 寻找是哪一个己方接壤的城池发起的进攻以连线
@@ -679,7 +711,7 @@ function nextStep() {
 
         const defender = gameState.cities[targetCity].union;
         
-        if (defender === gameState.playerUnion && gameState.stats.army_shield > 100 && Math.random() < 0.3) {
+        if (defender === "刘备" && gameState.stats.army_shield > 100 && Math.random() < 0.3) {
             logMsg = `派遣兵马大肆入侵我方【${targetCity}】，但遭到驻防的【虎贲重步兵】誓死抵抗，强行守住了要塞关隘！`;
             logType = "war";
             change.army_shield = -randInt(10, 30);
@@ -692,7 +724,7 @@ function nextStep() {
                 logMsg = `挥师强攻【${targetCity}】，击溃了【${defender}】的守备部队，成功将城池夺回！`;
                 logType = "war";
                 
-                if (defender === gameState.playerUnion) {
+                if (defender === "刘备") {
                     change.people = -randInt(50, 200);
                     change.army_spear = -randInt(5, 15);
                 }
@@ -718,7 +750,7 @@ function nextStep() {
         } else if (randEvent < 0.75) {
             const recruitCount = randInt(5, 15);
             logMsg = `在【${targetCity}】开设校场募集乡勇，获得 10 名长枪步兵入伍。`;
-            if (targetUnit === gameState.playerUnion) {
+            if (targetUnit === "刘备") {
                 change.army_spear = recruitCount;
             }
             change.people = randInt(20, 200);
@@ -745,6 +777,13 @@ function nextStep() {
     addLog(targetUnit, logMsg, logType);
     renderStats(change);
     renderMap();
+    
+    // 累加回合计数器并定时自动抽卡
+    gameState.tacticRounds++;
+    if (gameState.tacticRounds >= 15) {
+        gameState.tacticRounds = 0;
+        drawRandomCard();
+    }
     
     if (gameState.selectedCity) {
         updateSelectedCityUI();
@@ -851,10 +890,7 @@ window.onload = function() {
         { id: "cheat_war3", action: () => setAllCity("曹操") },
         { id: "cheat_war4", action: () => setAllCity("刘备") },
         { id: "cheat_war5", action: () => setAllCity("孙权") },
-        { id: "cheat_war6", action: () => { initGame("群雄并起"); settingsModal.classList.remove("active"); } },
-        { id: "cheat_war7", action: () => { initGame("红蓝对抗"); settingsModal.classList.remove("active"); } },
-        { id: "cheat_war8", action: () => setAllCity("红方") },
-        { id: "cheat_war9", action: () => setAllCity("蓝方") }
+        { id: "cheat_war6", action: () => { initGame("群雄并起"); settingsModal.classList.remove("active"); } }
     ];
 
     cheatActions.forEach(item => {
@@ -868,37 +904,18 @@ window.onload = function() {
     });
 
     // 绑定大厅侧的迷你剧本按钮
-    function selectScriptBtn(activeId) {
-        ["cheat_war1", "cheat_war6", "cheat_war7"].forEach(id => {
-            const btn = document.getElementById(id);
-            if (btn) {
-                if (id === activeId) {
-                    btn.classList.add("active");
-                } else {
-                    btn.classList.remove("active");
-                }
-            }
-        });
-    }
-
     document.getElementById("cheat_war1").onclick = function(e) {
         e.preventDefault();
-        selectScriptBtn("cheat_war1");
+        document.getElementById("cheat_war1").classList.add("active");
+        document.getElementById("cheat_war6").classList.remove("active");
         initGame("三分天下");
     };
     document.getElementById("cheat_war6").onclick = function(e) {
         e.preventDefault();
-        selectScriptBtn("cheat_war6");
+        document.getElementById("cheat_war6").classList.add("active");
+        document.getElementById("cheat_war1").classList.remove("active");
         initGame("群雄并起");
     };
-    const rvbBtn = document.getElementById("cheat_war7");
-    if (rvbBtn) {
-        rvbBtn.onclick = function(e) {
-            e.preventDefault();
-            selectScriptBtn("cheat_war7");
-            initGame("红蓝对抗");
-        };
-    }
 
     const speedButtons = [
         { id: "speed_1x", ms: 1000 },
@@ -924,3 +941,183 @@ window.onload = function() {
 
     window.addEventListener("resize", drawConnections);
 };
+
+// ==========================================
+// 🧭 军师计策锦囊核心逻辑与数据配置
+// ==========================================
+const TACTICS_CONFIG = {
+    "kongcheng": {
+        name: "🛡️ 空城计",
+        desc: "指定我方一城获得 5 回合【免战】状态，敌军无法进犯。",
+        costText: "💰 30万",
+        type: "self",
+        costCheck: () => gameState.stats.cash >= 300000,
+        costPay: () => { gameState.stats.cash -= 300000; }
+    },
+    "huoshao": {
+        name: "🔥 火烧连营",
+        desc: "指定敌方一城，瞬间削减其 50% 繁荣度，并平息战火。",
+        costText: "💰 50万 + 🌾 10万",
+        type: "enemy",
+        costCheck: () => gameState.stats.cash >= 500000 && gameState.stats.food >= 100000,
+        costPay: () => {
+            gameState.stats.cash -= 500000;
+            gameState.stats.food -= 100000;
+        }
+    },
+    "dongfeng": {
+        name: "🌾 借东风",
+        desc: "指定我方一城，祈风求雨以战养战，后勤暴增 60万 粮食。",
+        costText: "💎 5个珍宝",
+        type: "self",
+        costCheck: () => gameState.stats.means >= 5,
+        costPay: () => { gameState.stats.means -= 5; }
+    },
+    "lianhuan": {
+        name: "🔗 连环计",
+        desc: "对敌方接壤城施放，3 回合内我方强攻该城成功率升至 100%。",
+        costText: "💎 8个珍宝",
+        type: "enemy_reachable",
+        costCheck: () => gameState.stats.means >= 8,
+        costPay: () => { gameState.stats.means -= 8; }
+    }
+};
+
+// 定时抽取随机锦囊卡牌
+function drawRandomCard() {
+    if (gameState.cards.length >= 3) {
+        addLog("锦囊堆叠", "军师牌库已满 (最多3张)，无法凝聚更多的妙计！", "system");
+        return;
+    }
+    const pool = Object.keys(TACTICS_CONFIG);
+    const cardId = randChoice(pool);
+    gameState.cards.push(cardId);
+    addLog("妙计入库", `军师夜观星象，成功推演并凝聚了锦囊妙计：【${TACTICS_CONFIG[cardId].name}】！`, "victory");
+    updateTacticsUI();
+}
+
+// 选中锦囊卡牌
+function selectCard(index) {
+    const cardId = gameState.cards[index];
+    if (!cardId) return;
+
+    const config = TACTICS_CONFIG[cardId];
+    if (!config.costCheck()) {
+        addLog("筹备失败", `释放【${config.name}】所需要的钱粮珍宝不足！`, "system");
+        return;
+    }
+
+    if (gameState.activeCardIndex === index) {
+        // 取消选择
+        gameState.activeCardIndex = null;
+        addLog("取消计策", `军师收回了【${config.name}】的将令。`, "system");
+    } else {
+        gameState.activeCardIndex = index;
+        addLog("计策筹备", `已签发【${config.name}】将令！请直接在堪舆图上点击目标城池释放！`, "system");
+    }
+    
+    updateTacticsUI();
+    renderMap();
+}
+
+// 作用锦囊计策到指定城市
+function applyTactic(cityName) {
+    if (gameState.activeCardIndex === null) return false;
+
+    const cardIndex = gameState.activeCardIndex;
+    const cardId = gameState.cards[cardIndex];
+    if (!cardId) return false;
+
+    const config = TACTICS_CONFIG[cardId];
+    const cData = gameState.cities[cityName];
+    const isMine = cData.union === "刘备";
+
+    // 目标合法性验证
+    if (config.type === "self" && !isMine) {
+        addLog("施法失败", `【${config.name}】必须对我方城市施放！`, "system");
+        return false;
+    }
+    if (config.type === "enemy" && isMine) {
+        addLog("施法失败", `【${config.name}】必须对敌方或无主城市施放！`, "system");
+        return false;
+    }
+    if (config.type === "enemy_reachable") {
+        if (isMine) {
+            addLog("施法失败", `【${config.name}】必须对敌方或无主城市施放！`, "system");
+            return false;
+        }
+        const myCities = getOwnedCities("刘备");
+        const neighbours = getNeighbours(myCities);
+        if (!neighbours.includes(cityName)) {
+            addLog("施法失败", `【${config.name}】必须施放在与我方接壤的敌军关口！`, "system");
+            return false;
+        }
+    }
+
+    // 扣除资源
+    config.costPay();
+
+    // 触发效果
+    if (cardId === "kongcheng") {
+        cData.avoidWarTurns = 6; // 设置免战保护回合 (下回合扣除，实质有 5 回合)
+        addLog("空城高悬", `【计策】在【${cityName}】城头大设空城计！获得 5 回合免战保护，敌军不可犯！`, "victory");
+    } else if (cardId === "huoshao") {
+        const loss = Math.floor(cData.value * 0.5);
+        cData.value = Math.max(2000, cData.value - loss);
+        cData.isWar = false;
+        if (gameState.currentWar && (gameState.currentWar.from === cityName || gameState.currentWar.to === cityName)) {
+            gameState.currentWar = null; // 扑灭战火连线
+        }
+        addLog("火烧连营", `【计策】顺风纵火突袭【${cityName}】，重创守军，其城市繁荣度惨遭腰斩！`, "war");
+    } else if (cardId === "dongfeng") {
+        gameState.stats.food += 600000;
+        addLog("借得东风", `【计策】在【${cityName}】借东风天降甘霖，后勤获得 60万 石粮草补给！`, "econ");
+    } else if (cardId === "lianhuan") {
+        cData.lianhuanTurns = 4; // 设置连环计弱化回合 (实质 3 回合)
+        addLog("连锁战船", `【计策】对【${cityName}】巧授连环计，敌方阵营铁锁连环，我军对其强攻成功率提升至 100%！`, "victory");
+    }
+
+    // 消耗手牌并复位
+    gameState.cards.splice(cardIndex, 1);
+    gameState.activeCardIndex = null;
+
+    renderStats();
+    renderMap();
+    updateTacticsUI();
+    updateSelectedCityUI();
+    return true;
+}
+
+// 刷新军师锦囊列表面板
+function updateTacticsUI() {
+    const list = document.getElementById("tacticsList");
+    const count = document.getElementById("cardCount");
+    if (!list || !count) return;
+
+    count.textContent = `(${gameState.cards.length}/3)`;
+
+    if (gameState.cards.length === 0) {
+        list.innerHTML = `<div class="no-cards-tip" style="font-size:0.65rem; color:#666; text-align:center; padding:10px 0;">等待凝聚锦囊妙计...</div>`;
+        return;
+    }
+
+    let html = "";
+    gameState.cards.forEach((cardId, index) => {
+        const config = TACTICS_CONFIG[cardId];
+        const canPay = config.costCheck();
+        const isSelected = gameState.activeCardIndex === index;
+
+        let cardClass = `tactic-card card-${cardId}`;
+        if (!canPay) cardClass += " disabled";
+        if (isSelected) cardClass += " selected";
+
+        html += `
+            <div class="${cardClass}" onclick="selectCard(${index})">
+                <div class="tactic-name">${config.name}</div>
+                <div class="tactic-desc">${config.desc}</div>
+                <div class="tactic-cost">消耗：${config.costText}</div>
+            </div>
+        `;
+    });
+    list.innerHTML = html;
+}
