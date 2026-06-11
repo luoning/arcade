@@ -9,303 +9,148 @@
 }
 
 body {
-    background-color: #0b0c10;
+    background-color: #05070f;
     color: #c5c6c7;
     height: 100vh;
+    width: 100vw;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     user-select: none;
+    position: relative;
 }
 
-/* 顶部状态栏 */
-.cabinet-header {
-    background: rgba(26, 26, 36, 0.9);
-    border-bottom: 2px solid #1f2833;
-    padding: 10px 20px;
+/* ==========================================
+ * 1. 顶部高阶扁平状态栏 (StatusBar)
+ * ========================================== */
+.status-bar {
+    height: 48px;
+    background: rgba(14, 18, 32, 0.95);
+    border-bottom: 2px solid rgba(102, 252, 241, 0.35);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 55px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    padding: 0 20px;
     z-index: 100;
 }
 
-.header-left {
+.status-left {
     display: flex;
     align-items: center;
-    gap: 10px;
-    font-size: 1.2rem;
+    gap: 12px;
+}
+
+.logo-title {
+    font-size: 1.1rem;
     font-weight: 800;
     color: #66fcf1;
-    text-transform: uppercase;
     letter-spacing: 1.5px;
+    text-shadow: 0 0 5px rgba(102, 252, 241, 0.4);
 }
 
-.header-right {
+.role-badge {
+    background: rgba(102, 252, 241, 0.12);
+    border: 1px dashed rgba(102, 252, 241, 0.4);
+    color: #66fcf1;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+}
+
+.status-center {
     display: flex;
     align-items: center;
-    gap: 10px;
+    gap: 20px;
 }
 
-.user-tag {
-    background: rgba(102, 252, 241, 0.1);
-    color: #66fcf1;
+.status-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    background: rgba(255, 255, 255, 0.02);
     padding: 4px 10px;
     border-radius: 4px;
-    font-size: 0.85rem;
-    border: 1px dashed rgba(102, 252, 241, 0.4);
-}
-
-.exit-btn {
-    background: linear-gradient(135deg, #ff4e50, #f9d423);
-    border: none;
-    color: #fff;
-    padding: 6px 14px;
-    border-radius: 4px;
-    font-weight: 600;
-    font-size: 0.85rem;
-    cursor: pointer;
-    transition: transform 0.2s, box-shadow 0.2s;
-}
-
-.exit-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 0 10px rgba(255, 78, 80, 0.6);
-}
-
-/* 游戏布局 */
-.game-container {
-    flex: 1;
-    display: grid;
-    grid-template-columns: 310px 1fr 310px;
-    gap: 15px;
-    padding: 15px;
-    overflow: hidden;
-    height: calc(100vh - 85px);
-}
-
-.panel {
-    background: rgba(26, 26, 36, 0.65);
-    backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 8px;
-    display: flex;
-    flex-direction: column;
-    padding: 15px;
-    overflow: hidden;
-    position: relative;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
-}
-
-.panel-title {
-    font-size: 1rem;
-    color: #66fcf1;
-    margin-bottom: 12px;
-    padding-bottom: 8px;
-    border-bottom: 1px solid rgba(102, 252, 241, 0.2);
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    text-transform: uppercase;
-}
-
-/* 左侧面板 - 消息日志 */
-.left-panel {
-    position: relative;
-}
-
-.message-log {
-    flex: 1;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    padding-bottom: 30px;
-}
-
-/* 自定义滚动条 */
-.message-log::-webkit-scrollbar {
-    width: 4px;
-}
-.message-log::-webkit-scrollbar-thumb {
-    background: rgba(102, 252, 241, 0.3);
-    border-radius: 2px;
-}
-
-/* 日志分级样式 */
-.message-log .line {
-    background: rgba(255, 255, 255, 0.01);
-    border-left: 3px solid rgba(197, 198, 199, 0.3);
-    padding: 8px 10px;
-    border-radius: 0 6px 6px 0;
-    font-size: 0.8rem;
-    line-height: 1.4;
-    transition: background 0.3s;
-}
-
-.message-log .line:hover {
-    background: rgba(255, 255, 255, 0.03);
-}
-
-.message-log .line.war {
-    border-left-color: #ff4e50;
-    background: rgba(255, 78, 80, 0.05);
-    color: #ffd6d6;
-}
-.message-log .line.war i {
-    color: #ff4e50;
-    font-weight: bold;
-}
-
-.message-log .line.econ {
-    border-left-color: #2ecc71;
-    background: rgba(46, 204, 113, 0.05);
-    color: #d6ffd8;
-}
-.message-log .line.econ i {
-    color: #2ecc71;
-}
-
-.message-log .line.victory {
-    border-left-width: 4px;
-    border-left-color: #f9d423;
-    background: linear-gradient(90deg, rgba(249, 212, 35, 0.1), transparent);
-    color: #fffdf5;
-}
-.message-log .line.victory i {
-    color: #f9d423;
-    text-shadow: 0 0 5px rgba(249, 212, 35, 0.5);
-    font-weight: bold;
-}
-
-.message-log .line.system {
-    border-left-color: #00f5d4;
-    background: rgba(0, 245, 212, 0.05);
-    color: #e3fffc;
-}
-.message-log .line.system i {
-    color: #00f5d4;
-}
-
-.mask-fade {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 50px;
-    background: linear-gradient(rgba(11, 12, 16, 0), rgba(26, 26, 36, 1));
-    pointer-events: none;
-}
-
-/* 中间面板 - 仪表盘与地图 */
-.middle-panel {
-    display: flex;
-    flex-direction: column;
-    gap: 15px;
-}
-
-/* 数据看板 */
-.data-dashboard {
-    display: grid;
-    grid-template-columns: repeat(6, 1fr);
-    gap: 10px;
-}
-
-.data-card {
-    background: rgba(31, 40, 51, 0.8);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.03);
     transition: background-color 0.4s ease;
 }
 
-.data-card.flash-green {
+/* 闪烁动效 */
+.status-item.flash-green {
     background-color: rgba(46, 204, 113, 0.25) !important;
 }
-.data-card.flash-red {
+.status-item.flash-red {
     background-color: rgba(231, 76, 60, 0.25) !important;
 }
 
-.card-label {
-    font-size: 0.75rem;
-    color: #45f248;
-    opacity: 0.6;
+.status-item .label {
+    color: #888;
 }
 
-.card-value {
-    font-size: 1rem;
+.status-item .val {
     font-weight: bold;
     color: #fff;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
 }
 
 .updown {
     font-size: 0.7rem;
-    font-weight: normal;
-    padding-left: 4px;
+    margin-left: 4px;
 }
+.updown.warning { color: #ff4e50; }
+.updown.running { color: #2ecc71; }
 
-.updown.warning {
-    color: #ff4e50;
-}
-
-.updown.running {
-    color: #2ecc71;
-}
-
-/* 环世堪舆 (绝对定位画布版) */
-.map-wrapper {
-    flex: 1;
-    background: radial-gradient(circle, #0e1220 0%, #05070f 100%);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    padding: 10px;
+.status-right {
     display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.map-header {
-    display: flex;
-    justify-content: space-between;
     align-items: center;
-    margin-bottom: 8px;
-    font-size: 0.9rem;
-    color: #66fcf1;
-    z-index: 10;
+    gap: 10px;
 }
 
-.control-btn {
-    background: #1f2833;
-    border: 1px solid #45f3ff;
-    color: #45f3ff;
-    padding: 4px 12px;
+.action-btn-gear {
+    background: transparent;
+    border: 1px solid #f9d423;
+    color: #f9d423;
+    padding: 4px 10px;
     border-radius: 4px;
-    cursor: pointer;
     font-size: 0.8rem;
-    font-weight: 600;
+    cursor: pointer;
+    font-weight: bold;
     transition: all 0.2s;
 }
-
-.control-btn:hover {
-    background: #45f3ff;
-    color: #0b0c10;
-    box-shadow: 0 0 8px rgba(69, 243, 255, 0.5);
+.action-btn-gear:hover {
+    background: #f9d423;
+    color: #000;
+    box-shadow: 0 0 10px rgba(249, 212, 35, 0.5);
 }
 
-/* 2D 画布绝对容器 */
-.map-grid {
+.action-btn-exit {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+    border: none;
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+    font-weight: bold;
+    transition: transform 0.2s;
+}
+.action-btn-exit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 0 10px rgba(255, 78, 80, 0.5);
+}
+
+
+/* ==========================================
+ * 2. 全屏大地图主舞台
+ * ========================================== */
+.main-map-stage {
     flex: 1;
     position: relative;
+    background: radial-gradient(circle, #0e1220 0%, #030408 100%);
+    width: 100vw;
+    height: calc(100vh - 48px);
     overflow: hidden;
-    border: 1px solid rgba(255, 255, 255, 0.02);
-    border-radius: 4px;
+    z-index: 5;
 }
 
 /* SVG 连线画布层 */
@@ -316,12 +161,12 @@ body {
     width: 100%;
     height: 100%;
     pointer-events: none;
-    z-index: 1;
+    z-index: 10;
 }
 
 /* 基础发光连线 */
 .normal-line {
-    stroke: rgba(102, 252, 241, 0.18);
+    stroke: rgba(102, 252, 241, 0.16);
     stroke-width: 1.5px;
     transition: stroke 0.3s;
 }
@@ -345,7 +190,7 @@ body {
 .city-wrapper {
     position: absolute;
     transform: translate(-50%, -50%);
-    z-index: 5;
+    z-index: 20;
 }
 
 /* 精致迷你药丸舱格子 */
@@ -353,10 +198,10 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border: 1.5px solid rgba(255, 255, 255, 0.18);
     border-radius: 20px;
     height: 22px;
-    min-width: 60px;
+    min-width: 65px;
     padding: 0 6px;
     transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
     background: rgba(11, 12, 16, 0.95);
@@ -456,77 +301,273 @@ body {
     display: block;
 }
 
-/* 关隘军务直控面板 */
-.command-panel {
-    background: rgba(31, 40, 51, 0.7);
-    border: 1px solid rgba(102, 252, 241, 0.25);
-    border-radius: 6px;
+
+/* ==========================================
+ * 3. 悬浮面板系统 (Left / Right panels)
+ * ========================================== */
+.floating-panel {
+    position: absolute;
+    background: rgba(22, 22, 33, 0.78);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(102, 252, 241, 0.2);
+    border-radius: 8px;
     padding: 12px;
-    box-shadow: inset 0 0 10px rgba(102, 252, 241, 0.1);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+    z-index: 50;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
-.command-title {
+.panel-header-mini {
     font-size: 0.85rem;
+    font-weight: bold;
     color: #66fcf1;
     margin-bottom: 8px;
-    font-weight: 600;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    letter-spacing: 1px;
 }
 
-/* 直控关隘信息与按钮组合样式 */
-.city-info-card {
+.panel-header-mini .fold-btn {
+    cursor: pointer;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+/* 左下角战报面板 */
+.war-log-panel {
+    left: 15px;
+    bottom: 115px; /* 留出底部决策台空间 */
+    width: 300px;
+    height: 240px;
+    display: flex;
+    flex-direction: column;
+}
+
+.war-log-panel.collapsed {
+    height: 38px;
+}
+
+.war-log-panel.collapsed .message-log,
+.war-log-panel.collapsed .mask-fade {
+    display: none;
+}
+
+.message-log {
+    flex: 1;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     gap: 8px;
 }
-.city-info-header {
+
+/* 日志分级样式 */
+.message-log .line {
+    background: rgba(255, 255, 255, 0.01);
+    border-left: 3px solid rgba(197, 198, 199, 0.3);
+    padding: 6px 8px;
+    border-radius: 0 4px 4px 0;
+    font-size: 0.72rem;
+    line-height: 1.35;
+}
+
+.message-log .line.war {
+    border-left-color: #ff4e50;
+    background: rgba(255, 78, 80, 0.05);
+    color: #ffd6d6;
+}
+.message-log .line.econ {
+    border-left-color: #2ecc71;
+    background: rgba(46, 204, 113, 0.05);
+    color: #d6ffd8;
+}
+.message-log .line.victory {
+    border-left-color: #f9d423;
+    background: rgba(249, 212, 35, 0.05);
+    color: #fffdf5;
+}
+.message-log .line.system {
+    border-left-color: #00f5d4;
+    background: rgba(0, 245, 212, 0.05);
+    color: #e3fffc;
+}
+
+/* 右侧兵种面板 */
+.barracks-panel {
+    right: 15px;
+    top: 65px;
+    width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.barracks-info {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item {
     display: flex;
     justify-content: space-between;
     align-items: center;
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.25);
+    padding: 6px 8px;
+    border-radius: 4px;
+    border-left: 3px solid #66fcf1;
 }
+
+.mini-script-btn {
+    width: 100%;
+    background: #1f2833;
+    border: 1.5px solid rgba(255, 255, 255, 0.05);
+    color: #ccc;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    text-align: left;
+    transition: all 0.2s;
+}
+
+.mini-script-btn.active, .mini-script-btn:hover {
+    border-color: #66fcf1;
+    color: #66fcf1;
+    background: rgba(102, 252, 241, 0.05);
+}
+
+
+/* ==========================================
+ * 4. 底部中央大决策台 (Command Console)
+ * ========================================== */
+.bottom-command-deck {
+    position: absolute;
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 720px;
+    height: 85px;
+    background: rgba(22, 22, 33, 0.92);
+    border: 2px solid rgba(102, 252, 241, 0.35);
+    box-shadow: 0 -4px 30px rgba(0, 0, 0, 0.8), inset 0 0 10px rgba(102, 252, 241, 0.05);
+    border-radius: 8px;
+    padding: 10px 18px;
+    z-index: 60;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.15);
+}
+
+.deck-flex-center {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    gap: 20px;
+}
+
+.deck-desc-text {
+    font-size: 0.8rem;
+    color: #888;
+    line-height: 1.35;
+}
+
+.main-play-btn {
+    background: #12343f;
+    border: 1.5px solid #00f5d4;
+    color: #00f5d4;
+    padding: 8px 24px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: bold;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: all 0.2s;
+}
+
+.main-play-btn:hover {
+    background: #00f5d4;
+    color: #000;
+    box-shadow: 0 0 12px rgba(0, 245, 212, 0.6);
+}
+
+/* 点选状态的控制面板 */
+.deck-state-active {
+    display: block;
+    width: 100%;
+}
+.deck-state-hidden {
+    display: none;
+    width: 100%;
+}
+
+.city-info-card {
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    gap: 15px;
+    align-items: center;
+    width: 100%;
+}
+
+.city-info-header {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    border-right: 1px solid rgba(255, 255, 255, 0.08);
+    padding-right: 15px;
+}
+
 .city-info-header .c-name {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
     font-weight: bold;
     color: #fff;
+    white-space: nowrap;
 }
+
 .city-info-header .c-union {
-    font-size: 0.75rem;
-    padding: 2px 8px;
-    border-radius: 12px;
+    font-size: 0.72rem;
+    padding: 1px 6px;
+    border-radius: 10px;
+    align-self: flex-start;
 }
+
 .badge-gray {
     background: rgba(255, 255, 255, 0.1);
     color: #ccc;
 }
 .badge-color {
-    background: rgba(102, 252, 241, 0.15);
+    background: rgba(102, 252, 241, 0.12);
     border: 1px solid #66fcf1;
     color: #66fcf1;
 }
 
 .city-info-body {
-    font-size: 0.8rem;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 6px 10px;
-    border-radius: 4px;
+    font-size: 0.75rem;
+    color: #aaa;
 }
 
 .city-action-grid {
     display: grid;
     grid-template-columns: repeat(4, 1fr);
-    gap: 8px;
-    margin-top: 4px;
+    gap: 6px;
 }
 
 .action-trigger-btn {
     border: none;
     border-radius: 4px;
     color: #fff;
-    padding: 8px;
-    font-size: 0.75rem;
+    padding: 6px;
+    font-size: 0.72rem;
     font-weight: 600;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
     text-align: center;
+    white-space: nowrap;
 }
 
 .action-trigger-btn:hover {
@@ -543,95 +584,36 @@ body {
 /* 按钮专属调色 */
 .cbtn-recruit {
     background: linear-gradient(135deg, #2b5c8f, #1e3c72);
-    box-shadow: 0 0 6px rgba(30, 60, 114, 0.4);
 }
 .cbtn-recruit:hover {
-    box-shadow: 0 0 10px rgba(102, 252, 241, 0.5);
+    box-shadow: 0 0 10px rgba(102, 252, 241, 0.4);
 }
 
 .cbtn-econ {
     background: linear-gradient(135deg, #134e4a, #0d9488);
-    box-shadow: 0 0 6px rgba(13, 148, 136, 0.4);
 }
 .cbtn-econ:hover {
-    box-shadow: 0 0 10px rgba(46, 204, 113, 0.5);
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.4);
 }
 
 .cbtn-war {
     background: linear-gradient(135deg, #991b1b, #ef4444);
-    box-shadow: 0 0 6px rgba(239, 68, 68, 0.4);
 }
 .cbtn-war:hover {
-    box-shadow: 0 0 12px rgba(239, 68, 68, 0.6);
+    box-shadow: 0 0 12px rgba(239, 68, 68, 0.5);
 }
 
 .cbtn-plot {
     background: linear-gradient(135deg, #78350f, #d97706);
-    box-shadow: 0 0 6px rgba(217, 119, 6, 0.4);
 }
 .cbtn-plot:hover {
-    box-shadow: 0 0 10px rgba(217, 119, 6, 0.5);
+    box-shadow: 0 0 10px rgba(217, 119, 6, 0.4);
 }
 
-/* 右侧面板 - 剧本与管理 */
-.section-box {
-    background: rgba(31, 40, 51, 0.4);
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 6px;
-    padding: 12px;
-    margin-bottom: 12px;
-}
 
-.script-list {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-}
-
-.script-btn {
-    background: #1f2833;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: #c5c6c7;
-    padding: 8px 12px;
-    text-align: left;
-    border-radius: 4px;
-    cursor: pointer;
-    font-size: 0.8rem;
-    transition: all 0.2s;
-}
-
-.script-btn.active, .script-btn:hover {
-    border-color: #66fcf1;
-    color: #66fcf1;
-    background: rgba(102, 252, 241, 0.05);
-}
-
-.info-list {
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-}
-
-.info-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.75rem;
-    background: rgba(0, 0, 0, 0.2);
-    padding: 6px 8px;
-    border-radius: 4px;
-}
-
-.info-item span:first-child {
-    color: #66fcf1;
-}
-
-/* 兵种大本营条目高亮 */
-.spec-barrack {
-    border-left: 3.5px solid #66fcf1;
-    background: rgba(102, 252, 241, 0.04);
-}
-
-/* ⚙️ 军政司 (设置弹窗 Modal) */
+/* ==========================================
+ * 5. ⚙️ 军政司 (设置弹窗 Modal)
+ * ========================================== */
 .settings-modal {
     position: fixed;
     top: 0;
@@ -688,10 +670,7 @@ body {
     font-size: 1.5rem;
     cursor: pointer;
 }
-
-.close-btn:hover {
-    color: #fff;
-}
+.close-btn:hover { color: #fff; }
 
 .modal-body {
     padding: 20px;
@@ -760,17 +739,3 @@ body {
 .bg-sima:hover { background: rgba(26, 188, 156, 0.45); }
 .bg-xiandi { background: rgba(231, 76, 60, 0.2); }
 .bg-xiandi:hover { background: rgba(231, 76, 60, 0.45); }
-
-/* 页脚 */
-.cabinet-footer {
-    background: rgba(26, 26, 36, 0.9);
-    border-top: 1px solid #1f2833;
-    padding: 5px 20px;
-    height: 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.75rem;
-    color: #45f248;
-    opacity: 0.6;
-}

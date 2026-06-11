@@ -9,112 +9,101 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- 街机标题顶栏 -->
-    <header class="cabinet-header">
-        <div class="header-left">
-            <i class="fa fa-gamepad"></i> <span>三国演兵录 (Idle Run)</span>
+    <!-- 1. 顶部扁平化状态栏 (StatusBar) -->
+    <header class="status-bar">
+        <div class="status-left">
+            <span class="logo-title"><i class="fa fa-flag"></i> 三国演兵录</span>
+            <span class="role-badge">主公：刘皇叔</span>
         </div>
-        <div class="header-right">
-            <span class="user-tag"><i class="fa fa-user-circle"></i> 刘皇叔</span>
-            <!-- 新增设置按钮以收拢测试作弊指令 -->
-            <button id="settingsBtn" class="control-btn" style="border-color:#f9d423; color:#f9d423; margin-right:8px;"><i class="fa fa-cog"></i> 军政司</button>
-            <button id="exit" class="exit-btn"><i class="fa fa-sign-out"></i> 返回大厅</button>
+        
+        <!-- 核心国库与民生数据展示 -->
+        <div class="status-center">
+            <div class="status-item" title="总人口数">
+                <span class="label">👥 人口</span>
+                <span id="people" class="val">--</span>
+            </div>
+            <div class="status-item" title="麾下武将">
+                <span class="label">🗡️ 武将</span>
+                <span id="avator" class="val">--</span>
+            </div>
+            <div class="status-item" title="军费资金">
+                <span class="label">💰 资金</span>
+                <span id="cash" class="val">--</span>
+            </div>
+            <div class="status-item" title="屯粮储积">
+                <span class="label">🌾 粮食</span>
+                <span id="food" class="val">--</span>
+            </div>
+            <div class="status-item" title="收买珍宝">
+                <span class="label">💎 珍宝</span>
+                <span id="means" class="val">--</span>
+            </div>
+            <div class="status-item" title="三兵种总战力">
+                <span class="label">🛡️ 兵力</span>
+                <span id="army" class="val">--</span>
+            </div>
+        </div>
+
+        <div class="status-right">
+            <button id="settingsBtn" class="action-btn-gear" title="设置与天命调试"><i class="fa fa-sliders"></i> 军政司</button>
+            <button id="exit" class="action-btn-exit" title="返回电玩城"><i class="fa fa-sign-out"></i> 返回大厅</button>
         </div>
     </header>
 
-    <!-- 游戏主舞台 -->
-    <main class="game-container">
-        <!-- 左侧面板: 朝堂风云 (实时推演日志) -->
-        <section class="panel left-panel">
-            <h2 class="panel-title"><i class="fa fa-bullhorn"></i> 朝堂风云</h2>
-            <div id="message" class="message-log">
-                <!-- 动态生成事件 -->
-            </div>
-            <div class="mask-fade"></div>
-        </section>
-
-        <!-- 中间面板: 观星知鉴 (数据看板) + 环世堪舆 (2D地图) -->
-        <section class="panel middle-panel">
-            <!-- 观星知鉴 (数据看板) -->
-            <div class="data-dashboard">
-                <div class="data-card">
-                    <span class="card-label">人口</span>
-                    <span id="people" class="card-value">--</span>
-                </div>
-                <div class="data-card">
-                    <span class="card-label">武将</span>
-                    <span id="avator" class="card-value">--</span>
-                </div>
-                <div class="data-card">
-                    <span class="card-label">部队 (总兵力)</span>
-                    <span id="army" class="card-value">--</span>
-                </div>
-                <div class="data-card">
-                    <span class="card-label">资金</span>
-                    <span id="cash" class="card-value">--</span>
-                </div>
-                <div class="data-card">
-                    <span class="card-label">粮食</span>
-                    <span id="food" class="card-value">--</span>
-                </div>
-                <div class="data-card">
-                    <span class="card-label">珍宝</span>
-                    <span id="means" class="card-value">--</span>
-                </div>
-            </div>
-
-            <!-- 环世堪舆 (2D 拓扑连线地图) -->
-            <div class="map-wrapper">
-                <div class="map-header">
-                    <span><i class="fa fa-globe"></i> 环世堪舆</span>
-                    <button id="pause" class="control-btn"><i class="fa fa-play"></i> 回合开始</button>
-                </div>
-                <div id="content" class="map-grid">
-                    <!-- SVG 动态连线画布层 -->
-                    <svg id="map-links-svg"></svg>
-                    <!-- 动态生成绝对定位城市关隘 -->
-                </div>
-            </div>
-
-            <!-- 军机阁改版：直接操作选中关隘的微操控制面板 -->
-            <div class="command-panel">
-                <div class="command-title"><i class="fa fa-sliders"></i> 关隘军务直控</div>
-                <div id="selectedCityBox">
-                    <!-- 动态渲染点选中的关卡信息及募兵/屯田/强攻交互按钮 -->
-                </div>
-            </div>
-        </section>
-
-        <!-- 右侧面板: 战略情报与兵种营房 -->
-        <section class="panel right-panel">
-            <!-- 剧本选择 -->
-            <div class="section-box script-box">
-                <h2 class="panel-title"><i class="fa fa-book"></i> 天下大势 (剧本)</h2>
-                <div class="script-list">
-                    <button id="cheat_war1" class="script-btn active">三国时代 (三分天下)</button>
-                    <button id="cheat_war6" class="script-btn">群雄并起 (割据一方)</button>
-                </div>
-            </div>
-
-            <!-- 兵种营房改版：实时兵力分布与克制优势说明 -->
-            <div class="section-box info-box">
-                <h2 class="panel-title"><i class="fa fa-shield"></i> 兵力整备 (兵种配额)</h2>
-                <div id="barracksList" class="info-list">
-                    <!-- 动态渲染虎贲、象兵、长枪分布 -->
-                </div>
-            </div>
-
-            <!-- 兵种属性与相克指南 -->
-            <div class="section-box info-box">
-                <h2 class="panel-title"><i class="fa fa-info-circle"></i> 兵种克制关系</h2>
-                <div class="info-list" style="font-size: 0.7rem; line-height: 1.4; color: #888;">
-                    <div style="margin-bottom: 6px;"><strong style="color:#66fcf1;">🛡️ 虎贲重步：</strong> 高防御城防守备，驻守城市遭到敌对势力攻击吞并时，有 30% 几率坚守免于被夺取。</div>
-                    <div style="margin-bottom: 6px;"><strong style="color:#66fcf1;">🐘 南蛮骑象：</strong> 强力的突破性攻城器械，主动【亲征强攻】相邻敌城必带兵种，攻城胜率高达 75% 但每次出兵会有消耗。</div>
-                    <div><strong style="color:#66fcf1;">🔱 精锐枪兵：</strong> 基础平民兵种。招募成本极低，守城遭遇巨兽象兵攻击时，能发挥显著克制优势。</div>
-                </div>
-            </div>
-        </section>
+    <!-- 2. 全屏大地图主舞台 -->
+    <main class="main-map-stage" id="content">
+        <!-- SVG 动态发光地缘通路层 -->
+        <svg id="map-links-svg"></svg>
+        
+        <!-- 绝对定位的城市关隘节点将通过 JS 渲染在这里 -->
     </main>
+
+    <!-- 3. 左下角半透明战报简讯 (朝堂风云) -->
+    <section class="floating-panel war-log-panel">
+        <div class="panel-header-mini">
+            <span><i class="fa fa-bullhorn"></i> 军情简报</span>
+            <span class="fold-btn" onclick="toggleLogPanel()"><i class="fa fa-chevron-down" id="logFoldIcon"></i></span>
+        </div>
+        <div id="message" class="message-log">
+            <!-- 动态生成事件 -->
+        </div>
+        <div class="mask-fade"></div>
+    </section>
+
+    <!-- 4. 右侧半透明浮动兵种营房 -->
+    <section class="floating-panel barracks-panel">
+        <div class="panel-header-mini">
+            <span><i class="fa fa-shield"></i> 兵团整备</span>
+        </div>
+        <div id="barracksList" class="barracks-info">
+            <!-- 动态渲染虎贲、象兵、长枪分布 -->
+        </div>
+        <div class="panel-header-mini" style="margin-top:10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top:6px;">
+            <span><i class="fa fa-book"></i> 天下剧本</span>
+        </div>
+        <div class="script-list-mini">
+            <button id="cheat_war1" class="mini-script-btn active">三分天下</button>
+            <button id="cheat_war6" class="mini-script-btn">群雄并起</button>
+        </div>
+    </section>
+
+    <!-- 5. 底部中央大决策台 (Command Console) -->
+    <footer class="bottom-command-deck" id="commandDeck">
+        <!-- 默认状态：回合推进控制器 -->
+        <div id="defaultDeck" class="deck-state-active">
+            <div class="deck-flex-center">
+                <div class="deck-desc-text">沙盘地图推演中。点选任意城市关隘可进行治国、募兵或军事亲征。</div>
+                <button id="pause" class="main-play-btn"><i class="fa fa-play"></i> 开始回合</button>
+            </div>
+        </div>
+
+        <!-- 点选中城市状态：弹出关隘直控卡片与圆圆折扇命令按钮 -->
+        <div id="selectedDeck" class="deck-state-hidden">
+            <div id="selectedCityBox">
+                <!-- 动态渲染点选中的关卡信息及交互按钮 -->
+            </div>
+        </div>
+    </footer>
 
     <!-- ⚙️ 军政司 (设置与测试指令 Modal 弹窗) -->
     <div id="settingsModal" class="settings-modal">
@@ -124,7 +113,6 @@
                 <button id="closeSettings" class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- 推演倍速设置 -->
                 <div class="settings-section">
                     <h3><i class="fa fa-dashboard"></i> 沙盘推演流速调节</h3>
                     <div class="speed-control-grid">
@@ -134,10 +122,9 @@
                     </div>
                 </div>
 
-                <!-- 收拢后的作弊测试指令 -->
                 <div class="settings-section">
                     <h3><i class="fa fa-cogs"></i> 天命归一 (测试与作弊指令)</h3>
-                    <p style="font-size:0.75rem; color:#888; margin-bottom:8px;">测试统一结局，可直接强行把天命塞给指定的主公。</p>
+                    <p style="font-size:0.75rem; color:#888; margin-bottom:8px;">测试一统结局，可直接强行把天命塞给指定的主公。</p>
                     <div class="cheat-control-grid">
                         <button id="cheat_war3" class="cheat-btn bg-caocao">曹操一统</button>
                         <button id="cheat_war4" class="cheat-btn bg-liubei">刘备一统</button>
@@ -150,13 +137,21 @@
         </div>
     </div>
 
-    <!-- 页脚版权 -->
-    <footer class="cabinet-footer">
-        <span>&copy; VibeArcade 2026 - 三国演兵录</span>
-        <span>Developer: 野生打工人 Rhounin</span>
-    </footer>
-
     <!-- 游戏主逻辑 JS -->
     <script src="game.js"></script>
+    <script>
+        // 控制日志面板最小化/收起的简易函数
+        function toggleLogPanel() {
+            const panel = document.querySelector('.war-log-panel');
+            const icon = document.getElementById('logFoldIcon');
+            if (panel.classList.contains('collapsed')) {
+                panel.classList.remove('collapsed');
+                icon.className = "fa fa-chevron-down";
+            } else {
+                panel.classList.add('collapsed');
+                icon.className = "fa fa-chevron-up";
+            }
+        }
+    </script>
 </body>
 </html>
