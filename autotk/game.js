@@ -188,12 +188,11 @@ function setAllCity(unitName) {
     if (modal) modal.classList.remove("active");
 }
 
-// 动态绘制 SVG 连线
+// 动态绘制/更新 SVG 连线
 function drawConnections() {
     const svg = document.getElementById("map-links-svg");
     if (!svg) return;
 
-    svg.innerHTML = "";
     const drawn = new Set();
 
     Object.keys(cityConnections).forEach(startCity => {
@@ -214,36 +213,46 @@ function drawConnections() {
                 (startCity === gameState.currentWar.to && endCity === gameState.currentWar.from)
             );
             
-            const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+            let line = document.getElementById(`link-${lineKey}`);
+            let isNew = false;
             
+            if (!line) {
+                isNew = true;
+                line = document.createElementNS("http://www.w3.org/2000/svg", "line");
+                line.id = `link-${lineKey}`;
+            }
+
             if (isWarLine) {
-                // 强制让虚线动画从发起方 (from) 流向目标防守方 (to)
                 const fromCoord = cityCoords[gameState.currentWar.from];
                 const toCoord = cityCoords[gameState.currentWar.to];
                 line.setAttribute("x1", `${fromCoord.x}%`);
                 line.setAttribute("y1", `${fromCoord.y}%`);
                 line.setAttribute("x2", `${toCoord.x}%`);
                 line.setAttribute("y2", `${toCoord.y}%`);
-                line.setAttribute("class", "war-line");
+                if (line.getAttribute("class") !== "war-line") {
+                    line.setAttribute("class", "war-line");
+                }
             } else {
                 line.setAttribute("x1", `${startCoord.x}%`);
                 line.setAttribute("y1", `${startCoord.y}%`);
                 line.setAttribute("x2", `${endCoord.x}%`);
                 line.setAttribute("y2", `${endCoord.y}%`);
-                line.setAttribute("class", "normal-line");
+                if (line.getAttribute("class") !== "normal-line") {
+                    line.setAttribute("class", "normal-line");
+                }
             }
-            svg.appendChild(line);
+
+            if (isNew) {
+                svg.appendChild(line);
+            }
         });
     });
 }
 
-// 绝对定位 2D 渲染地图关卡
+// 绝对定位 2D 渲染/更新地图关卡
 function renderMap() {
     const container = document.getElementById("content");
     if (!container) return;
-    
-    const oldNodes = container.querySelectorAll(".city-wrapper");
-    oldNodes.forEach(node => node.remove());
 
     const citiesList = Object.keys(cityConnections);
 
@@ -252,12 +261,24 @@ function renderMap() {
         const role = rolesConfig[cityData.union] || rolesConfig["无主"];
         const coord = cityCoords[cityName] || { x: 50, y: 50 };
         
-        const cityEl = document.createElement("div");
-        cityEl.id = cityName;
-        cityEl.className = "city-wrapper";
+        let cityEl = document.getElementById(cityName);
+        let isNew = false;
         
-        cityEl.style.left = `${coord.x}%`;
-        cityEl.style.top = `${coord.y}%`;
+        if (!cityEl) {
+            isNew = true;
+            cityEl = document.createElement("div");
+            cityEl.id = cityName;
+            cityEl.className = "city-wrapper";
+            cityEl.style.left = `${coord.x}%`;
+            cityEl.style.top = `${coord.y}%`;
+            
+            cityEl.onclick = function(e) {
+                e.stopPropagation();
+                gameState.selectedCity = cityName;
+                renderMap(); 
+                updateSelectedCityUI();
+            };
+        }
 
         let cardClasses = `map_gird ${role.color}`;
         if (cityName === gameState.cityNow) {
@@ -270,33 +291,47 @@ function renderMap() {
             cardClasses += " selected"; 
         }
 
-        const contentHTML = `
-            <span class="${cardClasses}">
-                <div class="map_item tip ${role.color}">
-                    <span class="city-name-label">${cityName}</span>
-                    <span class="map_index">${cityData.union[0]}</span>
-                    <span class="prompt-box">
-                        <strong>${cityName}</strong> - 归属: ${cityData.union}
-                        <div class="main73">
-                            <div id="${cityName}_content" style="width:100%; padding:5px 0;">
-                                繁荣度: ${cityData.value} <br/>
-                                连通: ${cityConnections[cityName].connect.join(", ")}
+        if (!isNew) {
+            const gridEl = cityEl.querySelector(".map_gird");
+            if (gridEl) {
+                gridEl.className = cardClasses;
+            }
+            const itemEl = cityEl.querySelector(".map_item");
+            if (itemEl) {
+                itemEl.className = `map_item tip ${role.color}`;
+            }
+            const indexEl = cityEl.querySelector(".map_index");
+            if (indexEl) {
+                indexEl.textContent = cityData.union[0];
+            }
+            const contentEl = document.getElementById(`${cityName}_content`);
+            if (contentEl) {
+                contentEl.innerHTML = `
+                    繁荣度: ${cityData.value} <br/>
+                    连通: ${cityConnections[cityName].connect.join(", ")}
+                `;
+            }
+        } else {
+            const contentHTML = `
+                <span class="${cardClasses}">
+                    <div class="map_item tip ${role.color}">
+                        <span class="city-name-label">${cityName}</span>
+                        <span class="map_index">${cityData.union[0]}</span>
+                        <span class="prompt-box">
+                            <strong>${cityName}</strong> - 归属: ${cityData.union}
+                            <div class="main73">
+                                <div id="${cityName}_content" style="width:100%; padding:5px 0;">
+                                    繁荣度: ${cityData.value} <br/>
+                                    连通: ${cityConnections[cityName].connect.join(", ")}
+                                </div>
                             </div>
-                        </div>
-                    </span>
-                </div>
-            </span>
-        `;
-        cityEl.innerHTML = contentHTML;
-        
-        cityEl.onclick = function(e) {
-            e.stopPropagation();
-            gameState.selectedCity = cityName;
-            renderMap(); 
-            updateSelectedCityUI();
-        };
-
-        container.appendChild(cityEl);
+                        </span>
+                    </div>
+                </span>
+            `;
+            cityEl.innerHTML = contentHTML;
+            container.appendChild(cityEl);
+        }
     });
 
     drawConnections();
