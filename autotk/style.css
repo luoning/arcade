@@ -151,6 +151,9 @@ body {
     height: calc(100vh - 48px);
     overflow: hidden;
     z-index: 5;
+    /* 核心修复：预留底部决策台的 115 像素安全隔离带，让百分比定位节点限制在该高度以上 */
+    padding-bottom: 115px;
+    background-clip: content-box;
 }
 
 /* SVG 连线画布层 */
