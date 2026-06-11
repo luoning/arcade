@@ -88,9 +88,11 @@
         <div class="panel-header-mini" style="margin-top:10px; border-top: 1px solid rgba(255,255,255,0.08); padding-top:6px;">
             <span><i class="fa fa-book"></i> 天下剧本</span>
         </div>
-        <div class="script-list-mini">
-            <button id="cheat_war1" class="mini-script-btn active">三分天下</button>
-            <button id="cheat_war6" class="mini-script-btn">群雄并起</button>
+        <div class="script-list-mini" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
+            <button class="mini-script-btn active">三分天下</button>
+            <button class="mini-script-btn">群雄并起</button>
+            <button class="mini-script-btn">官渡之战</button>
+            <button class="mini-script-btn">赤壁之战</button>
         </div>
     </section>
 
@@ -139,6 +141,8 @@
     <!-- 引入独立剧本配置 -->
     <script src="scenarios/sanfen.js"></script>
     <script src="scenarios/qunxiong.js"></script>
+    <script src="scenarios/guandu.js"></script>
+    <script src="scenarios/chibi.js"></script>
     <!-- 游戏主逻辑 JS -->
     <script src="game.js"></script>
     <script>

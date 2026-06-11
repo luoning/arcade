@@ -175,6 +175,17 @@ function initGame(scriptName) {
     if (msgContainer) msgContainer.innerHTML = "";
     
     addLog("system", `${scriptName}时代，天下割据，狼烟四起。`, "system");
+    
+    // 同步侧边栏剧本按钮的激活状态
+    const scriptBtns = document.querySelectorAll(".mini-script-btn");
+    scriptBtns.forEach(btn => {
+        if (btn.textContent.trim() === scriptName) {
+            btn.classList.add("active");
+        } else {
+            btn.classList.remove("active");
+        }
+    });
+
     renderMap();
     renderStats({ people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 });
 }
@@ -904,18 +915,14 @@ window.onload = function() {
     });
 
     // 绑定大厅侧的迷你剧本按钮
-    document.getElementById("cheat_war1").onclick = function(e) {
-        e.preventDefault();
-        document.getElementById("cheat_war1").classList.add("active");
-        document.getElementById("cheat_war6").classList.remove("active");
-        initGame("三分天下");
-    };
-    document.getElementById("cheat_war6").onclick = function(e) {
-        e.preventDefault();
-        document.getElementById("cheat_war6").classList.add("active");
-        document.getElementById("cheat_war1").classList.remove("active");
-        initGame("群雄并起");
-    };
+    const scriptBtns = document.querySelectorAll(".mini-script-btn");
+    scriptBtns.forEach(btn => {
+        btn.onclick = function(e) {
+            e.preventDefault();
+            const scriptName = btn.textContent.trim();
+            initGame(scriptName);
+        };
+    });
 
     const speedButtons = [
         { id: "speed_1x", ms: 1000 },
