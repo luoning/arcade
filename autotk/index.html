@@ -87,23 +87,23 @@
         </div>
     </section>
 
-    <!-- 5. 底部中央大决策台 (Command Console) -->
+    <!-- 5. 底部中央总调配台 (只承担回合推进与流速超频控制，视觉极致扁平) -->
     <footer class="bottom-command-deck" id="commandDeck">
-        <!-- 默认状态：回合推进控制器 -->
-        <div id="defaultDeck" class="deck-state-active">
-            <div class="deck-flex-center">
-                <div class="deck-desc-text">沙盘地图推演中。点选任意城市关隘可进行治国、募兵或军事亲征。</div>
-                <button id="pause" class="main-play-btn"><i class="fa fa-play"></i> 开始回合</button>
+        <div class="deck-flex-center">
+            <button id="pause" class="main-play-btn"><i class="fa fa-play"></i> 开始回合</button>
+            <div class="deck-speed-controls">
+                <button id="speed_1x" class="speed-btn-mini active">1.0x (推演)</button>
+                <button id="speed_2x" class="speed-btn-mini">2.5x (交火)</button>
+                <button id="speed_5x" class="speed-btn-mini">6.0x (超频)</button>
             </div>
-        </div>
-
-        <!-- 点选中城市状态：弹出关隘直控卡片与圆圆折扇命令按钮 -->
-        <div id="selectedDeck" class="deck-state-hidden">
-            <div id="selectedCityBox">
-                <!-- 动态渲染点选中的关卡信息及交互按钮 -->
-            </div>
+            <div class="deck-desc-text">点选堪舆图上的关口可就地出兵防御，点击空白处可重置点选。</div>
         </div>
     </footer>
+
+    <!-- 就地悬浮命令菜单容器 (由 JS 控制显示定位) -->
+    <div id="floatingContext" class="floating-city-context" style="display: none;">
+        <!-- 动态就地渲染关隘微操按钮 -->
+    </div>
 
     <!-- ⚙️ 军政司 (设置与测试指令 Modal 弹窗) -->
     <div id="settingsModal" class="settings-modal">
@@ -113,14 +113,6 @@
                 <button id="closeSettings" class="close-btn">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="settings-section">
-                    <h3><i class="fa fa-dashboard"></i> 沙盘推演流速调节</h3>
-                    <div class="speed-control-grid">
-                        <button id="speed_1x" class="speed-btn active">1.0x (常速推演)</button>
-                        <button id="speed_2x" class="speed-btn">2.5x (快速交火)</button>
-                        <button id="speed_5x" class="speed-btn">6.0x (挂机超频)</button>
-                    </div>
-                </div>
 
                 <div class="settings-section">
                     <h3><i class="fa fa-cogs"></i> 天命归一 (测试与作弊指令)</h3>

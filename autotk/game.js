@@ -61,69 +61,14 @@ const cityConnections = {
 
 // 2D 地理坐标配置 (基于大地图全屏铺满新比例微调)
 const cityCoords = {
-    // 关中 / 西北 (靠左上)
-    "武威": { x: 8, y: 15 },
-    "金城": { x: 10, y: 25 },
-    "天水": { x: 15, y: 35 },
-    "安定": { x: 22, y: 22 },
-    "武都": { x: 15, y: 48 },
-    "长安": { x: 30, y: 34 },
-    "弘农": { x: 37, y: 34 },
-
-    // 河北 / 中原 / 北疆
-    "洛阳": { x: 44, y: 34 },
-    "晋阳": { x: 41, y: 16 },
-    "上党": { x: 45, y: 24 },
-    "中山": { x: 51, y: 10 },
-    "邺": { x: 51, y: 21 },
-    "南皮": { x: 61, y: 14 },
-    "蓟": { x: 62, y: 6 },
-    "北平": { x: 74, y: 6 },
-    "襄平": { x: 84, y: 6 },
-    "乐浪": { x: 92, y: 8 },
-    "平原": { x: 59, y: 22 },
-    "濮阳": { x: 58, y: 30 },
-    "北海": { x: 67, y: 26 },
-    "陈留": { x: 51, y: 38 },
-    "许昌": { x: 48, y: 46 },
-    "宛": { x: 41, y: 51 },
-    "汝南": { x: 52, y: 54 },
-
-    // 徐州 / 淮南 / 江东
-    "下邳": { x: 65, y: 38 },
-    "广陵": { x: 71, y: 42 },
-    "寿春": { x: 60, y: 48 },
-    "庐江": { x: 62, y: 58 },
-    "建业": { x: 74, y: 58 },
-    "吴": { x: 84, y: 64 },
-    "会稽": { x: 89, y: 72 },
-    "建安": { x: 81, y: 84 },
-    "夷洲": { x: 94, y: 90 },
-
-    // 荆襄 / 华中 / 华南
-    "新野": { x: 44, y: 61 },
-    "上庸": { x: 34, y: 54 },
-    "襄阳": { x: 44, y: 70 },
-    "江陵": { x: 47, y: 79 },
-    "江夏": { x: 57, y: 72 },
-    "豫章": { x: 67, y: 80 },
-    "长沙": { x: 51, y: 88 },
-    "武陵": { x: 41, y: 86 },
-    "零陵": { x: 43, y: 93 },
-    "桂阳": { x: 51, y: 95 },
-    "南海": { x: 60, y: 97 },
-
-    // 巴蜀 / 大西南
-    "汉中": { x: 27, y: 48 },
-    "梓潼": { x: 20, y: 59 },
-    "成都": { x: 13, y: 69 },
-    "江州": { x: 25, y: 74 },
-    "永安": { x: 34, y: 74 },
-    "永昌": { x: 4, y: 80 },
-    "建宁": { x: 11, y: 88 },
-    "交趾": { x: 9, y: 96 },
-    "合浦": { x: 21, y: 97 },
-    "朱崖洲": { x: 21, y: 99 }
+    "武威": { x: 5, y: 12 }, "金城": { x: 7, y: 22 }, "天水": { x: 13, y: 32 }, "安定": { x: 20, y: 20 }, "武都": { x: 13, y: 45 }, "长安": { x: 30, y: 32 }, "弘农": { x: 37, y: 32 },
+    "洛阳": { x: 44, y: 32 }, "晋阳": { x: 41, y: 14 }, "上党": { x: 45, y: 22 }, "中山": { x: 51, y: 8 }, "邺": { x: 51, y: 19 }, "南皮": { x: 61, y: 12 }, "蓟": { x: 62, y: 4 },
+    "北平": { x: 74, y: 4 }, "襄平": { x: 84, y: 4 }, "乐浪": { x: 92, y: 6 }, "平原": { x: 59, y: 20 }, "濮阳": { x: 58, y: 28 }, "北海": { x: 67, y: 24 }, "陈留": { x: 51, y: 36 },
+    "许昌": { x: 48, y: 44 }, "宛": { x: 41, y: 49 }, "汝南": { x: 52, y: 52 }, "下邳": { x: 65, y: 36 }, "广陵": { x: 71, y: 40 }, "寿春": { x: 60, y: 46 }, "庐江": { x: 62, y: 56 },
+    "建业": { x: 74, y: 56 }, "吴": { x: 84, y: 62 }, "会稽": { x: 89, y: 70 }, "建安": { x: 81, y: 82 }, "夷洲": { x: 94, y: 88 }, "新野": { x: 44, y: 59 }, "上庸": { x: 34, y: 52 },
+    "襄阳": { x: 44, y: 68 }, "江陵": { x: 47, y: 77 }, "江夏": { x: 57, y: 70 }, "豫章": { x: 67, y: 78 }, "长沙": { x: 51, y: 86 }, "武陵": { x: 41, y: 84 }, "零陵": { x: 43, y: 92 },
+    "桂阳": { x: 51, y: 94 }, "南海": { x: 60, y: 96 }, "汉中": { x: 27, y: 46 }, "梓潼": { x: 20, y: 57 }, "成都": { x: 13, y: 67 }, "江州": { x: 25, y: 72 }, "永安": { x: 34, y: 72 },
+    "永昌": { x: 4, y: 78 }, "建宁": { x: 11, y: 86 }, "交趾": { x: 9, y: 95 }, "合浦": { x: 21, y: 96 }, "朱崖洲": { x: 21, y: 99 }
 };
 
 // 3. 势力配置
@@ -345,65 +290,58 @@ function renderMap() {
     drawConnections();
 }
 
-// 刷新底部中央大决策台 UI
+// 刷新【就地悬浮命令菜单】UI
 function updateSelectedCityUI() {
-    const defaultDeck = document.getElementById("defaultDeck");
-    const selectedDeck = document.getElementById("selectedDeck");
-    const selectedCityBox = document.getElementById("selectedCityBox");
-    if (!defaultDeck || !selectedDeck || !selectedCityBox) return;
+    const bubble = document.getElementById("floatingContext");
+    if (!bubble) return;
 
     if (!gameState.selectedCity) {
-        // 展示默认回合控制台
-        selectedDeck.className = "deck-state-hidden";
-        defaultDeck.className = "deck-state-active";
+        bubble.style.display = "none";
         return;
     }
 
-    // 隐藏默认，激活选中关口决策台
-    defaultDeck.className = "deck-state-hidden";
-    selectedDeck.className = "deck-state-active";
-
     const cName = gameState.selectedCity;
     const cData = gameState.cities[cName];
+    const coord = cityCoords[cName];
+    if (!coord) return;
+
     const isMine = cData.union === "刘备";
-    
     const myCities = getOwnedCities("刘备");
     const neighbours = getNeighbours(myCities);
     const isReachable = neighbours.includes(cName);
 
+    // 就地计算气泡位置：向右平移 6% 坐标以作避让
+    bubble.style.left = `${coord.x + 4.5}%`;
+    bubble.style.top = `${coord.y}%`;
+    bubble.style.display = "block";
+
     let actionsHTML = "";
     if (isMine) {
         actionsHTML = `
-            <div class="city-action-grid">
-                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_shield')">🛡️ 募虎贲军 (-15万)</button>
-                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_spear')">🔱 募长枪兵 (-8万)</button>
-                <button class="action-trigger-btn cbtn-recruit" onclick="cityAction('recruit_cavalry')">🐘 募象骑兵 (-25万)</button>
-                <button class="action-trigger-btn cbtn-econ" onclick="cityAction('farm')">🌾 屯田修水利 (-5万)</button>
+            <div class="bubble-actions">
+                <button class="b-action-btn cbtn-recruit" onclick="cityAction('recruit_shield')">🛡️ 虎贲军 (-15万)</button>
+                <button class="b-action-btn cbtn-recruit" onclick="cityAction('recruit_spear')">🔱 长枪兵 (-8万)</button>
+                <button class="b-action-btn cbtn-recruit" onclick="cityAction('recruit_cavalry')">🐘 象骑兵 (-25万)</button>
+                <button class="b-action-btn cbtn-econ" onclick="cityAction('farm')">🌾 屯田灌溉 (-5万)</button>
             </div>
         `;
     } else {
         actionsHTML = `
-            <div class="city-action-grid">
-                <button class="action-trigger-btn cbtn-war ${isReachable ? '' : 'disabled'}" ${isReachable ? '' : 'disabled'} onclick="cityAction('attack')">⚔️ 亲征强攻</button>
-                <button class="action-trigger-btn cbtn-plot" onclick="cityAction('plot')">🔥 流言破坏 (-5珍宝)</button>
+            <div class="bubble-actions">
+                <button class="b-action-btn cbtn-war ${isReachable ? '' : 'disabled'}" ${isReachable ? '' : 'disabled'} onclick="cityAction('attack')">⚔️ 亲征强攻</button>
+                <button class="b-action-btn cbtn-plot" onclick="cityAction('plot')">🔥 流言破坏 (-5珍宝)</button>
             </div>
+            ${!isReachable ? '<div style="font-size:0.65rem; color:#ff4e50; margin-top:5px; text-align:center;">提示：需接壤才可亲征</div>' : ''}
         `;
     }
 
-    selectedCityBox.innerHTML = `
-        <div class="city-info-card">
-            <div class="city-info-header">
-                <span class="c-name">${cName}</span>
-                <span class="c-union badge-${cData.union === '无主' ? 'gray' : 'color'}">${cData.union}</span>
-            </div>
-            <div class="city-info-body">
-                <div>城市治安繁荣度：<strong>${cData.value}</strong></div>
-                <div style="font-size: 0.72rem; color: #888; margin-top: 2px;">接壤连通：${cityConnections[cName].connect.join(", ")}</div>
-            </div>
-            <div class="city-info-actions">
-                ${actionsHTML}
-            </div>
+    bubble.innerHTML = `
+        <div class="bubble-city-name">${cName}</div>
+        <div class="bubble-city-info">
+            <span>归属：${cData.union}</span>
+            <span>繁荣：${cData.value}</span>
         </div>
+        ${actionsHTML}
     `;
 }
 
@@ -529,20 +467,9 @@ function updateBarracksUI() {
             <strong>${gameState.stats.army_spear} 杆</strong>
         </div>
         <div style="font-size:0.65rem; color:#777; margin-top:8px; line-height:1.3;">
-            攻城由象兵开锋(需30骑)；守城时虎贲军发挥30%几率坚守免于被克。
+            攻城由象兵开锋(需30骑)；守城时虎贲战法防御几率坚守免遭丢失。
         </div>
     `;
-}
-
-// 触发数值变动背景微光闪烁
-function flashStatCard(statId, isIncrease) {
-    const card = document.getElementById(statId)?.parentElement;
-    if (!card) return;
-    const flashClass = isIncrease ? "flash-green" : "flash-red";
-    card.classList.add(flashClass);
-    setTimeout(() => {
-        card.classList.remove(flashClass);
-    }, 450);
 }
 
 // 渲染玩家数值看板 (三兵种拆分)
@@ -615,7 +542,7 @@ function getNeighbours(citiesArr) {
     return Array.from(neighbours);
 }
 
-// 单次推演动作 (兵种克制与守城战判定)
+// 单次推演动作
 function nextStep() {
     Object.keys(gameState.cities).forEach(c => {
         gameState.cities[c].isWar = false;
@@ -763,7 +690,7 @@ function toggleTimer(forceState = null) {
 function changeSpeed(speedMs, btnEl) {
     gameState.speed = speedMs;
     
-    const btns = document.querySelectorAll(".speed-btn");
+    const btns = document.querySelectorAll(".speed-btn-mini");
     btns.forEach(b => b.classList.remove("active"));
     btnEl.classList.add("active");
 
@@ -777,7 +704,7 @@ function changeSpeed(speedMs, btnEl) {
 window.onload = function() {
     initGame("三分天下");
 
-    // 地图空白区点击，重置选中关隘
+    // 地图空白区点击，重置选中关隘，隐藏就地气泡
     document.getElementById("content").onclick = function(e) {
         if (e.target.id === "content" || e.target.tagName.toLowerCase() === "svg") {
             gameState.selectedCity = null;
