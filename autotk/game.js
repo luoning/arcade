@@ -74,16 +74,16 @@ const cityCoords = {
 
 // 3. 势力配置
 const rolesConfig = {
-    "无主": { flag: "circle-o", color: "blank", winByGod: ["混沌", "从零开始吧."] },
-    "刘备": { flag: "bookmark", color: "gird1", winByGod: ["刘备", "终于，大汉的江山还是姓刘."] },
-    "曹操": { flag: "bookmark", color: "gird2", winByGod: ["曹操", "奉孝，你还记得么？"] },
-    "孙权": { flag: "bookmark", color: "gird3", winByGod: ["孙权", "呵呵，我不比哥爹差."] },
-    "董卓": { flag: "bookmark", color: "gird4", winByGod: ["董卓", "看吧，你们都给我敞开了吃！"] },
-    "汉献帝": { flag: "bookmark", color: "gird5", winByGod: ["汉献帝", "高祖，让那些力挽狂澜的汉臣，夺回江山吧"] },
-    "司马炎": { flag: "bookmark", color: "gird6", winByGod: ["司马炎", "三分天下？我才是真命天子！"] },
-    "吕布": { flag: "bookmark", color: "gird7", winByGod: ["吕布", "君不见辕门射戟乎！"] },
-    "袁绍": { flag: "bookmark", color: "gird5", winByGod: ["袁绍", "四世三公，名门袁氏终临天下！"] },
-    "刘表": { flag: "bookmark", color: "gird6", winByGod: ["刘表", "八俊之一，跨有江汉，雄据荆襄！"] }
+    "无主": { flag: "circle-o", color: "blank", logo: "无", winByGod: ["混沌", "从零开始吧."] },
+    "刘备": { flag: "bookmark", color: "gird1", logo: "备", winByGod: ["刘备", "终于，大汉的江山还是姓刘."] },
+    "曹操": { flag: "bookmark", color: "gird2", logo: "操", winByGod: ["曹操", "奉孝，你还记得么？"] },
+    "孙权": { flag: "bookmark", color: "gird3", logo: "孙", winByGod: ["孙权", "呵呵，我不比哥爹差."] },
+    "董卓": { flag: "bookmark", color: "gird4", logo: "董", winByGod: ["董卓", "看吧，你们都给我敞开了吃！"] },
+    "汉献帝": { flag: "bookmark", color: "gird5", logo: "汉", winByGod: ["汉献帝", "高祖，让那些力挽狂澜的汉臣，夺回江山吧"] },
+    "司马炎": { flag: "bookmark", color: "gird6", logo: "司", winByGod: ["司马炎", "三分天下？我才是真命天子！"] },
+    "吕布": { flag: "bookmark", color: "gird7", logo: "吕", winByGod: ["吕布", "君不见辕门射戟乎！"] },
+    "袁绍": { flag: "bookmark", color: "gird5", logo: "绍", winByGod: ["袁绍", "四世三公，名门袁氏终临天下！"] },
+    "刘表": { flag: "bookmark", color: "gird6", logo: "表", winByGod: ["刘表", "八俊之一，跨有江汉，雄据荆襄！"] }
 };
 
 const scriptUnits = {
@@ -341,7 +341,11 @@ function renderMap() {
             }
             const indexEl = cityEl.querySelector(".map_index");
             if (indexEl) {
-                indexEl.textContent = cityData.union[0];
+                indexEl.textContent = role.logo || cityData.union[0];
+            }
+            const ownerEl = document.getElementById(`${cityName}_owner`);
+            if (ownerEl) {
+                ownerEl.textContent = cityData.union;
             }
             const contentEl = document.getElementById(`${cityName}_content`);
             if (contentEl) {
@@ -357,9 +361,9 @@ function renderMap() {
                 <span class="${cardClasses}">
                     <div class="map_item tip ${role.color}">
                         <span class="city-name-label">${cityName}</span>
-                        <span class="map_index">${cityData.union[0]}</span>
+                        <span class="map_index">${role.logo || cityData.union[0]}</span>
                         <span class="prompt-box">
-                            <strong>${cityName}</strong> - 归属: ${cityData.union}
+                            <strong>${cityName}</strong> - 归属: <span id="${cityName}_owner">${cityData.union}</span>
                             <div class="main73">
                                 <div id="${cityName}_content" style="width:100%; padding:5px 0;">
                                     状态: <span style="color:#66fcf1;">${statusTexts.join(" / ")}</span><br/>
