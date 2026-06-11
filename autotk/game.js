@@ -578,15 +578,13 @@ function nextStep() {
     });
 
     const activeUnits = scriptUnits[gameState.script];
-    const unitList = Object.keys(activeUnits);
-    const targetUnit = randChoice(unitList);
-
-    const owned = getOwnedCities(targetUnit);
+    // 过滤出当前至少拥有一座城池的存活势力
+    const aliveUnits = Object.keys(activeUnits).filter(unit => getOwnedCities(unit).length > 0);
     
-    if (owned.length === 0) {
-        nextStep();
-        return;
-    }
+    if (aliveUnits.length === 0) return;
+
+    const targetUnit = randChoice(aliveUnits);
+    const owned = getOwnedCities(targetUnit);
 
     const neighbours = getNeighbours(owned);
     const isAggressive = Math.random() < 0.65 && neighbours.length > 0;
