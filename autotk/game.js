@@ -306,12 +306,9 @@ function renderMap() {
             };
         }
 
-        let nameSuffix = "";
-        if (cityData.avoidWarTurns > 0) {
-            nameSuffix = ` <span style="color:#66fcf1; font-weight:800;" title="免战保护中">[免]</span>`;
-        } else if (cityData.lianhuanTurns > 0) {
-            nameSuffix = ` <span style="color:#f9d423; font-weight:800;" title="混乱混乱中">[乱]</span>`;
-        }
+        const isCapital = isCapitalCity(cityName, cityData.union);
+        const badgesHTML = getCityStatusBadgesHTML(cityData, isCapital);
+        const statusTexts = getCityStatusTextList(cityData, isCapital);
 
         let cardClasses = `map_gird ${role.color}`;
         if (cityName === gameState.cityNow) {
@@ -333,9 +330,9 @@ function renderMap() {
             if (itemEl) {
                 itemEl.className = `map_item tip ${role.color}`;
             }
-            const labelEl = cityEl.querySelector(".city-name-label");
-            if (labelEl) {
-                labelEl.innerHTML = `${cityName}${nameSuffix}`;
+            const badgesEl = document.getElementById(`${cityName}_badges`);
+            if (badgesEl) {
+                badgesEl.innerHTML = badgesHTML;
             }
             const indexEl = cityEl.querySelector(".map_index");
             if (indexEl) {
@@ -344,20 +341,23 @@ function renderMap() {
             const contentEl = document.getElementById(`${cityName}_content`);
             if (contentEl) {
                 contentEl.innerHTML = `
+                    状态: <span style="color:#66fcf1;">${statusTexts.join(" / ")}</span><br/>
                     繁荣度: ${cityData.value} <br/>
                     连通: ${cityConnections[cityName].connect.join(", ")}
                 `;
             }
         } else {
             const contentHTML = `
+                <div class="city-status-badges" id="${cityName}_badges">${badgesHTML}</div>
                 <span class="${cardClasses}">
                     <div class="map_item tip ${role.color}">
-                        <span class="city-name-label">${cityName}${nameSuffix}</span>
+                        <span class="city-name-label">${cityName}</span>
                         <span class="map_index">${cityData.union[0]}</span>
                         <span class="prompt-box">
                             <strong>${cityName}</strong> - 归属: ${cityData.union}
                             <div class="main73">
                                 <div id="${cityName}_content" style="width:100%; padding:5px 0;">
+                                    状态: <span style="color:#66fcf1;">${statusTexts.join(" / ")}</span><br/>
                                     繁荣度: ${cityData.value} <br/>
                                     连通: ${cityConnections[cityName].connect.join(", ")}
                                 </div>
@@ -431,11 +431,17 @@ function updateSelectedCityUI() {
         `;
     }
 
+    const isCapital = isCapitalCity(cName, cData.union);
+    const badgesHTML = getCityStatusBadgesHTML(cData, isCapital);
+
     bubble.innerHTML = `
         <div class="bubble-city-name">${cName}</div>
         <div class="bubble-city-info">
             <span>归属：${cData.union}</span>
             <span>繁荣：${cData.value}</span>
+        </div>
+        <div class="bubble-city-states">
+            ${badgesHTML}
         </div>
         ${actionsHTML}
     `;
@@ -1120,4 +1126,50 @@ function updateTacticsUI() {
         `;
     });
     list.innerHTML = html;
+}
+
+// 判断某城市是否是势力的初始都城 (首府)
+function isCapitalCity(cityName, union) {
+    if (!union || union === "无主") return false;
+    const activeUnits = scriptUnits[gameState.script];
+    if (activeUnits && activeUnits[union]) {
+        return activeUnits[union].home[0] === cityName;
+    }
+    return false;
+}
+
+// 构造城市上方徽章栏的 HTML
+function getCityStatusBadgesHTML(cityData, isCapital) {
+    let badges = "";
+    if (isCapital) {
+        badges += `<span class="status-badge-mini b-capital" title="势力首府都城">👑 都城</span>`;
+    }
+    if (cityData.avoidWarTurns > 0) {
+        badges += `<span class="status-badge-mini b-avoid" title="免战保护中 (还剩 ${cityData.avoidWarTurns}回合)">🛡️ 免战(${cityData.avoidWarTurns})</span>`;
+    }
+    if (cityData.lianhuanTurns > 0) {
+        badges += `<span class="status-badge-mini b-chaos" title="防御瘫痪 (还剩 ${cityData.lianhuanTurns}回合)">🔗 混乱(${cityData.lianhuanTurns})</span>`;
+    }
+    if (cityData.value >= 70000) {
+        badges += `<span class="status-badge-mini b-rich" title="富庶繁荣度很高">🌾 富庶</span>`;
+    } else if (cityData.value < 6000) {
+        badges += `<span class="status-badge-mini b-poor" title="残破废墟经济凋敝">🏚️ 残破</span>`;
+    }
+    return badges;
+}
+
+// 构造城市状态提示详情文字列表
+function getCityStatusTextList(cityData, isCapital) {
+    const states = [];
+    if (isCapital) states.push("👑 势力都城");
+    if (cityData.avoidWarTurns > 0) states.push(`🛡️ 免战保护(${cityData.avoidWarTurns}回合)`);
+    if (cityData.lianhuanTurns > 0) states.push(`🔗 防线瘫痪(${cityData.lianhuanTurns}回合)`);
+    if (cityData.value >= 70000) {
+        states.push("🌾 富庶繁华");
+    } else if (cityData.value < 6000) {
+        states.push("🏚️ 满目疮痍");
+    } else {
+        states.push("🕯️ 饱暖安宁");
+    }
+    return states;
 }

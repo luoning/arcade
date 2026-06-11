@@ -813,3 +813,49 @@ body {
     color: #45f248;
     opacity: 0.6;
 }
+
+/* 城市上方状态徽章栏 */
+.city-status-badges {
+    position: absolute;
+    bottom: 110%; /* 浮在药丸的上方 */
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 3px;
+    z-index: 30;
+    pointer-events: none;
+}
+
+.status-badge-mini {
+    font-size: 0.62rem;
+    padding: 1px 4px;
+    border-radius: 4px;
+    background: rgba(10, 12, 22, 0.92);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+    animation: badgeFloat 1.8s infinite alternate ease-in-out;
+    white-space: nowrap;
+}
+
+@keyframes badgeFloat {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(-3px); }
+}
+
+.status-badge-mini.b-capital { border-color: #f9d423; color: #f9d423; }
+.status-badge-mini.b-avoid { border-color: #66fcf1; color: #66fcf1; }
+.status-badge-mini.b-chaos { border-color: #ff4e50; color: #ff4e50; }
+.status-badge-mini.b-rich { border-color: #2ecc71; color: #2ecc71; }
+.status-badge-mini.b-poor { border-color: #e74c3c; color: #e74c3c; }
+
+/* 气泡内的状态行 */
+.bubble-city-states {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 8px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
