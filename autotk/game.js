@@ -698,7 +698,37 @@ function nextStep() {
     let logType = "normal";
 
     if (isAggressive) {
-        targetCity = randChoice(neighbours);
+        // AI 地缘战略智商评估：优先攻打低繁荣度、非首府、非免战的“软柿子”城池
+        let bestCity = "";
+        let maxWeight = -999999;
+        
+        // 随机打乱邻居列表，保持局部随机性
+        const shuffledNeighbours = [...neighbours].sort(() => Math.random() - 0.5);
+        
+        shuffledNeighbours.forEach(nCity => {
+            const nData = gameState.cities[nCity];
+            let weight = 1000;
+            
+            // 扣减繁荣度分 (越穷越好打)
+            weight -= Math.floor(nData.value / 250);
+            
+            // 判定是否都城 (硬骨头扣分)
+            if (isCapitalCity(nCity, nData.union)) {
+                weight -= 800;
+            }
+            
+            // 判定免战保护 (主动绕路避让)
+            if (nData.avoidWarTurns > 0) {
+                weight -= 5000;
+            }
+            
+            if (weight > maxWeight) {
+                maxWeight = weight;
+                bestCity = nCity;
+            }
+        });
+        
+        targetCity = bestCity || randChoice(neighbours);
         
         // 拦截：如果敌军准备进攻的目标是我方且处于【免战】状态下
         if (gameState.cities[targetCity].union === "刘备" && gameState.cities[targetCity].avoidWarTurns > 0) {
@@ -856,8 +886,100 @@ function changeSpeed(speedMs, btnEl) {
     }
 }
 
+// [第一阶段] 存档与读档功能
+function saveGame() {
+    const serializedState = {
+        running: false, // 载入时默认先暂停，安全为主
+        script: gameState.script,
+        speed: gameState.speed,
+        stats: { ...gameState.stats },
+        cities: { ...gameState.cities },
+        cityNow: gameState.cityNow,
+        selectedCity: gameState.selectedCity,
+        currentWar: gameState.currentWar,
+        cards: [ ...gameState.cards ],
+        activeCardIndex: null,
+        tacticRounds: gameState.tacticRounds,
+        history: [ ...gameState.history ]
+    };
+    try {
+        localStorage.setItem("autotk_save", JSON.stringify(serializedState));
+        addLog("系统存档", "当前军政大势与国库储备已成功封存入档！", "victory");
+    } catch (e) {
+        addLog("存档失败", "本地存储空间不足，未能成功保存进度！", "system");
+    }
+}
+
+function loadGame() {
+    try {
+        const saved = localStorage.getItem("autotk_save");
+        if (!saved) {
+            addLog("载入失败", "未找到任何已保存的军政档案！", "system");
+            return;
+        }
+        const loadedState = JSON.parse(saved);
+        
+        // 停止当前推演定时器
+        if (gameState.running) {
+            toggleTimer(false);
+        }
+
+        // 恢复状态
+        gameState.running = false;
+        gameState.script = loadedState.script;
+        gameState.speed = loadedState.speed;
+        gameState.stats = loadedState.stats;
+        gameState.cities = loadedState.cities;
+        gameState.cityNow = loadedState.cityNow;
+        gameState.selectedCity = loadedState.selectedCity;
+        gameState.currentWar = loadedState.currentWar;
+        gameState.cards = loadedState.cards;
+        gameState.activeCardIndex = null;
+        gameState.tacticRounds = loadedState.tacticRounds;
+        gameState.history = loadedState.history || [];
+
+        // 更新 UI 展示
+        updateSelectedCityUI();
+        updateTacticsUI();
+        updateBarracksUI();
+        renderStats();
+        
+        // 同步剧本按钮高亮
+        const scriptBtns = document.querySelectorAll(".mini-script-btn");
+        scriptBtns.forEach(btn => {
+            if (btn.textContent.trim() === gameState.script) {
+                btn.classList.add("active");
+            } else {
+                btn.classList.remove("active");
+            }
+        });
+
+        // 重新渲染大地图
+        renderMap();
+        
+        addLog("载入成功", `已读取【${gameState.script}】剧本的历时档案，推演已暂停，等待调遣！`, "victory");
+    } catch (e) {
+        addLog("载入失败", "档案文件格式损坏，未能恢复进度！", "system");
+    }
+}
+
 // 页面加载就绪
 window.onload = function() {
+    // 绑定存档读档按钮
+    const btnSave = document.getElementById("btn_save_game");
+    const btnLoad = document.getElementById("btn_load_game");
+    if (btnSave) {
+        btnSave.onclick = function(e) {
+            e.preventDefault();
+            saveGame();
+        };
+    }
+    if (btnLoad) {
+        btnLoad.onclick = function(e) {
+            e.preventDefault();
+            loadGame();
+        };
+    }
     initGame("三分天下");
 
     // 地图空白区点击，重置选中关隘，隐藏就地气泡

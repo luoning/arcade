@@ -442,6 +442,26 @@ body {
     background: rgba(102, 252, 241, 0.05);
 }
 
+.mini-archive-btn {
+    width: 100%;
+    background: #1f2833;
+    border: 1.5px solid rgba(255, 255, 255, 0.05);
+    color: #ccc;
+    padding: 6px;
+    margin-top: 5px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.75rem;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.mini-archive-btn:hover {
+    border-color: #66fcf1;
+    color: #66fcf1;
+    background: rgba(102, 252, 241, 0.05);
+}
+
 /* 军师计策锦囊样式 */
 .tactics-info {
     display: flex;
