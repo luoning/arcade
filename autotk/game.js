@@ -215,14 +215,21 @@ function drawConnections() {
             );
             
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
-            line.setAttribute("x1", `${startCoord.x}%`);
-            line.setAttribute("y1", `${startCoord.y}%`);
-            line.setAttribute("x2", `${endCoord.x}%`);
-            line.setAttribute("y2", `${endCoord.y}%`);
             
             if (isWarLine) {
+                // 强制让虚线动画从发起方 (from) 流向目标防守方 (to)
+                const fromCoord = cityCoords[gameState.currentWar.from];
+                const toCoord = cityCoords[gameState.currentWar.to];
+                line.setAttribute("x1", `${fromCoord.x}%`);
+                line.setAttribute("y1", `${fromCoord.y}%`);
+                line.setAttribute("x2", `${toCoord.x}%`);
+                line.setAttribute("y2", `${toCoord.y}%`);
                 line.setAttribute("class", "war-line");
             } else {
+                line.setAttribute("x1", `${startCoord.x}%`);
+                line.setAttribute("y1", `${startCoord.y}%`);
+                line.setAttribute("x2", `${endCoord.x}%`);
+                line.setAttribute("y2", `${endCoord.y}%`);
                 line.setAttribute("class", "normal-line");
             }
             svg.appendChild(line);
