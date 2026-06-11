@@ -80,7 +80,9 @@ const rolesConfig = {
     "董卓": { flag: "bookmark", color: "gird4", winByGod: ["董卓", "看吧，你们都给我敞开了吃！"] },
     "汉献帝": { flag: "bookmark", color: "gird5", winByGod: ["汉献帝", "高祖，让那些力挽狂澜的汉臣，夺回江山吧"] },
     "司马炎": { flag: "bookmark", color: "gird6", winByGod: ["司马炎", "三分天下？我才是真命天子！"] },
-    "吕布": { flag: "bookmark", color: "gird7", winByGod: ["吕布", "君不见辕门射戟乎！"] }
+    "吕布": { flag: "bookmark", color: "gird7", winByGod: ["吕布", "君不见辕门射戟乎！"] },
+    "红方": { flag: "bookmark", color: "red-team", winByGod: ["红方", "朱羽蔽日，红方最终完成了大一统！"] },
+    "蓝方": { flag: "bookmark", color: "blue-team", winByGod: ["蓝方", "北冥化鲲，蓝方成功扫平宇内，一统天下！"] }
 };
 
 const scriptUnits = {
@@ -95,6 +97,19 @@ const scriptUnits = {
         "孙权": { home: ["吴"] },
         "董卓": { home: ["洛阳"] },
         "吕布": { home: ["下邳"] }
+    },
+    "红蓝对抗": {
+        "红方": { home: [
+            "成都", "梓潼", "汉中", "建宁", "永昌", "交趾", "合浦", "朱崖洲", 
+            "南海", "桂阳", "零陵", "武陵", "长沙", "江陵", "永安", "江州", 
+            "豫章", "建安", "夷洲", "会稽", "吴", "建业", "庐江", "江夏"
+        ] },
+        "蓝方": { home: [
+            "长安", "武威", "金城", "天水", "安定", "武都", "上庸", "新野", 
+            "襄阳", "宛", "弘农", "洛阳", "许昌", "汝南", "寿春", "下邳", 
+            "广陵", "陈留", "濮阳", "小沛", "北海", "平原", "邺", "上党", 
+            "晋阳", "中山", "南皮", "蓟", "北平", "襄平", "乐浪"
+        ] }
     }
 };
 
@@ -117,6 +132,7 @@ let gameState = {
     cities: {},
     cityNow: "新野",
     selectedCity: null, 
+    playerUnion: "刘备",
     currentWar: null, 
     history: []
 };
@@ -143,6 +159,17 @@ function initGame(scriptName) {
     gameState.selectedCity = null;
     gameState.currentWar = null;
     
+    if (scriptName === "红蓝对抗") {
+        gameState.playerUnion = "红方";
+    } else {
+        gameState.playerUnion = "刘备";
+    }
+
+    const roleBadgeEl = document.querySelector(".role-badge");
+    if (roleBadgeEl) {
+        roleBadgeEl.innerHTML = `主公：${gameState.playerUnion === '红方' ? '红方统帅' : '刘皇叔'}`;
+    }
+
     updateSelectedCityUI();
     
     const citiesList = Object.keys(cityConnections);
@@ -160,7 +187,7 @@ function initGame(scriptName) {
         });
     });
 
-    gameState.cityNow = activeUnits["刘备"] ? activeUnits["刘备"].home[0] : "新野";
+    gameState.cityNow = activeUnits[gameState.playerUnion] ? activeUnits[gameState.playerUnion].home[0] : "新野";
     
     const msgContainer = document.getElementById("message");
     if (msgContainer) msgContainer.innerHTML = "";
@@ -352,8 +379,8 @@ function updateSelectedCityUI() {
     const coord = cityCoords[cName];
     if (!coord) return;
 
-    const isMine = cData.union === "刘备";
-    const myCities = getOwnedCities("刘备");
+    const isMine = cData.union === gameState.playerUnion;
+    const myCities = getOwnedCities(gameState.playerUnion);
     const neighbours = getNeighbours(myCities);
     const isReachable = neighbours.includes(cName);
 
@@ -459,7 +486,7 @@ function cityAction(type) {
         renderStats({ cash: -50000, food: 300000 });
 
     } else if (type === "attack") {
-        const myCities = getOwnedCities("刘备");
+        const myCities = getOwnedCities(gameState.playerUnion);
         const neighbours = getNeighbours(myCities);
         if (!neighbours.includes(cName)) {
             addLog("出征失败", "非接壤关隘，无法强袭！", "system");
@@ -482,9 +509,10 @@ function cityAction(type) {
         const success = Math.random() < 0.75;
         if (success) {
             const old = cData.union;
-            cData.union = "刘备";
+            cData.union = gameState.playerUnion;
             cData.value = Math.floor(cData.value * 0.95);
-            addLog("亲征大捷", `【战报】刘皇叔率领精装象兵大举突破【${cName}】，瞬间踩平【${old}】防御，收复失地！`, "victory");
+            const leaderName = gameState.playerUnion === "红方" ? "红方统帅" : "刘皇叔";
+            addLog("亲征大捷", `【战报】${leaderName}率领精装象兵大举突破【${cName}】，瞬间踩平【${old}】防御，收复失地！`, "victory");
         } else {
             addLog("亲征受挫", `【战报】强攻【${cName}】遭遇激烈反抗，象兵被枪兵伏击折损，被迫收兵。`, "war");
         }
@@ -651,7 +679,7 @@ function nextStep() {
 
         const defender = gameState.cities[targetCity].union;
         
-        if (defender === "刘备" && gameState.stats.army_shield > 100 && Math.random() < 0.3) {
+        if (defender === gameState.playerUnion && gameState.stats.army_shield > 100 && Math.random() < 0.3) {
             logMsg = `派遣兵马大肆入侵我方【${targetCity}】，但遭到驻防的【虎贲重步兵】誓死抵抗，强行守住了要塞关隘！`;
             logType = "war";
             change.army_shield = -randInt(10, 30);
@@ -664,7 +692,7 @@ function nextStep() {
                 logMsg = `挥师强攻【${targetCity}】，击溃了【${defender}】的守备部队，成功将城池夺回！`;
                 logType = "war";
                 
-                if (defender === "刘备") {
+                if (defender === gameState.playerUnion) {
                     change.people = -randInt(50, 200);
                     change.army_spear = -randInt(5, 15);
                 }
@@ -690,7 +718,7 @@ function nextStep() {
         } else if (randEvent < 0.75) {
             const recruitCount = randInt(5, 15);
             logMsg = `在【${targetCity}】开设校场募集乡勇，获得 10 名长枪步兵入伍。`;
-            if (targetUnit === "刘备") {
+            if (targetUnit === gameState.playerUnion) {
                 change.army_spear = recruitCount;
             }
             change.people = randInt(20, 200);
@@ -823,7 +851,10 @@ window.onload = function() {
         { id: "cheat_war3", action: () => setAllCity("曹操") },
         { id: "cheat_war4", action: () => setAllCity("刘备") },
         { id: "cheat_war5", action: () => setAllCity("孙权") },
-        { id: "cheat_war6", action: () => { initGame("群雄并起"); settingsModal.classList.remove("active"); } }
+        { id: "cheat_war6", action: () => { initGame("群雄并起"); settingsModal.classList.remove("active"); } },
+        { id: "cheat_war7", action: () => { initGame("红蓝对抗"); settingsModal.classList.remove("active"); } },
+        { id: "cheat_war8", action: () => setAllCity("红方") },
+        { id: "cheat_war9", action: () => setAllCity("蓝方") }
     ];
 
     cheatActions.forEach(item => {
@@ -837,18 +868,37 @@ window.onload = function() {
     });
 
     // 绑定大厅侧的迷你剧本按钮
+    function selectScriptBtn(activeId) {
+        ["cheat_war1", "cheat_war6", "cheat_war7"].forEach(id => {
+            const btn = document.getElementById(id);
+            if (btn) {
+                if (id === activeId) {
+                    btn.classList.add("active");
+                } else {
+                    btn.classList.remove("active");
+                }
+            }
+        });
+    }
+
     document.getElementById("cheat_war1").onclick = function(e) {
         e.preventDefault();
-        document.getElementById("cheat_war1").classList.add("active");
-        document.getElementById("cheat_war6").classList.remove("active");
+        selectScriptBtn("cheat_war1");
         initGame("三分天下");
     };
     document.getElementById("cheat_war6").onclick = function(e) {
         e.preventDefault();
-        document.getElementById("cheat_war6").classList.add("active");
-        document.getElementById("cheat_war1").classList.remove("active");
+        selectScriptBtn("cheat_war6");
         initGame("群雄并起");
     };
+    const rvbBtn = document.getElementById("cheat_war7");
+    if (rvbBtn) {
+        rvbBtn.onclick = function(e) {
+            e.preventDefault();
+            selectScriptBtn("cheat_war7");
+            initGame("红蓝对抗");
+        };
+    }
 
     const speedButtons = [
         { id: "speed_1x", ms: 1000 },

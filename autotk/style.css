@@ -281,6 +281,8 @@ body {
 .gird5 { border-color: rgba(231, 76, 60, 0.8); color: #ffd6d6; }
 .gird6 { border-color: rgba(26, 188, 156, 0.8); color: #d6fff7; }
 .gird7 { border-color: rgba(241, 196, 15, 0.8); color: #fffdff; }
+.red-team { border-color: rgba(231, 76, 60, 0.95) !important; color: #ffd6d6; }
+.blue-team { border-color: rgba(52, 152, 219, 0.95) !important; color: #d6ebff; }
 
 /* Map Hover Tip */
 .tip .prompt-box {
@@ -716,6 +718,10 @@ body {
 .bg-sima:hover { background: rgba(26, 188, 156, 0.45); }
 .bg-xiandi { background: rgba(231, 76, 60, 0.2); }
 .bg-xiandi:hover { background: rgba(231, 76, 60, 0.45); }
+.bg-red { background: rgba(231, 76, 60, 0.2); }
+.bg-red:hover { background: rgba(231, 76, 60, 0.45); }
+.bg-blue { background: rgba(52, 152, 219, 0.2); }
+.bg-blue:hover { background: rgba(52, 152, 219, 0.45); }
 
 /* 页脚 */
 .cabinet-footer {
