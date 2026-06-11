@@ -117,6 +117,7 @@ let gameState = {
     cities: {},
     cityNow: "新野",
     selectedCity: null, 
+    currentWar: null, 
     history: []
 };
 
@@ -140,6 +141,7 @@ function initGame(scriptName) {
     gameState.script = scriptName;
     gameState.history = [];
     gameState.selectedCity = null;
+    gameState.currentWar = null;
     
     updateSelectedCityUI();
     
@@ -207,7 +209,10 @@ function drawConnections() {
             if (drawn.has(lineKey)) return;
             drawn.add(lineKey);
 
-            const isWarLine = gameState.cities[startCity]?.isWar || gameState.cities[endCity]?.isWar;
+            const isWarLine = gameState.currentWar && (
+                (startCity === gameState.currentWar.from && endCity === gameState.currentWar.to) ||
+                (startCity === gameState.currentWar.to && endCity === gameState.currentWar.from)
+            );
             
             const line = document.createElementNS("http://www.w3.org/2000/svg", "line");
             line.setAttribute("x1", `${startCoord.x}%`);
@@ -428,6 +433,10 @@ function cityAction(type) {
         gameState.stats.cash -= 500000;
 
         cData.isWar = true;
+        // 计算发起我方强攻的接壤城池以进行连线
+        const myAttackers = myCities.filter(c => cityConnections[c]?.connect.includes(cName));
+        const attackerCity = randChoice(myAttackers) || myCities[0];
+        gameState.currentWar = { from: attackerCity, to: cName };
         const success = Math.random() < 0.75;
         if (success) {
             const old = cData.union;
@@ -556,6 +565,7 @@ function getNeighbours(citiesArr) {
 
 // 单次推演动作
 function nextStep() {
+    gameState.currentWar = null; // 重置本回合战斗发起线路
     Object.keys(gameState.cities).forEach(c => {
         gameState.cities[c].isWar = false;
     });
@@ -582,6 +592,11 @@ function nextStep() {
     if (isAggressive) {
         targetCity = randChoice(neighbours);
         gameState.cities[targetCity].isWar = true;
+
+        // 寻找是哪一个己方接壤的城池发起的进攻以连线
+        const attackers = owned.filter(c => cityConnections[c]?.connect.includes(targetCity));
+        const attackerCity = randChoice(attackers) || owned[0];
+        gameState.currentWar = { from: attackerCity, to: targetCity };
 
         const defender = gameState.cities[targetCity].union;
         
