@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Connect - 赛博连连看</title>
+  <meta name="description" content="一个视觉惊艳的霓虹赛博连连看游戏，包含经典的二折角寻路、自动死锁洗牌和 Web Audio 音效。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2220%22 width=%2230%22 height=%2260%22 rx=%225%22 fill=%22%23ff007f%22/><rect x=%2260%22 y=%2220%22 width=%2230%22 height=%2260%22 rx=%225%22 fill=%22%23ff007f%22/><path d=%22M35,50 L65,50%22 stroke=%22%2300f5d4%22 stroke-width=%228%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部控制面板 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="stats-container">
+      <div class="stat-box level">
+        <div class="stat-label">LEVEL</div>
+        <div id="levelVal" class="stat-value">1</div>
+      </div>
+      <div class="stat-box score">
+        <div class="stat-label">SCORE</div>
+        <div id="scoreVal" class="stat-value">0</div>
+      </div>
+      <div class="stat-box time">
+        <div class="stat-label">TIME</div>
+        <div id="timeVal" class="stat-value">90</div>
+      </div>
+      <div class="stat-box hints">
+        <div class="stat-label">HINTS</div>
+        <div id="hintVal" class="stat-value">3</div>
+      </div>
+      <div class="stat-box shuffles">
+        <div class="stat-label">SHUFFLES</div>
+        <div id="shuffleVal" class="stat-value">3</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">CYBER CONNECT</h1>
+
+  <!-- 画布及遮罩卡片 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+    
+    <!-- 开始游戏遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">CYBER CONNECT</h2>
+      <p>点击选择两个相同的赛博芯片图块，如果它们之间的连接路径折角不超过两次，就可以发出等离子束将它们消除！</p>
+      <p>请选择计算核心载入难度（无尽递归模式）：</p>
+      <div class="difficulty-selection" style="display:flex;gap:10px;margin-top:15px;">
+        <button id="startEasyBtn" class="btn" style="border-color:#39ff14;color:#39ff14;padding:8px 18px;font-size:0.75rem;">简单核能</button>
+        <button id="startMediumBtn" class="btn" style="border-color:#fee440;color:#fee440;padding:8px 18px;font-size:0.75rem;">中等超频</button>
+        <button id="startHardBtn" class="btn btn-pink" style="padding:8px 18px;font-size:0.75rem;">地狱熔毁</button>
+      </div>
+    </div>
+
+    <!-- 关卡成功过关遮罩 -->
+    <div id="stageClearOverlay" class="overlay hidden">
+      <h2 class="win-text">STAGE CLEARED</h2>
+      <p>恭喜！本关图块已全部清理，链路阻抗归零。</p>
+      <div class="clear-stats">
+        <div>通过关卡: <span id="clearLevelVal" class="highlight">1</span></div>
+        <div>当前积分: <span id="clearScoreVal" class="highlight">0</span></div>
+      </div>
+      <button id="nextLevelBtn" class="btn">进入下关</button>
+    </div>
+
+    <!-- 游戏结束 GG 遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="over-text">SYSTEM OFFLINE</h2>
+      <p>时间耗尽！网络链路发生阻塞，系统已强制脱机。</p>
+      <div class="clear-stats">
+        <div>最终得分: <span id="failScoreVal" class="highlight">0</span></div>
+      </div>
+      <button id="restartBtn" class="btn btn-pink">重启核心</button>
+    </div>
+  </main>
+
+  <!-- 道具按钮与说明 -->
+  <div class="item-actions">
+    <button id="useHintBtn" class="action-btn">
+      <span class="btn-icon">💡</span> 提示 (Hint)
+    </button>
+    <button id="useShuffleBtn" class="action-btn">
+      <span class="btn-icon">🔄</span> 洗牌 (Shuffle)
+    </button>
+  </div>
+
+  <footer class="help-guide">
+    <p>直接点击两个<strong>相同图案且边缘畅通</strong>的图块进行消除。连线最多弯折两次。</p>
+    <p>系统内置<strong>死锁自动重组</strong>，如果没有可消除对，会自动重新洗牌打乱，保障流畅手感！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

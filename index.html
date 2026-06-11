@@ -1,0 +1,1793 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Arcade - 赛博街机游戏厅</title>
+  <meta name="description" content="一个视觉极其炸裂的霓虹赛博街机游戏厅。汇聚 17 款 Vanilla JS 网页小游戏，带 3D 街机机台、CRT 扫描线及 Synthwave 动态合成 BGM。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎮</text></svg>">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@200;400;600&display=swap');
+
+    :root {
+      --bg-color-1: #030008;
+      --bg-color-2: #000205;
+      --panel-bg: rgba(10, 5, 20, 0.75);
+      --border-color: rgba(255, 255, 255, 0.05);
+      --text-primary: #ffffff;
+      --text-secondary: #8b8f99;
+      --cyan-neon: #00f5d4;
+      --purple-neon: #9d4edd;
+      
+      --font-display: 'Orbitron', sans-serif;
+      --font-body: 'Outfit', sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: var(--font-body);
+      background: radial-gradient(circle at 50% 30%, #15092a 0%, var(--bg-color-1) 70%, var(--bg-color-2) 100%);
+      color: var(--text-primary);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start;
+      overflow-x: hidden;
+      position: relative;
+      padding: 30px 20px 80px 20px;
+    }
+
+    /* 漂浮的霓虹微粒 */
+    .dust-container {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: -1;
+      overflow: hidden;
+    }
+    .dust {
+      position: absolute;
+      width: 4px;
+      height: 4px;
+      background: var(--dust-color, #ff007f);
+      border-radius: 50%;
+      filter: blur(1px);
+      opacity: 0.3;
+      animation: floatUp var(--dust-duration, 15s) linear infinite;
+    }
+    @keyframes floatUp {
+      0% {
+        transform: translateY(110vh) translateX(0px);
+        opacity: 0;
+      }
+      10% { opacity: 0.6; }
+      90% { opacity: 0.6; }
+      100% {
+        transform: translateY(-10vh) translateX(var(--dust-drift, 50px));
+        opacity: 0;
+      }
+    }
+
+    /* 真实 CRT 电视屏幕扫描线滤镜 */
+    body::before {
+      content: " ";
+      display: block;
+      position: fixed;
+      top: 0; left: 0; bottom: 0; right: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.3) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+      z-index: 9999;
+      background-size: 100% 6px, 9px 100%;
+      pointer-events: none;
+    }
+
+    /* 赛博朋克 Synthwave 流动网格地板 */
+    .floor-grid-container {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 35vh;
+      perspective: 150px;
+      overflow: hidden;
+      z-index: -2;
+      border-top: 2px solid rgba(255, 0, 127, 0.15);
+      background: linear-gradient(to top, rgba(13, 3, 29, 0.8), transparent);
+    }
+
+    .floor-grid {
+      position: absolute;
+      top: -100%;
+      left: -50%;
+      width: 200%;
+      height: 300%;
+      background-image: 
+        linear-gradient(rgba(0, 245, 212, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 245, 212, 0.1) 1px, transparent 1px);
+      background-size: 80px 80px;
+      transform: rotateX(70deg);
+      animation: gridMove 15s linear infinite;
+    }
+
+    @keyframes gridMove {
+      0% { background-position: 0 0; }
+      100% { background-position: 0 960px; }
+    }
+
+    /* 赛博大厅霓虹背景气团 */
+    .aura-pink, .aura-cyan {
+      position: fixed;
+      width: 800px;
+      height: 800px;
+      border-radius: 50%;
+      filter: blur(200px);
+      z-index: -3;
+      opacity: 0.15;
+      pointer-events: none;
+    }
+    .aura-pink { background: #ff007f; top: 10%; left: -10%; }
+    .aura-cyan { background: #00f5d4; bottom: -10%; right: -10%; }
+
+    /* LED 跑马灯 */
+    .led-ticker {
+      width: 100%;
+      background: #08020f;
+      border-bottom: 2px dashed rgba(0, 245, 212, 0.2);
+      color: #00f5d4;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      padding: 6px 0;
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 900;
+      overflow: hidden;
+      white-space: nowrap;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    }
+    .led-text {
+      display: inline-block;
+      padding-left: 100%;
+      animation: tickerRun 25s linear infinite;
+      text-shadow: 0 0 4px #00f5d4;
+    }
+    @keyframes tickerRun {
+      0% { transform: translate3d(0, 0, 0); }
+      100% { transform: translate3d(-100%, 0, 0); }
+    }
+
+    /* 顶栏 */
+    .top-header {
+      width: 100%;
+      max-width: 1200px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 20px;
+      margin-bottom: 30px;
+      border-bottom: 1px solid var(--border-color);
+      padding-bottom: 15px;
+    }
+
+    .arcade-logo {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 6px;
+      background: linear-gradient(to right, #fee440, #ff007f, #00f5d4);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      filter: drop-shadow(0 2px 8px rgba(255, 0, 127, 0.4));
+    }
+
+    .header-actions {
+      display: flex;
+      gap: 12px;
+    }
+
+    .icon-btn {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--border-color);
+      color: var(--text-secondary);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      backdrop-filter: blur(5px);
+    }
+
+    .icon-btn:hover, .icon-btn.active {
+      color: #00f5d4;
+      border-color: #00f5d4;
+      background: rgba(0, 245, 212, 0.08);
+      box-shadow: 0 0 15px rgba(0, 245, 212, 0.4);
+    }
+
+    /* 霓虹复古主标题 */
+    .main-title-container {
+      text-align: center;
+      margin-bottom: 45px;
+      position: relative;
+    }
+
+    .main-title {
+      font-family: var(--font-display);
+      font-size: 4.5rem;
+      font-weight: 900;
+      letter-spacing: 12px;
+      text-transform: uppercase;
+      color: #fff;
+      text-shadow: 
+        0 0 5px #fff,
+        0 0 10px #fff,
+        0 0 20px #ff007f,
+        0 0 35px #ff007f,
+        0 0 50px #9d4edd;
+      animation: flicker 6s infinite alternate;
+      margin-bottom: 12px;
+    }
+
+    @keyframes flicker {
+      0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+        text-shadow: 
+          0 0 5px #fff,
+          0 0 10px #fff,
+          0 0 20px #ff007f,
+          0 0 30px #ff007f,
+          0 0 45px #9d4edd;
+        opacity: 1;
+      }
+      20%, 24%, 55% {
+        text-shadow: none;
+        color: rgba(255, 255, 255, 0.15);
+        opacity: 0.8;
+      }
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: var(--text-secondary);
+      letter-spacing: 2px;
+      font-weight: 400;
+      max-width: 700px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* 游戏大厅机台卡片网格 */
+    .lobby-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 40px;
+      width: 100%;
+      max-width: 1200px;
+      margin-bottom: 60px;
+    }
+
+    /* 3D 街机机柜样式卡片 */
+    .cabinet-card {
+      background: var(--panel-bg);
+      border: 3px solid rgba(255, 255, 255, 0.05);
+      border-radius: 16px;
+      padding: 16px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.8), inset 0 2px 2px rgba(255,255,255,0.05);
+      transform-style: preserve-3d;
+      perspective: 800px;
+      height: 420px;
+    }
+
+    /* 街机侧边档板效果 */
+    .cabinet-card::after {
+      content: '';
+      position: absolute;
+      top: 0; bottom: 0; left: -8px; width: 8px;
+      background: linear-gradient(to right, transparent, rgba(0,0,0,0.5));
+      border-radius: 4px 0 0 4px;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+
+    /* 街机顶部发光广告牌 (Marquee) */
+    .cabinet-marquee {
+      width: 100%;
+      background: #020106;
+      border: 2px solid var(--cabinet-color, #9d4edd);
+      border-radius: 6px;
+      padding: 8px;
+      text-align: center;
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 900;
+      letter-spacing: 2px;
+      color: var(--cabinet-color, #9d4edd);
+      text-shadow: 0 0 6px var(--cabinet-color);
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.8), inset 0 0 8px var(--cabinet-color);
+      margin-bottom: 14px;
+      text-transform: uppercase;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* 模拟灯箱发光材质 */
+    .cabinet-marquee::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: linear-gradient(180deg, rgba(255,255,255,0.1), transparent);
+    }
+
+    /* 街机显示屏 (Screen) */
+    .cabinet-screen {
+      background: #040209;
+      border: 3px solid #141220;
+      border-radius: 8px;
+      padding: 24px 14px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+      overflow: hidden;
+      flex-grow: 1;
+      margin-bottom: 14px;
+      transition: all 0.3s ease;
+      box-shadow: inset 0 0 25px rgba(0,0,0,1);
+    }
+
+    /* CRT 显示器边缘微弱的反光与扫描阴影 */
+    .cabinet-screen::before {
+      content: '';
+      position: absolute;
+      top: 0; left: 0; right: 0; height: 100%;
+      background: linear-gradient(to bottom, rgba(255,255,255,0.03) 0%, transparent 50%, rgba(0,0,0,0.4) 100%);
+      pointer-events: none;
+      z-index: 2;
+    }
+
+    .cabinet-icon {
+      font-size: 3.2rem;
+      margin-bottom: 10px;
+      filter: drop-shadow(0 0 12px var(--shadow-color));
+      transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      z-index: 1;
+    }
+
+    .cabinet-title {
+      font-family: var(--font-display);
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 1px;
+      text-align: center;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+      z-index: 1;
+    }
+
+    /* 街机摇杆控制台 (Control Panel) */
+    .cabinet-control-panel {
+      width: 100%;
+      border-top: 2px solid rgba(255,255,255,0.08);
+      background: linear-gradient(180deg, rgba(255,255,255,0.02) 0%, rgba(0,0,0,0.4) 100%);
+      padding-top: 10px;
+      border-radius: 0 0 10px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .cabinet-desc {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      line-height: 1.4;
+      text-align: center;
+      min-height: 36px;
+      padding: 0 6px;
+    }
+
+    /* 控制面板台面 */
+    .cabinet-deck {
+      display: flex;
+      justify-content: space-between;
+      width: 100%;
+      align-items: center;
+      padding: 4px 8px;
+      background: rgba(0,0,0,0.3);
+      border-radius: 6px;
+      border: 1px solid rgba(255,255,255,0.03);
+    }
+
+    /* 投币孔 (Coin Slot) */
+    .coin-slot {
+      background: #020106;
+      border: 1px solid #ff0055;
+      border-radius: 3px;
+      padding: 3px 5px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2px;
+      font-family: var(--font-display);
+      font-size: 0.45rem;
+      color: #ff0055;
+      text-shadow: 0 0 2px #ff0055;
+      box-shadow: 0 0 4px rgba(255, 0, 85, 0.2);
+    }
+    
+    .coin-light {
+      width: 2px;
+      height: 8px;
+      background: #ff0055;
+      box-shadow: 0 0 6px #ff0055;
+      border-radius: 1px;
+      animation: neonPulse 1.5s infinite alternate;
+    }
+
+    @keyframes neonPulse {
+      0% { opacity: 0.4; }
+      100% { opacity: 1; }
+    }
+
+    /* 街机摇杆/按钮组 */
+    .joystick-group {
+      display: flex;
+      gap: 6px;
+      align-items: center;
+    }
+    .joy-stick {
+      width: 10px; height: 10px;
+      background: var(--cabinet-color, #ff007f);
+      border-radius: 50%;
+      position: relative;
+      box-shadow: 0 0 6px var(--cabinet-color);
+      transform: translate3d(0, -2px, 0);
+    }
+    .joy-stick::after {
+      content: '';
+      position: absolute;
+      top: 6px; left: 4px;
+      width: 2px; height: 8px;
+      background: #666;
+    }
+    .joy-btn {
+      width: 6px; height: 6px;
+      background: #00f5d4;
+      border-radius: 50%;
+      box-shadow: 0 0 4px #00f5d4;
+    }
+    .joy-btn:nth-child(3) {
+      background: #ff007f;
+      box-shadow: 0 0 4px #ff007f;
+    }
+
+    /* 3D 悬浮高亮动效 */
+    .cabinet-card:hover {
+      transform: translateY(-15px) rotateX(8deg);
+      border-color: var(--cabinet-color, #9d4edd);
+      box-shadow: 0 30px 60px var(--shadow-color, rgba(157, 78, 221, 0.45)), inset 0 2px 4px rgba(255,255,255,0.1);
+    }
+
+    .cabinet-card:hover::after {
+      opacity: 1;
+    }
+
+    .cabinet-card:hover .cabinet-marquee {
+      background: var(--cabinet-color);
+      color: #020106;
+      text-shadow: none;
+      box-shadow: 0 0 20px var(--cabinet-color);
+    }
+
+    .cabinet-card:hover .cabinet-screen {
+      border-color: var(--cabinet-color);
+      box-shadow: inset 0 0 35px var(--shadow-color), 0 0 10px rgba(255, 255, 255, 0.05);
+    }
+
+    .cabinet-card:hover .cabinet-icon {
+      transform: scale(1.2) rotate(-5deg);
+    }
+
+    .cabinet-card:hover .coin-light {
+      animation: blink 0.2s infinite alternate;
+    }
+
+    @keyframes blink {
+      0% { opacity: 0.1; }
+      100% { opacity: 1; }
+    }
+
+    /* 底部说明 */
+    .lobby-footer {
+      text-align: center;
+      width: 100%;
+      max-width: 1200px;
+      border-top: 1px solid var(--border-color);
+      padding-top: 25px;
+      color: var(--text-secondary);
+      font-size: 0.8rem;
+      letter-spacing: 1px;
+      z-index: 10;
+    }
+
+    /* --- 解耦街机运行框架样式 (Lobby Arcade Cabinet Frame) --- */
+    .arcade-frame-wrapper {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #020106;
+      z-index: 999;
+      display: flex;
+      flex-direction: column;
+      transform: translateY(100%);
+      transition: transform 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+    }
+
+    .arcade-frame-wrapper.active {
+      transform: translateY(0);
+    }
+
+    /* 街机框架顶部边栏 */
+    .frame-header {
+      height: 54px;
+      width: 100%;
+      background: #0d0617;
+      border-bottom: 2px solid var(--active-color, #00f5d4);
+      box-shadow: 0 4px 20px var(--active-shadow, rgba(0, 245, 212, 0.3));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 0 20px;
+      z-index: 1000;
+    }
+
+    /* 返回大厅按钮 (退币) */
+    .exit-btn {
+      font-family: var(--font-display);
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: #fff;
+      background: transparent;
+      border: 1.5px solid var(--active-color, #00f5d4);
+      padding: 6px 16px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: 0 0 6px var(--active-shadow, rgba(0, 245, 212, 0.15));
+    }
+
+    .exit-btn:hover {
+      background: var(--active-color, #00f5d4);
+      color: #05020c;
+      box-shadow: 0 0 15px var(--active-color, #00f5d4);
+    }
+
+    /* 跑马灯显示屏 */
+    .marquee-screen {
+      font-family: var(--font-display);
+      font-size: 0.9rem;
+      font-weight: 900;
+      color: var(--active-color, #00f5d4);
+      letter-spacing: 2px;
+      text-shadow: 0 0 5px var(--active-color, #00f5d4);
+      background: #040107;
+      border: 1px solid rgba(255,255,255,0.06);
+      padding: 4px 20px;
+      border-radius: 4px;
+      max-width: 300px;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+
+    /* 纯粹游戏窗口容器 */
+    .iframe-container {
+      flex: 1;
+      width: 100%;
+      position: relative;
+      background: #000;
+    }
+
+    #gameIframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    /* 翻转过渡遮罩 */
+    .cabinet-loader {
+      position: absolute;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: #020106;
+      z-index: 1001;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      transition: opacity 0.35s ease;
+      pointer-events: none;
+      opacity: 0;
+    }
+    
+    .cabinet-loader.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .loader-text {
+      font-family: var(--font-display);
+      font-size: 1.8rem;
+      font-weight: 900;
+      letter-spacing: 5px;
+      color: var(--active-color, #00f5d4);
+      text-shadow: 0 0 10px var(--active-color);
+      animation: blink 0.6s infinite alternate;
+    }
+
+    @media (max-width: 768px) {
+      .main-title {
+        font-size: 2.6rem;
+      }
+      .lobby-grid {
+        grid-template-columns: 1fr 1fr;
+      }
+    }
+
+    /* --- 成就系统专属样式 --- */
+    .toast-container {
+      position: fixed;
+      top: 20px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-120px);
+      background: rgba(12, 5, 25, 0.95);
+      border: 2px solid var(--cyan-neon, #00f5d4);
+      box-shadow: 0 0 25px rgba(0, 245, 212, 0.45);
+      padding: 12px 24px;
+      border-radius: 12px;
+      z-index: 10000;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      color: #fff;
+      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(8px);
+      pointer-events: none;
+    }
+    .toast-container.active {
+      transform: translateX(-50%) translateY(0);
+    }
+    .toast-icon {
+      font-size: 1.6rem;
+      filter: drop-shadow(0 0 6px var(--cyan-neon));
+    }
+    .toast-content {
+      display: flex;
+      flex-direction: column;
+    }
+    .toast-title {
+      font-weight: 900;
+      color: var(--cyan-neon);
+      letter-spacing: 1px;
+    }
+    .toast-desc {
+      font-family: var(--font-body);
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      margin-top: 2px;
+    }
+
+    /* 成就弹窗 */
+    .achievements-modal {
+      position: fixed;
+      top: 0; left: 0; width: 100%; height: 100%;
+      background: rgba(3, 1, 8, 0.96);
+      z-index: 9999;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s ease;
+      backdrop-filter: blur(10px);
+    }
+    .achievements-modal.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .achievements-content {
+      background: rgba(16, 8, 32, 0.88);
+      border: 2px solid rgba(157, 78, 221, 0.35);
+      box-shadow: 0 0 30px rgba(157, 78, 221, 0.25);
+      border-radius: 20px;
+      width: 90%;
+      max-width: 720px;
+      height: 80vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      position: relative;
+    }
+    .achievements-header {
+      padding: 18px 24px;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: rgba(10, 5, 20, 0.6);
+    }
+    .achievements-header h2 {
+      font-family: var(--font-display);
+      font-size: 1.35rem;
+      font-weight: 900;
+      letter-spacing: 3px;
+      color: var(--purple-neon);
+      text-shadow: 0 0 10px rgba(157, 78, 221, 0.5);
+    }
+    .modal-close-btn {
+      background: transparent;
+      border: 1px solid rgba(255,255,255,0.15);
+      color: var(--text-secondary);
+      border-radius: 8px;
+      width: 34px; height: 34px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: bold;
+      font-size: 1.2rem;
+      transition: all 0.2s ease;
+    }
+    .modal-close-btn:hover {
+      color: #fff;
+      border-color: #fff;
+      background: rgba(255,255,255,0.08);
+    }
+    .achievements-body {
+      flex: 1;
+      overflow-y: auto;
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+    /* 专属霓虹发光滚动条 */
+    .achievements-body::-webkit-scrollbar {
+      width: 8px;
+    }
+    .achievements-body::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.01);
+      border-radius: 4px;
+    }
+    .achievements-body::-webkit-scrollbar-thumb {
+      background: rgba(157, 78, 221, 0.4);
+      border: 1px solid rgba(157, 78, 221, 0.15);
+      border-radius: 4px;
+    }
+    .achievements-body::-webkit-scrollbar-thumb:hover {
+      background: var(--cyan-neon);
+      box-shadow: 0 0 10px var(--cyan-neon);
+    }
+    .game-achievements-row {
+      border: 1.5px solid rgba(255,255,255,0.04);
+      background: rgba(255, 255, 255, 0.01);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .game-row-title {
+      font-family: var(--font-display);
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: #fff;
+      margin-bottom: 12px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      letter-spacing: 1px;
+    }
+    .game-row-progress {
+      font-size: 0.75rem;
+      color: var(--cyan-neon);
+      font-family: var(--font-display);
+      font-weight: bold;
+    }
+    .ach-cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .ach-card {
+      background: rgba(0, 0, 0, 0.45);
+      border: 1.5px solid rgba(255, 255, 255, 0.04);
+      border-radius: 10px;
+      padding: 12px 14px;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      transition: all 0.3s ease;
+    }
+    .ach-card.locked {
+      opacity: 0.45;
+      filter: grayscale(1);
+    }
+    .ach-card.unlocked {
+      border-color: rgba(0, 245, 212, 0.3);
+      background: rgba(0, 245, 212, 0.03);
+      box-shadow: 0 0 12px rgba(0, 245, 212, 0.05);
+    }
+    .ach-medal {
+      font-size: 1.8rem;
+      filter: drop-shadow(0 0 5px var(--cyan-neon));
+    }
+    .ach-card.locked .ach-medal {
+      filter: none;
+    }
+    .ach-info {
+      display: flex;
+      flex-direction: column;
+    }
+    .ach-name {
+      font-family: var(--font-display);
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: #fff;
+      letter-spacing: 0.5px;
+    }
+    .ach-card.unlocked .ach-name {
+      color: var(--cyan-neon);
+    }
+    .ach-desc {
+      font-size: 0.72rem;
+      color: var(--text-secondary);
+      margin-top: 3px;
+      line-height: 1.4;
+    }
+</style>
+</head>
+<body>
+
+  <!-- LED 滚动跑马灯 -->
+  <div class="led-ticker">
+    <div class="led-text">&gt;&gt; WELCOME TO NEON ARCADE &gt;&gt; INSERT COIN TO PLAY &gt;&gt; 17 CHANNELS ONLINE &gt;&gt; HAVE FUN IN RETRO WORLD &gt;&gt; CHOOSE YOUR CABINET &gt;&gt;</div>
+  </div>
+
+  <!-- 漂浮粒子容器 -->
+  <div class="dust-container">
+    <div class="dust" style="left: 10%; --dust-color: #ff007f; --dust-duration: 12s; --dust-drift: 30px;"></div>
+    <div class="dust" style="left: 25%; --dust-color: #00f5d4; --dust-duration: 18s; --dust-drift: -40px;"></div>
+    <div class="dust" style="left: 45%; --dust-color: #fee440; --dust-duration: 15s; --dust-drift: 20px;"></div>
+    <div class="dust" style="left: 65%; --dust-color: #ff007f; --dust-duration: 20s; --dust-drift: -50px;"></div>
+    <div class="dust" style="left: 85%; --dust-color: #00f5d4; --dust-duration: 14s; --dust-drift: 40px;"></div>
+    <div class="dust" style="left: 15%; --dust-color: #fee440; --dust-duration: 22s; --dust-drift: 60px;"></div>
+    <div class="dust" style="left: 75%; --dust-color: #ff007f; --dust-duration: 16s; --dust-drift: -20px;"></div>
+  </div>
+
+  <!-- 网格地板 -->
+  <div class="floor-grid-container">
+    <div class="floor-grid"></div>
+  </div>
+
+  <!-- 氛围气团 -->
+  <div class="aura-pink"></div>
+  <div class="aura-cyan"></div>
+
+  <!-- 顶部栏 -->
+  <header class="top-header">
+    <div class="arcade-logo">NEON ARCADE</div>
+    <div class="header-actions">
+      <!-- 悬停音效开关 -->
+      <button id="muteBtn" class="icon-btn" title="开关音效反馈">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+      <!-- 背景氛围音乐开关 -->
+      <button id="bgmBtn" class="icon-btn" title="开关 Synthwave 背景氛围乐">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M9 18V5l12-2v13"></path>
+          <circle cx="6" cy="18" r="3"></circle>
+          <circle cx="18" cy="16" r="3"></circle>
+        </svg>
+      </button>
+      <!-- 游戏成就查看按钮 -->
+      <button id="achievementsBtn" class="icon-btn" title="查看游戏成就">
+        🏆
+      </button>
+    </div>
+  </header>
+
+  <!-- 中心大标题 -->
+  <div class="main-title-container">
+    <h1 class="main-title">NEON ARCADE</h1>
+    <p class="subtitle">欢迎来到霓虹电玩城大厅。投币启动 17 款搭载 8-bit NES 复古合成声效 of Vanilla JS 经典极简游戏。</p>
+  </div>
+
+  <!-- 网格排列 -->
+  <main class="lobby-grid">
+    <!-- Bricks (俄罗斯方块) -->
+    <div class="cabinet-card" style="--cabinet-color: #39ff14; --shadow-color: rgba(57, 255, 20, 0.25);" onclick="launchGame('bricks', 'TETRIS', '#39ff14', 'rgba(57, 255, 20, 0.3)')">
+      <div class="cabinet-marquee">01 // TETRIS</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🧱</div>
+        <h2 class="cabinet-title">赛博俄罗斯方块</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">霓虹方块重力掉落，平滑消行判定。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bomb (扫雷) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff0055; --shadow-color: rgba(255, 0, 85, 0.25);" onclick="launchGame('bomb', 'NEON MINES', '#ff0055', 'rgba(255, 0, 85, 0.3)')">
+      <div class="cabinet-marquee">02 // MINES</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">💣</div>
+        <h2 class="cabinet-title">霓虹扫雷</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">核心雷区排除。首开必定安全，爆炸白音。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2048 -->
+    <div class="cabinet-card" style="--cabinet-color: #fee440; --shadow-color: rgba(254, 228, 64, 0.25);" onclick="launchGame('2048', 'CYBER 2048', '#fee440', 'rgba(254, 228, 64, 0.3)')">
+      <div class="cabinet-marquee">03 // 2048</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🔢</div>
+        <h2 class="cabinet-title">赛博 2048</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">自适应滑移。震动回弹弹性合体。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Huarongdao (华容道) -->
+    <div class="cabinet-card" style="--cabinet-color: #9d4edd; --shadow-color: rgba(157, 78, 221, 0.25);" onclick="launchGame('huarongdao', 'SLIDE ROAD', '#9d4edd', 'rgba(157, 78, 221, 0.3)')">
+      <div class="cabinet-marquee">04 // SLIDE</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🧩</div>
+        <h2 class="cabinet-title">磁轨华容道</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">横竖独立磁性滑轨，平滑且不穿帮。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Balls (打砖块) -->
+    <div class="cabinet-card" style="--cabinet-color: #00bbf9; --shadow-color: rgba(0, 187, 249, 0.25);" onclick="launchGame('balls', 'BRICK BREAKER', '#00bbf9', 'rgba(0, 187, 249, 0.3)')">
+      <div class="cabinet-marquee">05 // BREAKER</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">⚽</div>
+        <h2 class="cabinet-title">粒子打砖块</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">分裂三倍球、电磁防漏网、火花飞溅。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Up100 (上100层) -->
+    <div class="cabinet-card" style="--cabinet-color: #00f5d4; --shadow-color: rgba(0, 245, 212, 0.25);" onclick="launchGame('up100', 'CYBER CLIMB', '#00f5d4', 'rgba(0, 245, 212, 0.3)')">
+      <div class="cabinet-marquee">06 // CLIMB</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🚀</div>
+        <h2 class="cabinet-title">是男人就上100层</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">蓄力大跳（果冻压缩形变+能耗机制）。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Goldminer (黄金矿工) -->
+    <div class="cabinet-card" style="--cabinet-color: #fee440; --shadow-color: rgba(254, 228, 64, 0.25);" onclick="launchGame('goldminer', 'CYBER DIGGER', '#fee440', 'rgba(254, 228, 64, 0.3)')">
+      <div class="cabinet-marquee">07 // DIGGER</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">⛏️</div>
+        <h2 class="cabinet-title">赛博黄金矿工</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">钩爪圆摆，拉回物品阻力负重，大爆炸。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Connect (连连看) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff007f; --shadow-color: rgba(255, 0, 127, 0.25);" onclick="launchGame('connect', 'CYBER CONNECT', '#ff007f', 'rgba(255, 0, 127, 0.3)')">
+      <div class="cabinet-marquee">08 // CONNECT</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🔗</div>
+        <h2 class="cabinet-title">赛博连连看</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">电路配对，激光转弯连线，死锁自动洗牌。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Snake (贪吃蛇) -->
+    <div class="cabinet-card" style="--cabinet-color: #39ff14; --shadow-color: rgba(57, 255, 20, 0.25);" onclick="launchGame('snake', 'CYBER SNAKE', '#39ff14', 'rgba(57, 255, 20, 0.3)')">
+      <div class="cabinet-marquee">09 // SNAKE</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🐍</div>
+        <h2 class="cabinet-title">赛博贪吃蛇</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">霓虹流光，超频加速，吃能量豆与闪电。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pacman (吃豆人) -->
+    <div class="cabinet-card" style="--cabinet-color: #fee440; --shadow-color: rgba(254, 228, 64, 0.25);" onclick="launchGame('pacman', 'CYBER PACMAN', '#fee440', 'rgba(254, 228, 64, 0.3)')">
+      <div class="cabinet-marquee">10 // PACMAN</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🍕</div>
+        <h2 class="cabinet-title">赛博吃豆人</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">霓虹迷宫，四色幽灵AI拦截，大药丸超频吞噬。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sokoban (推箱子) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff007f; --shadow-color: rgba(255, 0, 127, 0.25);" onclick="launchGame('sokoban', 'CYBER SOKOBAN', '#ff007f', 'rgba(255, 0, 127, 0.3)')">
+      <div class="cabinet-marquee">11 // SOKOBAN</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">📦</div>
+        <h2 class="cabinet-title">赛博推箱子</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">能量核充电，10大挑战关卡，支持一键撤销倒带。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Flappy (电磁鸟) -->
+    <div class="cabinet-card" style="--cabinet-color: #00bbf9; --shadow-color: rgba(0, 187, 249, 0.25);" onclick="launchGame('flappy', 'CYBER FLAPPY', '#00bbf9', 'rgba(0, 187, 249, 0.3)')">
+      <div class="cabinet-marquee">12 // FLAPPY</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🐦</div>
+        <h2 class="cabinet-title">赛博电磁鸟</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">等离子羽翼，高压电磁柱躲避，闪电电球袭击。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Dino (小恐龙) -->
+    <div class="cabinet-card" style="--cabinet-color: #39ff14; --shadow-color: rgba(57, 255, 20, 0.25);" onclick="launchGame('dino', 'CYBER DINO', '#39ff14', 'rgba(57, 255, 20, 0.3)')">
+      <div class="cabinet-marquee">13 // DINO</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🦖</div>
+        <h2 class="cabinet-title">赛博小恐龙</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">荒野奔跑，仙人掌与翼龙躲避，昼夜黑白强光反转。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pong (乒乓对战) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff007f; --shadow-color: rgba(255, 0, 127, 0.25);" onclick="launchGame('pong', 'CYBER PONG', '#ff007f', 'rgba(255, 0, 127, 0.3)')">
+      <div class="cabinet-marquee">14 // PONG</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🏓</div>
+        <h2 class="cabinet-title">等离子乒乓</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">极速偏转反弹，VS-AI/同屏双人，摩擦擦出旋转香蕉球。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Sudoku (数独) -->
+    <div class="cabinet-card" style="--cabinet-color: #9d4edd; --shadow-color: rgba(157, 78, 221, 0.25);" onclick="launchGame('sudoku', 'NEON SUDOKU', '#9d4edd', 'rgba(157, 78, 221, 0.3)')">
+      <div class="cabinet-marquee">15 // SUDOKU</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">9️⃣</div>
+        <h2 class="cabinet-title">霓虹数独</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">蓝紫霓虹9宫格，冲突红光报警，彩虹通关脉冲。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Rhythm (节奏音轨) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff007f; --shadow-color: rgba(255, 0, 127, 0.25);" onclick="launchGame('rhythm', 'NEON RHYTHM', '#ff007f', 'rgba(255, 0, 127, 0.3)')">
+      <div class="cabinet-marquee">16 // RHYTHM</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">🎵</div>
+        <h2 class="cabinet-title">霓虹节奏音轨</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">4轨流光律动，D/F/J/K敲击，实时合成复古音符。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Mainland (大航海) -->
+    <div class="cabinet-card" style="--cabinet-color: #00e5ff; --shadow-color: rgba(0, 229, 255, 0.25);" onclick="launchGame('mainland', 'UNCHARTED VOYAGE', '#00e5ff', 'rgba(0, 229, 255, 0.3)')">
+      <div class="cabinet-marquee">17 // VOYAGE</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">⛵</div>
+        <h2 class="cabinet-title">赛博大航海</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">风向罗盘、港口贸易交易所、航海奇遇与海盗交火。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <!-- 底部 -->
+  <footer class="lobby-footer">
+    <p>NES-Synth 8-Bit 合成音支持。由 Web Audio API 提供纯代码级发声。</p>
+    <p style="margin-top: 8px;">&copy; 2026 Neon Arcade. 尽享纯粹的复古快乐！</p>
+  </footer>
+
+  <!-- 成就解锁弹窗提示 -->
+  <div id="achievementToast" class="toast-container">
+    <div class="toast-icon">🏆</div>
+    <div class="toast-content">
+      <div class="toast-title">成就解锁！</div>
+      <div id="toastDesc" class="toast-desc">解锁说明</div>
+    </div>
+  </div>
+
+  <!-- 成就看板 Modal -->
+  <div id="achievementsModal" class="achievements-modal">
+    <div class="achievements-content">
+      <div class="achievements-header">
+        <h2>🏆 ARCADE ACHIEVEMENTS</h2>
+        <button class="modal-close-btn" id="closeAchBtn">&times;</button>
+      </div>
+      <div class="achievements-body" id="achievementsList">
+        <!-- 动态生成各游戏的成就列表 -->
+      </div>
+    </div>
+  </div>
+
+  <!-- --- 全屏街机解耦载入机架 (Arcade Cabinet Wrapper Frame) --- -->
+  <div id="arcadeFrame" class="arcade-frame-wrapper">
+    <header class="frame-header" id="frameHeader">
+      <!-- 返回大厅 (退币) -->
+      <button class="exit-btn" id="exitCabinetBtn">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+        </svg>
+        退币返回大厅 (EXIT)
+      </button>
+      
+      <!-- 跑马灯载入屏 -->
+      <div class="marquee-screen" id="frameMarquee">LOADING ROM...</div>
+      
+      <!-- 框架控制 -->
+      <div style="display:flex;gap:10px;">
+        <button id="frameFullscreenBtn" class="icon-btn" title="全屏切入" style="width:34px;height:34px;border-radius:6px;font-size:0.75rem;">
+          🔲
+        </button>
+      </div>
+    </header>
+    
+    <div class="iframe-container">
+      <iframe id="gameIframe" src=""></iframe>
+    </div>
+    
+    <!-- 炫光载入遮罩 -->
+    <div id="cabinetLoader" class="cabinet-loader">
+      <div class="loader-text" id="loaderText">BOOTING ROM...</div>
+    </div>
+  </div>
+
+  <script>
+    // --- 开放成就接口数据与 API 实现 ---
+    const ACHIEVEMENT_LIST = {
+      bricks: [{ id: 'tetris_clear4', name: '消行大师', desc: '一次性消去4行方块' }],
+      bomb: [{ id: 'mines_win', name: '扫雷大亨', desc: '成功排空全部雷区' }],
+      2048: [{ id: '2048_win', name: '终极合体', desc: '成功拼出 2048 图块' }],
+      huarongdao: [{ id: 'huarong_win', name: '逃出生天', desc: '成功将曹操移出华容道' }],
+      balls: [{ id: 'breaker_pts', name: '粉碎专家', desc: '打砖块得分超过 1500 分' }],
+      up100: [{ id: 'climb_100', name: '百层真男人', desc: '成功登顶 100 层平台' }],
+      goldminer: [{ id: 'digger_rich', name: '黄金富商', desc: '单局中积累金币超过 3000' }],
+      connect: [{ id: 'connect_perfect', name: '极速回路', desc: '连连看无缝通关且零死锁' }],
+      snake: [{ id: 'snake_long', name: '超长蛇妖', desc: '蛇身长度达到 30 节' }],
+      pacman: [{ id: 'pacman_eat_all', name: '幽灵克星', desc: '吃完大药丸吞噬所有幽灵' }],
+      sokoban: [{ id: 'sokoban_win_all', name: '关卡终结者', desc: '通关全部 10 个能量核心充电坞' }],
+      flappy: [{ id: 'flappy_score', name: '雷区信使', desc: '在电磁鸟中得分超过 50 分' }],
+      dino: [{ id: 'dino_distance', name: '荒野长跑家', desc: '小恐龙里程得分达到 1500 分' }],
+      pong: [{ id: 'pong_shutout', name: '零封雷霆', desc: '在乒乓对战中以 7:0 零封对方' }],
+      sudoku: [{ id: 'sudoku_expert', name: '数独大师', desc: '在数独中成功解决地狱熔毁难度' }],
+      rhythm: [{ id: 'rhythm_combo', name: '太鼓达人', desc: '在节奏音轨中打出 50 次连击' }],
+      mainland: [{ id: 'mainland_gold', name: '传奇船长', desc: '在航海中积累金币超过 2000' }]
+    };
+
+    const GAME_NAMES = {
+      bricks: '赛博俄罗斯方块',
+      bomb: '霓虹扫雷',
+      2048: '赛博 2048',
+      huarongdao: '磁轨华容道',
+      balls: '粒子打砖块',
+      up100: '是男人就上100层',
+      goldminer: '赛博黄金矿工',
+      connect: '赛博连连看',
+      snake: '赛博贪吃蛇',
+      pacman: '赛博吃豆人',
+      sokoban: '赛博推箱子',
+      flappy: '赛博电磁鸟',
+      dino: '赛博小恐龙',
+      pong: '等离子乒乓',
+      sudoku: '霓虹数独',
+      rhythm: '霓虹节奏音轨',
+      mainland: '赛博大航海'
+    };
+
+    class ArcadeAchievementsAPI {
+      constructor() {
+        this.storageKey = 'cyber_arcade_unlocked_achievements';
+        this.unlocked = this.loadUnlocked();
+      }
+
+      loadUnlocked() {
+        try {
+          return JSON.parse(localStorage.getItem(this.storageKey)) || {};
+        } catch (e) {
+          return {};
+        }
+      }
+
+      saveUnlocked() {
+        localStorage.setItem(this.storageKey, JSON.stringify(this.unlocked));
+      }
+
+      unlock(gameId, achievementId) {
+        if (!ACHIEVEMENT_LIST[gameId]) return false;
+        const ach = ACHIEVEMENT_LIST[gameId].find(a => a.id === achievementId);
+        if (!ach) return false;
+
+        if (!this.unlocked[gameId]) {
+          this.unlocked[gameId] = [];
+        }
+
+        if (this.unlocked[gameId].includes(achievementId)) {
+          return false;
+        }
+
+        this.unlocked[gameId].push(achievementId);
+        this.saveUnlocked();
+
+        this.triggerNotification(gameId, ach);
+        return true;
+      }
+
+      triggerNotification(gameId, ach) {
+        // 播放成就解锁和弦声 C5 -> E5 -> G5 -> C6
+        lobbySynth.init();
+        lobbySynth.playTone(523.25, 523.25, 0.08, 'sine', 0.1);
+        setTimeout(() => lobbySynth.playTone(659.25, 659.25, 0.08, 'sine', 0.08), 80);
+        setTimeout(() => lobbySynth.playTone(783.99, 783.99, 0.08, 'sine', 0.08), 160);
+        setTimeout(() => lobbySynth.playTone(1046.50, 1046.50, 0.25, 'sine', 0.1), 240);
+
+        const toast = document.getElementById('achievementToast');
+        const toastDesc = document.getElementById('toastDesc');
+        toastDesc.innerHTML = `[${GAME_NAMES[gameId]}] 解锁成就：<strong>${ach.name}</strong> (${ach.desc})`;
+        
+        toast.classList.add('active');
+        setTimeout(() => {
+          toast.classList.remove('active');
+        }, 4000);
+      }
+
+      isUnlocked(gameId, achievementId) {
+        return this.unlocked[gameId] && this.unlocked[gameId].includes(achievementId);
+      }
+    }
+
+    const ArcadeAPI = new ArcadeAchievementsAPI();
+    window.ArcadeAPI = ArcadeAPI;
+
+    // 跨框架 postMessage 监听
+    window.addEventListener('message', (e) => {
+      const data = e.data;
+      if (data && data.type === 'UNLOCK_ACHIEVEMENT') {
+        ArcadeAPI.unlock(data.gameId, data.achievementId);
+      }
+    });
+
+    // --- 大厅科幻音效与 Synthwave 音乐合成器 ---
+    class LobbySynth {
+      constructor() {
+        this.ctx = null;
+        this.muted = false;
+        this.bgmMuted = true; 
+        this.isPlayingBgm = false;
+        this.bgmTimer = null;
+        this.step = 0;
+      }
+
+      init() {
+        if (!this.ctx) {
+          this.ctx = new (window.AudioContext || window.webkitAudioContext)();
+        }
+        if (this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freqStart, freqEnd, duration, type = 'sine', gainVal = 0.08) {
+        if (this.muted) return;
+        this.init();
+        try {
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          
+          osc.type = type;
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          
+          const now = this.ctx.currentTime;
+          osc.frequency.setValueAtTime(freqStart, now);
+          if (freqEnd !== freqStart) {
+            osc.frequency.exponentialRampToValueAtTime(freqEnd, now + duration);
+          }
+          
+          gain.gain.setValueAtTime(gainVal, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+          
+          osc.start(now);
+          osc.stop(now + duration);
+        } catch (e) {}
+      }
+
+      // 悬停在街机机台：投币清脆声
+      playHover() {
+        this.playTone(950, 1100, 0.04, 'sine', 0.03);
+      }
+
+      // 启动投币声
+      playCoin() {
+        this.playTone(987.77, 1318.51, 0.08, 'sine', 0.12);
+        setTimeout(() => {
+          this.playTone(1567.98, 1567.98, 0.15, 'sine', 0.1);
+        }, 60);
+      }
+
+      // 退出弹币声
+      playCoinReturn() {
+        this.playTone(880, 587.33, 0.1, 'sine', 0.1);
+        setTimeout(() => {
+          this.playTone(440, 220, 0.15, 'triangle', 0.12);
+        }, 70);
+      }
+
+      // 自动谱写 Synthwave 大厅 BGM
+      startBgm() {
+        this.init();
+        if (this.isPlayingBgm) return;
+        this.isPlayingBgm = true;
+        this.bgmMuted = false;
+        
+        const bassLine = [
+          110, 110, 110, 110,  
+          98, 98, 98, 98,      
+          87.31, 87.31, 87.31, 87.31, 
+          82.41, 82.41, 82.41, 82.41  
+        ];
+        
+        const leadLine = [
+          220, 0, 329.63, 0, 440, 0, 329.63, 0,
+          196, 0, 293.66, 0, 392, 0, 293.66, 0
+        ];
+
+        this.bgmTimer = setInterval(() => {
+          if (this.bgmMuted || this.muted) return;
+          
+          const bassFreq = bassLine[this.step % bassLine.length];
+          this.playTone(bassFreq, bassFreq, 0.15, 'triangle', 0.08);
+          
+          if (this.step % 2 === 0) {
+            const leadFreq = leadLine[(this.step / 2) % leadLine.length];
+            if (leadFreq > 0) {
+              this.playTone(leadFreq, leadFreq * 1.01, 0.25, 'sine', 0.03);
+            }
+          }
+          
+          this.step++;
+        }, 160);
+      }
+
+      stopBgm() {
+        this.bgmMuted = true;
+        this.isPlayingBgm = false;
+        if (this.bgmTimer) {
+          clearInterval(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+    }
+
+    const lobbySynth = new LobbySynth();
+
+    // 绑定卡片悬浮音效
+    const cards = document.querySelectorAll('.cabinet-card');
+    cards.forEach(card => {
+      card.addEventListener('mouseenter', () => {
+        lobbySynth.playHover();
+      });
+    });
+
+    // --- 解耦街机框架载入与退回控制 ---
+    const arcadeFrame = document.getElementById('arcadeFrame');
+    const gameIframe = document.getElementById('gameIframe');
+    const exitCabinetBtn = document.getElementById('exitCabinetBtn');
+    const frameHeader = document.getElementById('frameHeader');
+    const frameMarquee = document.getElementById('frameMarquee');
+    const cabinetLoader = document.getElementById('cabinetLoader');
+    const loaderText = document.getElementById('loaderText');
+    const frameFullscreenBtn = document.getElementById('frameFullscreenBtn');
+
+    function launchGame(folderName, displayName, themeColor, themeShadow) {
+      // 1. 播放投币启动声
+      lobbySynth.playCoin();
+      
+      // 2. 临时暂停背景音乐，减少 CPU 占用并避免杂音干扰
+      const wasPlayingBgm = lobbySynth.isPlayingBgm;
+      if (wasPlayingBgm) {
+        lobbySynth.stopBgm();
+      }
+
+      // 3. 应用街机外框对应的主题霓虹色
+      arcadeFrame.style.setProperty('--active-color', themeColor);
+      arcadeFrame.style.setProperty('--active-shadow', themeShadow);
+      
+      // 4. 拉起闪烁载入遮罩
+      loaderText.textContent = `BOOTING ${displayName}...`;
+      cabinetLoader.classList.add('active');
+      
+      // 5. 展现全屏容器
+      arcadeFrame.classList.add('active');
+      
+      // 6. 延迟 400ms 加载 ROM
+      setTimeout(() => {
+        gameIframe.src = `./${folderName}/index.html`;
+        frameMarquee.textContent = `SYSTEM // ${displayName}`;
+        
+        // 7. 载入完成后撤除遮罩
+        setTimeout(() => {
+          cabinetLoader.classList.remove('active');
+        }, 750);
+      }, 400);
+
+      // 绑定退出监听
+      exitCabinetBtn.onclick = () => {
+        // 如果当前处于全屏状态，先退出全屏
+        if (document.fullscreenElement) {
+          document.exitFullscreen().catch(err => {});
+        }
+
+        lobbySynth.playCoinReturn();
+        cabinetLoader.classList.add('active');
+        loaderText.textContent = 'EXITING SYSTEM...';
+        
+        setTimeout(() => {
+          gameIframe.src = '';
+          arcadeFrame.classList.remove('active');
+          cabinetLoader.classList.remove('active');
+          
+          // 恢复背景氛围音乐
+          if (wasPlayingBgm) {
+            setTimeout(() => {
+              lobbySynth.startBgm();
+            }, 300);
+          }
+        }, 300);
+      };
+    }
+
+    // 全屏控制
+    frameFullscreenBtn.onclick = () => {
+      if (!document.fullscreenElement) {
+        arcadeFrame.requestFullscreen().catch(err => {});
+      } else {
+        document.exitFullscreen();
+      }
+    };
+
+    // 悬停静音控制
+    const muteBtn = document.getElementById('muteBtn');
+    muteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      lobbySynth.muted = !lobbySynth.muted;
+      const soundWave = document.getElementById('soundWave');
+      if (lobbySynth.muted) {
+        muteBtn.classList.add('muted');
+        soundWave.style.opacity = '0.2';
+      } else {
+        muteBtn.classList.remove('muted');
+        soundWave.style.opacity = '1';
+        lobbySynth.init();
+        lobbySynth.playTone(800, 800, 0.04);
+      }
+    });
+
+    // BGM 控制
+    const bgmBtn = document.getElementById('bgmBtn');
+    bgmBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (lobbySynth.isPlayingBgm) {
+        lobbySynth.stopBgm();
+        bgmBtn.classList.remove('active');
+        bgmBtn.style.color = 'var(--text-secondary)';
+      } else {
+        lobbySynth.startBgm();
+        bgmBtn.classList.add('active');
+        bgmBtn.style.color = '#00f5d4';
+      }
+    });
+
+    // --- 成就系统界面控制 ---
+    const achievementsBtn = document.getElementById('achievementsBtn');
+    const achievementsModal = document.getElementById('achievementsModal');
+    const closeAchBtn = document.getElementById('closeAchBtn');
+    const achievementsList = document.getElementById('achievementsList');
+
+    function renderAchievements() {
+      achievementsList.innerHTML = '';
+      Object.keys(ACHIEVEMENT_LIST).forEach(gameId => {
+        const achList = ACHIEVEMENT_LIST[gameId];
+        const unlockedList = ArcadeAPI.unlocked[gameId] || [];
+        
+        const row = document.createElement('div');
+        row.className = 'game-achievements-row';
+        
+        const rowTitle = document.createElement('div');
+        rowTitle.className = 'game-row-title';
+        rowTitle.innerHTML = `
+          <span>${GAME_NAMES[gameId]}</span>
+          <span class="game-row-progress">${unlockedList.length} / ${achList.length}</span>
+        `;
+        row.appendChild(rowTitle);
+        
+        const grid = document.createElement('div');
+        grid.className = 'ach-cards-grid';
+        
+        achList.forEach(ach => {
+          const isUnlocked = ArcadeAPI.isUnlocked(gameId, ach.id);
+          const card = document.createElement('div');
+          card.className = `ach-card ${isUnlocked ? 'unlocked' : 'locked'}`;
+          card.innerHTML = `
+            <div class="ach-medal">${isUnlocked ? '🏆' : '🔒'}</div>
+            <div class="ach-info">
+              <div class="ach-name">${ach.name}</div>
+              <div class="ach-desc">${ach.desc}</div>
+            </div>
+          `;
+          grid.appendChild(card);
+        });
+        
+        row.appendChild(grid);
+        achievementsList.appendChild(row);
+      });
+    }
+
+    achievementsBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      lobbySynth.init();
+      lobbySynth.playTone(600, 800, 0.08);
+      renderAchievements();
+      achievementsModal.classList.add('active');
+    });
+
+    closeAchBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      lobbySynth.playTone(500, 400, 0.08);
+      achievementsModal.classList.remove('active');
+    });
+
+    achievementsModal.addEventListener('click', (e) => {
+      if (e.target === achievementsModal) {
+        achievementsModal.classList.remove('active');
+      }
+    });
+  </script>
+</body>
+</html>

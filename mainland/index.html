@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uncharted Waters: Classic Voyage - 大航海：无尽航路</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- 大航海 2D 绘图画布 -->
+  <canvas id="seaCanvas"></canvas>
+
+  <!-- 左侧：船长航海日志面板 (HUD Left) -->
+  <div class="hud-left log-panel">
+    <div class="panel-header">⚓ 航海日志 // SHIP LOG</div>
+    
+    <!-- 罗盘与风向 -->
+    <div class="compass-widget">
+      <div class="compass-ring">
+        <div id="wind-arrow" class="wind-arrow">↑</div>
+      </div>
+      <div class="compass-info">
+        <span class="label">风向</span>
+        <span id="wind-dir-val" class="val">东北风</span>
+        <span class="label">风力</span>
+        <span id="wind-speed-val" class="val">4 节</span>
+      </div>
+    </div>
+
+    <!-- 船只核心属性 -->
+    <div class="ship-stats">
+      <div class="stat-item">
+        <span class="label">Supplies (粮食)</span>
+        <div class="bar-container">
+          <div id="supply-bar" class="bar supply-bar" style="width: 100%;"></div>
+        </div>
+        <span id="supply-text" class="val">100/100</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Hull (船体)</span>
+        <div class="bar-container">
+          <div id="hull-bar" class="bar hull-bar" style="width: 100%;"></div>
+        </div>
+        <span id="hull-text" class="val">100/100</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Gold (金币)</span>
+        <span id="gold-text" class="val gold-val">300 🪙</span>
+      </div>
+      <div class="stat-item">
+        <span class="label">Cargo (货舱)</span>
+        <span id="cargo-text" class="val">0 / 60 个</span>
+      </div>
+    </div>
+
+    <!-- 航海天数 -->
+    <div class="days-counter">
+      <span class="label">航行时间</span>
+      <span id="days-val" class="val">第 1 天</span>
+    </div>
+
+    <!-- 小地图迷你雷达 -->
+    <div class="minimap-panel">
+      <div class="minimap-title">🗺️ 简易海图 // MINIMAP</div>
+      <canvas id="minimapCanvas" width="210" height="210"></canvas>
+    </div>
+  </div>
+
+  <!-- 右侧：港口交互区 (到达港口自动展开) -->
+  <div id="port-panel" class="hud-panel hidden">
+    <div class="panel-header">🏘️ 港口停靠 // PORT STATION</div>
+    <div class="panel-body">
+      <h2 id="port-name">未知港口</h2>
+      <p id="port-desc">这个港口急需香料...</p>
+
+      <!-- 选项页签 -->
+      <div class="tab-container">
+        <button id="tab-market-btn" class="tab-btn active">交易所</button>
+        <button id="tab-tavern-btn" class="tab-btn">酒馆</button>
+        <button id="tab-shipyard-btn" class="tab-btn">造船厂</button>
+      </div>
+
+      <!-- 1. 交易所内容 -->
+      <div id="market-sec" class="tab-section">
+        <div class="market-top-bar" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+          <span style="font-size: 0.75rem; color: var(--color-text-light);">* 利润基于全图平均买入价估算</span>
+          <button onclick="sellAllCargo()" class="action-btn main-btn" style="padding: 4px 10px; font-size: 0.75rem;">一键全部卖出 (SELL ALL)</button>
+        </div>
+        <table class="trade-table">
+          <thead>
+            <tr>
+              <th>货物</th>
+              <th>单价</th>
+              <th>利润状态</th>
+              <th>库存</th>
+              <th>交易操作</th>
+            </tr>
+          </thead>
+          <tbody id="trade-goods-list">
+            <!-- 动态生成物资 -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- 2. 酒馆奇遇内容 -->
+      <div id="tavern-sec" class="tab-section hidden">
+        <div class="tavern-event">
+          <p id="tavern-dialog">“小伙子，听海员们说，北边海域有暴风雨...”</p>
+          <div id="tavern-options" class="options-list">
+            <!-- 动态选项 -->
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. 造船厂内容 -->
+      <div id="shipyard-sec" class="tab-section hidden">
+        <div class="upgrade-list">
+          <div class="upgrade-item">
+            <span>扩建货舱 (+20 容量)</span>
+            <button onclick="buyUpgrade('cargo')" class="action-btn">150 金币</button>
+          </div>
+          <div class="upgrade-item">
+            <span>加固船体 (+30 护甲)</span>
+            <button onclick="buyUpgrade('armor')" class="action-btn">120 金币</button>
+          </div>
+          <div class="upgrade-item">
+            <span>改装飞剪帆 (逆风阻力-20%)</span>
+            <button onclick="buyUpgrade('sail')" class="action-btn">200 金币</button>
+          </div>
+          <div class="upgrade-item">
+            <span>加装侧舷火炮 (+1 战斗力)</span>
+            <button onclick="buyUpgrade('cannon')" class="action-btn">180 金币</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 离港按钮 -->
+      <button id="leave-port-btn" onclick="leavePort()" class="action-btn main-btn">扬帆起航 (LEAVE PORT)</button>
+    </div>
+  </div>
+
+  <!-- 轻提示 (Toast) -->
+  <div id="toast-container" class="toast-container"></div>
+
+  <!-- 全局提示弹窗 -->
+  <div id="event-dialog-overlay" class="overlay hidden">
+    <div class="dialog-box">
+      <h3 id="dialog-title">海面异动 // EVENT</h3>
+      <p id="dialog-text">遭遇海盗拦截！</p>
+      <div id="dialog-options" class="dialog-options">
+        <button class="action-btn text-center">开炮还击</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 游戏结束/海难复活遮罩 -->
+  <div id="game-over-overlay" class="overlay hidden">
+    <div class="dialog-box text-center">
+      <h1 class="dead-title">⛵ 船只沉没 // SHIPWRECK</h1>
+      <p id="game-over-desc">淡水与粮食耗尽，船员失去了意志，小船漂入了冰冷的海流...</p>
+      <button id="restart-btn" class="action-btn main-btn text-center">重新出航</button>
+    </div>
+  </div>
+
+  <!-- 核心交互逻辑 -->
+  <script src="game.js"></script>
+</body>
+</html>

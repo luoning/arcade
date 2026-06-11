@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Up100 - 是男人就上100层</title>
+  <meta name="description" content="一个视觉惊艳、带8-bit复古音效的在线跳跃攀爬网页游戏。支持键盘与触控，挑战登顶100层！">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2220%22 y=%2260%22 width=%2260%22 height=%2215%22 rx=%224%22 fill=%22%2300f5d4%22/><circle cx=%2250%22 cy=%2235%22 r=%2215%22 fill=%22%23ff007f%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部控制头栏 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <div class="stat-label">Floor</div>
+        <div id="floorVal" class="stat-value">1F</div>
+      </div>
+      <div class="stat-box best">
+        <div class="stat-label">Best</div>
+        <div id="bestVal" class="stat-value">1F</div>
+      </div>
+      <div class="stat-box lives">
+        <div class="stat-label">HP</div>
+        <div id="livesVal" class="stat-value">3</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">UP 100</h1>
+
+  <!-- 主画布卡片 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    
+    <!-- 游戏开始遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">UP 100</h2>
+      <p>控制主角不断踩着平台往上跳！利用弹簧飞得更高！避开尖刺和一踩就塌的易碎踏板，挑战突破第 100 层！</p>
+      <button id="startBtn" class="btn">勇攀高峰</button>
+    </div>
+
+    <!-- 游戏通关100层遮罩 -->
+    <div id="gameWinOverlay" class="overlay hidden">
+      <h2 class="win-text">100F CLEARED</h2>
+      <p>太强了！你成功突破了 100 层，证明了你的实力！你可以继续向上探索无尽的炼狱深空模式。</p>
+      <button id="keepGoingBtn" class="btn" style="margin-bottom:10px;">挑战无尽</button>
+      <button id="winRestartBtn" class="btn btn-pink">再攀一次</button>
+    </div>
+
+    <!-- 游戏结束遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="over-text">GAME OVER</h2>
+      <p>你坠入了无底深渊，或者生命值被尖刺扎空了。再接再厉！</p>
+      <button id="restartBtn" class="btn btn-pink">重振旗鼓</button>
+    </div>
+  </main>
+
+  <!-- 说明区 -->
+  <footer class="help-guide">
+    <p>键盘使用 <span class="badge">A / D</span> 或 <span class="badge">&larr; / &rarr;</span> 左右移动控制方向。</p>
+    <p>按住 <span class="badge">空格键</span> 或<strong>鼠标/屏幕长按</strong>可以进行蓄力，松开即可释放<strong>蓄力大跳</strong>！</p>
+    <p>支持<strong>鼠标滑动</strong>与手机<strong>屏幕左右拖拽</strong>，角色会跟着左右位移。</p>
+    <p>角色在屏幕左右边缘穿过时，会从<strong>另一侧穿出来</strong>（环绕边缘）。</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

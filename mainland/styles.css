@@ -1,0 +1,496 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700;900&family=Spectral:ital,wght@0,300;0,500;1,400&display=swap');
+
+:root {
+  --font-display: 'Cinzel', serif;
+  --font-body: 'Spectral', serif;
+  
+  --color-parchment: #f6efe2;
+  --color-parchment-dark: #e8dbbe;
+  --color-border: #7c6243;
+  --color-text: #2f2518;
+  --color-text-light: #6e5c47;
+  --color-accent: #a33b26; /* 暗红锈斑色 */
+  --color-gold: #c29825;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body, html {
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background-color: #dfd3bb;
+  font-family: var(--font-body);
+  color: var(--color-text);
+  user-select: none;
+}
+
+#seaCanvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+  cursor: crosshair;
+}
+
+/* 羊皮纸面板通用样式 */
+.log-panel, .hud-panel {
+  position: absolute;
+  z-index: 10;
+  background: var(--color-parchment);
+  background-image: radial-gradient(circle, var(--color-parchment) 60%, var(--color-parchment-dark) 100%);
+  border: 2px solid var(--color-border);
+  outline: 1px solid var(--color-parchment);
+  outline-offset: -3px;
+  box-shadow: 0 10px 25px rgba(47, 37, 24, 0.35);
+  border-radius: 4px;
+}
+
+.panel-header {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 1.5px;
+  padding: 8px 12px;
+  border-bottom: 2px solid var(--color-border);
+  color: var(--color-accent);
+  background: rgba(124, 98, 67, 0.08);
+}
+
+/* 左侧航海日志 (Status Panel) */
+.hud-left {
+  top: 20px;
+  left: 20px;
+  width: 250px;
+}
+
+/* 罗盘小挂件 */
+.compass-widget {
+  padding: 16px;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.compass-ring {
+  width: 60px;
+  height: 60px;
+  border: 2px solid var(--color-border);
+  border-radius: 50%;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-parchment-dark);
+  box-shadow: inset 0 0 8px rgba(0,0,0,0.1);
+}
+
+.compass-ring::before {
+  content: 'N';
+  position: absolute;
+  top: 2px;
+  font-family: var(--font-display);
+  font-size: 0.55rem;
+  font-weight: 900;
+  color: var(--color-border);
+}
+
+.wind-arrow {
+  font-size: 1.4rem;
+  font-weight: bold;
+  color: var(--color-accent);
+  transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  transform-origin: center;
+}
+
+.compass-info {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.compass-info .label {
+  font-size: 0.7rem;
+  color: var(--color-text-light);
+}
+
+.compass-info .val {
+  font-family: var(--font-display);
+  font-weight: 700;
+  font-size: 0.8rem;
+  color: var(--color-text);
+}
+
+/* 核心属性 */
+.ship-stats {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-bottom: 1px dashed var(--color-border);
+}
+
+.stat-item {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.stat-item .label {
+  font-size: 0.72rem;
+  color: var(--color-text-light);
+  display: flex;
+  justify-content: space-between;
+}
+
+.bar-container {
+  width: 100%;
+  height: 6px;
+  background: rgba(124, 98, 67, 0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  border: 1px solid rgba(124, 98, 67, 0.3);
+}
+
+.bar {
+  height: 100%;
+  border-radius: 2px;
+  transition: width 0.3s ease;
+}
+
+.supply-bar {
+  background: #3c6e47;
+}
+
+.hull-bar {
+  background: var(--color-accent);
+}
+
+.val {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+}
+
+.gold-val {
+  color: #a47e1d;
+}
+
+.days-counter {
+  padding: 12px 16px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  background: rgba(124, 98, 67, 0.04);
+}
+
+.days-counter .label {
+  color: var(--color-text-light);
+}
+
+/* 小地图迷你雷达 */
+.minimap-panel {
+  padding: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  border-top: 1px dashed var(--color-border);
+  background: rgba(124, 98, 67, 0.02);
+}
+
+.minimap-title {
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-light);
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+#minimapCanvas {
+  border: 1px solid var(--color-border);
+  background: #fdfaf3;
+  box-shadow: inset 0 0 10px rgba(124, 98, 67, 0.15);
+  border-radius: 2px;
+  display: block;
+}
+
+/* 右侧港口面板 */
+.hud-panel {
+  top: 20px;
+  right: 20px;
+  width: 360px;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  transition: opacity 0.3s, transform 0.3s;
+}
+
+.hud-panel.hidden {
+  display: none !important;
+}
+
+.panel-body {
+  padding: 16px;
+}
+
+.panel-body h2 {
+  font-family: var(--font-display);
+  font-size: 1.3rem;
+  margin-bottom: 4px;
+  color: var(--color-accent);
+}
+
+.panel-body p {
+  font-size: 0.85rem;
+  color: var(--color-text-light);
+  line-height: 1.4;
+  margin-bottom: 16px;
+}
+
+/* 标签页导航 */
+.tab-container {
+  display: flex;
+  border-bottom: 2px solid var(--color-border);
+  margin-bottom: 14px;
+}
+
+.tab-btn {
+  flex: 1;
+  background: transparent;
+  border: none;
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  font-weight: 700;
+  padding: 8px 0;
+  cursor: pointer;
+  color: var(--color-text-light);
+  transition: all 0.2s;
+}
+
+.tab-btn.active {
+  color: var(--color-accent);
+  border-bottom: 3px solid var(--color-accent);
+  margin-bottom: -2px;
+}
+
+.tab-section {
+  min-height: 180px;
+}
+
+.tab-section.hidden {
+  display: none;
+}
+
+/* 交易表格 */
+.trade-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.8rem;
+  margin-bottom: 16px;
+}
+
+.trade-table th, .trade-table td {
+  padding: 8px 4px;
+  text-align: left;
+  border-bottom: 1px solid rgba(124, 98, 67, 0.2);
+}
+
+.trade-table th {
+  font-family: var(--font-display);
+  color: var(--color-text-light);
+  font-weight: 700;
+}
+
+.trade-btn-group {
+  display: flex;
+  gap: 4px;
+}
+
+/* 按钮样式 */
+.action-btn {
+  background: var(--color-parchment-dark);
+  border: 1px solid var(--color-border);
+  color: var(--color-text);
+  font-family: var(--font-display);
+  font-size: 0.7rem;
+  font-weight: 700;
+  padding: 4px 8px;
+  border-radius: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.action-btn:hover {
+  background: var(--color-border);
+  color: var(--color-parchment);
+}
+
+.action-btn.main-btn {
+  width: 100%;
+  padding: 10px 0;
+  font-size: 0.85rem;
+  background: var(--color-accent);
+  color: #fff;
+  border-color: var(--color-accent);
+  box-shadow: 0 4px 8px rgba(163, 59, 38, 0.25);
+  text-align: center;
+}
+
+.action-btn.main-btn:hover {
+  background: #bd4a32;
+  box-shadow: 0 6px 12px rgba(163, 59, 38, 0.4);
+}
+
+/* 造船厂 */
+.upgrade-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 16px;
+}
+
+.upgrade-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 0.8rem;
+  border-bottom: 1px dashed rgba(124, 98, 67, 0.3);
+  padding-bottom: 8px;
+}
+
+/* 酒馆奇遇 */
+.tavern-event {
+  background: rgba(124, 98, 67, 0.06);
+  border: 1px solid rgba(124, 98, 67, 0.15);
+  border-radius: 4px;
+  padding: 12px;
+}
+
+.tavern-event p {
+  font-style: italic;
+  margin-bottom: 12px;
+}
+
+.options-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* 全屏遮罩弹窗 */
+.overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(20, 16, 11, 0.75);
+  z-index: 100;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  backdrop-filter: blur(2px);
+  transition: opacity 0.3s;
+}
+
+.overlay.hidden {
+  display: none !important;
+}
+
+.dialog-box {
+  background: var(--color-parchment);
+  background-image: radial-gradient(circle, var(--color-parchment) 70%, var(--color-parchment-dark) 100%);
+  border: 2px solid var(--color-border);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+  border-radius: 4px;
+  width: 90%;
+  max-width: 420px;
+  padding: 24px;
+}
+
+.dialog-box h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--color-accent);
+  margin-bottom: 10px;
+  letter-spacing: 1px;
+}
+
+.dialog-box p {
+  font-size: 0.9rem;
+  line-height: 1.5;
+  margin-bottom: 20px;
+  color: var(--color-text-light);
+}
+
+.dialog-options {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.text-center {
+  text-align: center;
+}
+
+/* 死亡标题 */
+.dead-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  color: var(--color-accent) !important;
+  margin-bottom: 14px;
+}
+
+/* Toast 轻提示 */
+.toast-container {
+  position: absolute;
+  top: 30px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  pointer-events: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.toast {
+  background: var(--color-parchment);
+  border: 1px solid var(--color-border);
+  color: var(--color-accent);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  font-weight: 500;
+  padding: 8px 16px;
+  border-radius: 4px;
+  box-shadow: 0 4px 12px rgba(47, 37, 24, 0.25);
+  min-width: 200px;
+  text-align: center;
+  opacity: 0;
+  animation: toast-fade-in-out 3.5s forwards ease-in-out;
+}
+
+@keyframes toast-fade-in-out {
+  0% {
+    transform: translateY(-20px);
+    opacity: 0;
+  }
+  8% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  92% {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(-10px);
+    opacity: 0;
+  }
+}

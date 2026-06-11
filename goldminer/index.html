@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cyber Miner - 赛博黄金矿工</title>
+  <meta name="description" content="一个视觉惊艳的霓虹赛博黄金矿工游戏，包含等离子绳索抓取、大爆炸和黑市道具系统。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2235%22 fill=%22%23fee440%22/><path d=%22M35,65 L65,35 M50,65 L65,50 M35,50 L50,35%22 stroke=%22%23000%22 stroke-width=%228%22 stroke-linecap=%22round%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部数据看板 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="stats-container">
+      <div class="stat-box score">
+        <div class="stat-label">SCORE</div>
+        <div id="scoreVal" class="stat-value">0</div>
+      </div>
+      <div class="stat-box target">
+        <div class="stat-label">TARGET</div>
+        <div id="targetVal" class="stat-value">650</div>
+      </div>
+      <div class="stat-box time">
+        <div class="stat-label">TIME</div>
+        <div id="timeVal" class="stat-value">60</div>
+      </div>
+      <div class="stat-box bomb">
+        <div class="stat-label">DYNAMITE</div>
+        <div id="bombVal" class="stat-value">1</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">CYBER MINER</h1>
+
+  <!-- 主游戏容器 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="640" height="480"></canvas>
+    
+    <!-- 开始游戏遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">CYBER MINER</h2>
+      <p>操作采矿核心发射等离子钩爪抓取金矿和钻石！</p>
+      <p>拉回重物时可按 <span class="badge">空格键</span> 消耗炸药直接炸碎它！</p>
+      <button id="startBtn" class="btn">启动核心</button>
+    </div>
+
+    <!-- 黑市商店遮罩 -->
+    <div id="shopOverlay" class="overlay hidden">
+      <h2 class="shop-title win-text">黑市交易商</h2>
+      <p>花金币购买超频组件，提升下关开采效率。每关道具随机刷新！</p>
+      
+      <div id="shopItemsContainer" class="shop-items-container">
+        <!-- 动态生成商品卡片 -->
+      </div>
+      
+      <div class="shop-footer">
+        <button id="closeShopBtn" class="btn btn-pink">开始下关</button>
+      </div>
+    </div>
+
+    <!-- 关卡成功过关遮罩 -->
+    <div id="stageClearOverlay" class="overlay hidden">
+      <h2 class="win-text">STAGE CLEARED</h2>
+      <p>恭喜！你成功达成了本关目标。</p>
+      <div class="clear-stats">
+        <div>关卡: <span id="clearLevelVal" class="highlight">1</span></div>
+        <div>得分: <span id="clearScoreVal" class="highlight">0</span></div>
+      </div>
+      <button id="goToShopBtn" class="btn">进入黑市</button>
+    </div>
+
+    <!-- 游戏结束 GG 遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="over-text">CORE OFFLINE</h2>
+      <p>你未能达成本关开采目标，核心电力耗尽被强制离线。</p>
+      <div class="clear-stats">
+        <div>最终得分: <span id="failScoreVal" class="highlight">0</span></div>
+      </div>
+      <button id="restartBtn" class="btn btn-pink">重启系统</button>
+    </div>
+  </main>
+
+  <!-- 底部说明 -->
+  <footer class="help-guide">
+    <p>按 <span class="badge">&darr; 键</span>、<span class="badge">S 键</span> 或<strong>鼠标左键/手机屏幕</strong>发射等离子绳索出钩。</p>
+    <p>拉回重物（如铁矿）觉得浪费时间时，按 <span class="badge">空格键 (Space)</span> 消耗炸药扔爆它！</p>
+    <p>小心避开地底红色的<strong>爆裂炸药桶</strong>，钩子碰到它会引起大范围霓虹爆炸！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

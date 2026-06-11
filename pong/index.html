@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cyber Pong - 等离子乒乓</title>
+  <meta name="description" content="一个视觉炸裂的霓虹赛博等离子乒乓游戏，支持单人、双人、能量道具模式，配备粒子爆破特效与 8-bit NES 复古合成音。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2220%22 width=%2215%22 height=%2260%22 fill=%22%23ff007f%22/><rect x=%2275%22 y=%2220%22 width=%2215%22 height=%2260%22 fill=%22%2300f5d4%22/><circle cx=%2250%22 cy=%2250%22 r=%228%22 fill=%22%23fff%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部状态看板 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="score-board">
+      <div id="p1Score" class="score-digit">0</div>
+      <div class="score-divider">:</div>
+      <div id="p2Score" class="score-digit">0</div>
+    </div>
+    
+    <div id="activeModeText" class="active-mode-tag">CLASSIC VS AI</div>
+  </header>
+
+  <!-- 游戏主容器 -->
+  <main class="canvas-wrapper" id="canvasContainer">
+    <canvas id="gameCanvas" width="800" height="500"></canvas>
+    
+    <!-- 移动端虚拟蓄力键 -->
+    <div id="touchChargeBtn" class="virtual-charge-btn">⚡ 蓄力</div>
+    
+    <!-- 1. 开始遮罩 (主菜单) -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">CYBER PONG</h2>
+      <p class="desc">赛博垂直乒乓对决。极板改为水平布局，1P 控制底部极板，2P/AI 控制顶部极板，将等离子球反弹回对方半场！</p>
+      
+      <div class="menu-sections">
+        <div class="mode-section">
+          <h3>选择游戏模式 // SELECT MODE</h3>
+          <div class="mode-select">
+            <button id="soloBtn" class="btn btn-cyan">VS 智能AI (SOLO)</button>
+            <button id="duoBtn" class="btn btn-pink">同屏双人 (LOCAL 2P)</button>
+            <button id="powerupBtn" class="btn btn-yellow">⚡ 道具对决 (POWER-UPS)</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 游戏结束遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 id="winnerText" class="over-text">SYSTEM SECURED</h2>
+      <p id="gameOverDesc">率先夺取 7 分者掌控了赛博矩阵的核心控制权。</p>
+      <button id="restartBtn" class="btn btn-cyan">返回菜单</button>
+    </div>
+  </main>
+
+  <footer class="help-guide">
+    <p>💡 操控指南：1P (底部) <span class="badge">A / D</span> 移动，击球瞬间<strong>按住并松开 空格键</strong>可进行蓄力击球与方向调整；2P (顶部) <span class="badge">J / L</span> 移动/空格键蓄力。</p>
+    <p>鼠标或触屏：<strong>按住并左右拖动</strong>极板可进行移动；击球瞬间<strong>按住不放</strong>可蓄力，拖拽调整发射方向！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>
