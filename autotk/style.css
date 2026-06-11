@@ -506,6 +506,35 @@ body {
     transform: none !important;
 }
 
+/* 按钮专属调色 */
+.cbtn-recruit {
+    background: linear-gradient(135deg, #2b5c8f, #1e3c72) !important;
+}
+.cbtn-recruit:hover {
+    box-shadow: 0 0 8px rgba(102, 252, 241, 0.4);
+}
+
+.cbtn-econ {
+    background: linear-gradient(135deg, #134e4a, #0d9488) !important;
+}
+.cbtn-econ:hover {
+    box-shadow: 0 0 8px rgba(46, 204, 113, 0.4);
+}
+
+.cbtn-war {
+    background: linear-gradient(135deg, #991b1b, #ef4444) !important;
+}
+.cbtn-war:hover {
+    box-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
+}
+
+.cbtn-plot {
+    background: linear-gradient(135deg, #78350f, #d97706) !important;
+}
+.cbtn-plot:hover {
+    box-shadow: 0 0 8px rgba(217, 119, 6, 0.4);
+}
+
 
 /* ==========================================
  * 5. 底部总调配台 (只做全局流速与播放控制，极致精简)
