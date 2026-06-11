@@ -150,10 +150,7 @@ body {
     left: 50%;
     top: 52%;
     transform: translate(-50%, -50%);
-    background: radial-gradient(circle, #0e1220 0%, #030408 100%);
-    border: 1.5px solid rgba(102, 252, 241, 0.25);
-    box-shadow: 0 0 25px rgba(102, 252, 241, 0.08);
-    border-radius: 12px;
+    background: transparent;
     overflow: hidden;
     z-index: 5;
 }
