@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>三国演兵录 (Idle Run)</title>
+    <!-- 引入 FontAwesome 字体图标库 -->
+    <link href="https://cdn.bootcdn.net/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- 街机标题顶栏 -->
+    <header class="cabinet-header">
+        <div class="header-left">
+            <i class="fa fa-gamepad"></i> <span>三国演兵录 (Idle Run)</span>
+        </div>
+        <div class="header-right">
+            <span class="user-tag"><i class="fa fa-user-circle"></i> 刘皇叔</span>
+            <button id="exit" class="exit-btn"><i class="fa fa-sign-out"></i> 返回大厅</button>
+        </div>
+    </header>
+
+    <!-- 游戏主舞台 -->
+    <main class="game-container">
+        <!-- 左侧面板: 朝堂风云 (实时推演日志) -->
+        <section class="panel left-panel">
+            <h2 class="panel-title"><i class="fa fa-bullhorn"></i> 朝堂风云</h2>
+            <div id="message" class="message-log">
+                <!-- 动态生成事件 -->
+            </div>
+            <div class="mask-fade"></div>
+        </section>
+
+        <!-- 中间面板: 观星知鉴 (数据看板) + 环世堪舆 (地图) + 动作面板 -->
+        <section class="panel middle-panel">
+            <!-- 观星知鉴 (数据看板) -->
+            <div class="data-dashboard">
+                <div class="data-card">
+                    <span class="card-label">人口</span>
+                    <span id="people" class="card-value">--</span>
+                </div>
+                <div class="data-card">
+                    <span class="card-label">武将</span>
+                    <span id="avator" class="card-value">--</span>
+                </div>
+                <div class="data-card">
+                    <span class="card-label">部队</span>
+                    <span id="army" class="card-value">--</span>
+                </div>
+                <div class="data-card">
+                    <span class="card-label">资金</span>
+                    <span id="cash" class="card-value">--</span>
+                </div>
+                <div class="data-card">
+                    <span class="card-label">粮食</span>
+                    <span id="food" class="card-value">--</span>
+                </div>
+                <div class="data-card">
+                    <span class="card-label">珍宝</span>
+                    <span id="means" class="card-value">--</span>
+                </div>
+            </div>
+
+            <!-- 环世堪舆 (地图网格) -->
+            <div class="map-wrapper">
+                <div class="map-header">
+                    <span><i class="fa fa-globe"></i> 环世堪舆</span>
+                    <button id="pause" class="control-btn"><i class="fa fa-play"></i> 回合开始</button>
+                </div>
+                <div id="content" class="map-grid">
+                    <!-- 动态生成城市网格 -->
+                </div>
+            </div>
+
+            <!-- 挥斥方遒 (静态指令面板，仅作视觉填充) -->
+            <div class="command-panel">
+                <div class="command-title"><i class="fa fa-sliders"></i> 军机阁</div>
+                <div class="command-grid">
+                    <div class="cmd-btn">朝议</div>
+                    <div class="cmd-btn">情报</div>
+                    <div class="cmd-btn">驱策</div>
+                    <div class="cmd-btn">联盟</div>
+                    <div class="cmd-btn">方针</div>
+                    <div class="cmd-btn">运输</div>
+                    <div class="cmd-btn">技术</div>
+                    <div class="cmd-btn">外交</div>
+                    <div class="cmd-btn">任免</div>
+                    <div class="cmd-btn">赏罚</div>
+                    <div class="cmd-btn">迁都</div>
+                    <div class="cmd-btn">军团</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 右侧面板: 战略情报与剧本 -->
+        <section class="panel right-panel">
+            <!-- 剧本选择 -->
+            <div class="section-box script-box">
+                <h2 class="panel-title"><i class="fa fa-book"></i> 天下大势 (剧本)</h2>
+                <div class="script-list">
+                    <button id="war1" class="script-btn active">三国时代 (三分天下)</button>
+                    <button id="war6" class="script-btn">群雄并起 (割据一方)</button>
+                </div>
+            </div>
+
+            <!-- 调试/作弊面板 -->
+            <div class="section-box admin-box">
+                <h2 class="panel-title"><i class="fa fa-cogs"></i> 天命归一 (测试指令)</h2>
+                <div class="admin-grid">
+                    <button id="war3" class="admin-btn cmd-caocao">曹操一统</button>
+                    <button id="war4" class="admin-btn cmd-liubei">刘备一统</button>
+                    <button id="war5" class="admin-btn cmd-sunquan">孙权一统</button>
+                    <button id="war2" class="admin-btn cmd-sima">司马代魏</button>
+                    <button id="war0" class="admin-btn cmd-xiandi">汉室复兴</button>
+                </div>
+            </div>
+
+            <!-- 城市军备说明 -->
+            <div class="section-box info-box">
+                <h2 class="panel-title"><i class="fa fa-shield"></i> 兵种营房</h2>
+                <div class="info-list">
+                    <div class="info-item"><span>虎贲军</span> <span>重装步兵 / 善于守城</span></div>
+                    <div class="info-item"><span>南蛮象兵</span> <span>强力突破 / 战损较高</span></div>
+                    <div class="info-item"><span>精锐长枪兵</span> <span>克制骑兵 / 训练容易</span></div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- 页脚版权 -->
+    <footer class="cabinet-footer">
+        <span>&copy; VibeArcade 2026 - 三国演兵录</span>
+        <span>Developer: 野生打工人 Rhounin</span>
+    </footer>
+
+    <!-- 游戏主逻辑 JS -->
+    <script src="game.js"></script>
+</body>
+</html>

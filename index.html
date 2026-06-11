@@ -867,7 +867,7 @@
 
   <!-- LED 滚动跑马灯 -->
   <div class="led-ticker">
-    <div class="led-text">&gt;&gt; WELCOME TO NEON ARCADE &gt;&gt; INSERT COIN TO PLAY &gt;&gt; 17 CHANNELS ONLINE &gt;&gt; HAVE FUN IN RETRO WORLD &gt;&gt; CHOOSE YOUR CABINET &gt;&gt;</div>
+    <div class="led-text">&gt;&gt; WELCOME TO NEON ARCADE &gt;&gt; INSERT COIN TO PLAY &gt;&gt; 18 CHANNELS ONLINE &gt;&gt; HAVE FUN IN RETRO WORLD &gt;&gt; CHOOSE YOUR CABINET &gt;&gt;</div>
   </div>
 
   <!-- 漂浮粒子容器 -->
@@ -919,7 +919,7 @@
   <!-- 中心大标题 -->
   <div class="main-title-container">
     <h1 class="main-title">NEON ARCADE</h1>
-    <p class="subtitle">欢迎来到霓虹电玩城大厅。投币启动 17 款搭载 8-bit NES 复古合成声效 of Vanilla JS 经典极简游戏。</p>
+    <p class="subtitle">欢迎来到霓虹电玩城大厅。投币启动 18 款搭载 8-bit NES 复古合成声效 of Vanilla JS 经典极简游戏。</p>
   </div>
 
   <!-- 网格排列 -->
@@ -1315,6 +1315,29 @@
       </div>
     </div>
 
+    <!-- autotk (三国演兵录) -->
+    <div class="cabinet-card" style="--cabinet-color: #a855f7; --shadow-color: rgba(168, 85, 247, 0.25);" onclick="launchGame('autotk', 'THREE KINGDOMS IDLE', '#a855f7', 'rgba(168, 85, 247, 0.3)')">
+      <div class="cabinet-marquee">18 // WAR IDLE</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">⚔️</div>
+        <h2 class="cabinet-title">三国演兵录</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">文字版三国挂机博弈推演。看风起云涌，天命大势花落谁家。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- 底部 -->
@@ -1398,7 +1421,8 @@
       pong: [{ id: 'pong_shutout', name: '零封雷霆', desc: '在乒乓对战中以 7:0 零封对方' }],
       sudoku: [{ id: 'sudoku_expert', name: '数独大师', desc: '在数独中成功解决地狱熔毁难度' }],
       rhythm: [{ id: 'rhythm_combo', name: '太鼓达人', desc: '在节奏音轨中打出 50 次连击' }],
-      mainland: [{ id: 'mainland_gold', name: '传奇船长', desc: '在航海中积累金币超过 2000' }]
+      mainland: [{ id: 'mainland_gold', name: '传奇船长', desc: '在航海中积累金币超过 2000' }],
+      autotk: [{ id: 'autotk_win', name: '天下一统', desc: '在演兵录中达成某一势力占领所有城市' }]
     };
 
     const GAME_NAMES = {
@@ -1418,7 +1442,8 @@
       pong: '等离子乒乓',
       sudoku: '霓虹数独',
       rhythm: '霓虹节奏音轨',
-      mainland: '赛博大航海'
+      mainland: '赛博大航海',
+      autotk: '三国演兵录 (Idle)'
     };
 
     class ArcadeAchievementsAPI {
@@ -1488,8 +1513,13 @@
     // 跨框架 postMessage 监听
     window.addEventListener('message', (e) => {
       const data = e.data;
-      if (data && data.type === 'UNLOCK_ACHIEVEMENT') {
-        ArcadeAPI.unlock(data.gameId, data.achievementId);
+      if (data) {
+        if (data.type === 'UNLOCK_ACHIEVEMENT') {
+          ArcadeAPI.unlock(data.gameId, data.achievementId);
+        } else if (data.type === 'unlock_achievement') {
+          // 兼容写法
+          ArcadeAPI.unlock('autotk', 'autotk_win');
+        }
       }
     });
 

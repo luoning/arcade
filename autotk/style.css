@@ -1,0 +1,453 @@
+/* 全局基础设置 */
+@import url('https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Outfit', 'Microsoft YaHei', sans-serif;
+}
+
+body {
+    background-color: #0b0c10;
+    color: #c5c6c7;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    user-select: none;
+}
+
+/* 顶部状态栏 */
+.cabinet-header {
+    background: rgba(26, 26, 36, 0.9);
+    border-bottom: 2px solid #1f2833;
+    padding: 10px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 55px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    z-index: 100;
+}
+
+.header-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: #66fcf1;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+}
+
+.header-right {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.user-tag {
+    background: rgba(102, 252, 241, 0.1);
+    color: #66fcf1;
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    border: 1px dashed rgba(102, 252, 241, 0.4);
+}
+
+.exit-btn {
+    background: linear-gradient(135deg, #ff4e50, #f9d423);
+    border: none;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.exit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 0 10px rgba(255, 78, 80, 0.6);
+}
+
+/* 游戏布局 */
+.game-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    gap: 15px;
+    padding: 15px;
+    overflow: hidden;
+    height: calc(100vh - 85px);
+}
+
+.panel {
+    background: rgba(26, 26, 36, 0.65);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 8px;
+    display: flex;
+    flex-direction: column;
+    padding: 15px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.panel-title {
+    font-size: 1rem;
+    color: #66fcf1;
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid rgba(102, 252, 241, 0.2);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-transform: uppercase;
+}
+
+/* 左侧面板 - 消息日志 */
+.left-panel {
+    position: relative;
+}
+
+.message-log {
+    flex: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding-bottom: 30px;
+}
+
+/* 自定义滚动条 */
+.message-log::-webkit-scrollbar,
+.map-grid::-webkit-scrollbar {
+    width: 4px;
+}
+.message-log::-webkit-scrollbar-thumb,
+.map-grid::-webkit-scrollbar-thumb {
+    background: rgba(102, 252, 241, 0.3);
+    border-radius: 2px;
+}
+
+.message-log .line {
+    background: rgba(255, 255, 255, 0.02);
+    border-left: 3px solid #45f3ff;
+    padding: 8px 10px;
+    border-radius: 0 6px 6px 0;
+    font-size: 0.8rem;
+    line-height: 1.4;
+    transition: background 0.3s;
+}
+
+.message-log .line:hover {
+    background: rgba(102, 252, 241, 0.05);
+}
+
+.mask-fade {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 50px;
+    background: linear-gradient(rgba(11, 12, 16, 0), rgba(26, 26, 36, 1));
+    pointer-events: none;
+}
+
+/* 中间面板 - 仪表盘与地图 */
+.middle-panel {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* 数据看板 */
+.data-dashboard {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 10px;
+}
+
+.data-card {
+    background: rgba(31, 40, 51, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.card-label {
+    font-size: 0.75rem;
+    color: #45f248; /* 偏青色 */
+    opacity: 0.6;
+}
+
+.card-value {
+    font-size: 1.1rem;
+    font-weight: bold;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.updown {
+    font-size: 0.7rem;
+    font-weight: normal;
+    padding-left: 4px;
+}
+
+.updown.warning {
+    color: #ff4e50;
+}
+
+.updown.running {
+    color: #2ecc71;
+}
+
+/* 环世堪舆 */
+.map-wrapper {
+    flex: 1;
+    background: rgba(11, 12, 16, 0.8);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.map-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 8px;
+    font-size: 0.9rem;
+    color: #66fcf1;
+}
+
+.control-btn {
+    background: #1f2833;
+    border: 1px solid #45f3ff;
+    color: #45f3ff;
+    padding: 4px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.control-btn:hover {
+    background: #45f3ff;
+    color: #0b0c10;
+    box-shadow: 0 0 8px rgba(69, 243, 255, 0.5);
+}
+
+.map-grid {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 6px;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+/* 城市格子 */
+.city-wrapper {
+    width: 100%;
+}
+
+.map_gird {
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    height: 60px;
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.map_gird:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+}
+
+.map_item {
+    height: 100%;
+    padding: 6px;
+    font-size: 0.75rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    position: relative;
+}
+
+.map_index {
+    align-self: flex-end;
+    font-size: 1.2rem;
+    font-weight: 800;
+    opacity: 0.25;
+}
+
+/* 势力专属颜色 */
+.blank { background: rgba(31, 40, 51, 0.4); color: #888; }
+.gird1 { background: rgba(155, 89, 182, 0.35); border-color: rgba(155, 89, 182, 0.8); color: #e8dbff; } /* 刘备 - 蜀 */
+.gird2 { background: rgba(230, 126, 34, 0.35); border-color: rgba(230, 126, 34, 0.8); color: #ffe8d6; } /* 曹操 - 魏 */
+.gird3 { background: rgba(46, 204, 113, 0.35); border-color: rgba(46, 204, 113, 0.8); color: #d6ffd8; } /* 孙权 - 吴 */
+.gird4 { background: rgba(52, 152, 219, 0.35); border-color: rgba(52, 152, 219, 0.8); color: #d6ebff; } /* 董卓 */
+.gird5 { background: rgba(231, 76, 60, 0.35); border-color: rgba(231, 76, 60, 0.8); color: #ffd6d6; }  /* 汉献帝 */
+.gird6 { background: rgba(26, 188, 156, 0.35); border-color: rgba(26, 188, 156, 0.8); color: #d6fff7; } /* 司马炎 */
+.gird7 { background: rgba(241, 196, 15, 0.35); border-color: rgba(241, 196, 15, 0.8); color: #fffdff; }  /* 吕布 */
+
+/* Map Hover Tip */
+.tip .prompt-box {
+    display: none;
+    position: absolute;
+    left: 105%;
+    top: 0;
+    width: 200px;
+    background: rgba(19, 19, 26, 0.95);
+    border: 1px solid #66fcf1;
+    border-radius: 6px;
+    padding: 10px;
+    color: #fff;
+    z-index: 999;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.6);
+}
+
+.tip:hover .prompt-box {
+    display: block;
+}
+
+/* 军机阁指令面板 */
+.command-panel {
+    background: rgba(31, 40, 51, 0.5);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 10px;
+}
+
+.command-title {
+    font-size: 0.8rem;
+    color: #45f3ff;
+    margin-bottom: 6px;
+}
+
+.command-grid {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 6px;
+}
+
+.cmd-btn {
+    background: #1f2833;
+    padding: 6px;
+    font-size: 0.7rem;
+    text-align: center;
+    border-radius: 4px;
+    cursor: not-allowed;
+    opacity: 0.65;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    transition: background 0.2s;
+}
+
+.cmd-btn:hover {
+    background: rgba(102, 252, 241, 0.05);
+}
+
+/* 右侧面板 - 剧本与管理 */
+.section-box {
+    background: rgba(31, 40, 51, 0.4);
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    border-radius: 6px;
+    padding: 12px;
+    margin-bottom: 12px;
+}
+
+.script-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.script-btn {
+    background: #1f2833;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: #c5c6c7;
+    padding: 8px 12px;
+    text-align: left;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    transition: all 0.2s;
+}
+
+.script-btn.active, .script-btn:hover {
+    border-color: #66fcf1;
+    color: #66fcf1;
+    background: rgba(102, 252, 241, 0.05);
+}
+
+/* 测试指令 */
+.admin-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 6px;
+}
+
+.admin-btn {
+    background: #1f2833;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+    color: #fff;
+    padding: 6px;
+    font-size: 0.75rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.cmd-caocao:hover { background: rgba(230, 126, 34, 0.3); }
+.cmd-liubei:hover { background: rgba(155, 89, 182, 0.3); }
+.cmd-sunquan:hover { background: rgba(46, 204, 113, 0.3); }
+.cmd-sima:hover { background: rgba(26, 188, 156, 0.3); }
+.cmd-xiandi:hover { background: rgba(231, 76, 60, 0.3); }
+
+/* 兵种营房 */
+.info-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.info-item {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    background: rgba(0, 0, 0, 0.2);
+    padding: 6px 8px;
+    border-radius: 4px;
+}
+
+.info-item span:first-child {
+    color: #66fcf1;
+}
+
+/* 页脚 */
+.cabinet-footer {
+    background: rgba(26, 26, 36, 0.9);
+    border-top: 1px solid #1f2833;
+    padding: 5px 20px;
+    height: 30px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.75rem;
+    color: #45f248; /* 偏青色 */
+    opacity: 0.6;
+}
