@@ -125,12 +125,10 @@ body {
 }
 
 /* 自定义滚动条 */
-.message-log::-webkit-scrollbar,
-.map-grid::-webkit-scrollbar {
+.message-log::-webkit-scrollbar {
     width: 4px;
 }
-.message-log::-webkit-scrollbar-thumb,
-.map-grid::-webkit-scrollbar-thumb {
+.message-log::-webkit-scrollbar-thumb {
     background: rgba(102, 252, 241, 0.3);
     border-radius: 2px;
 }
@@ -150,7 +148,6 @@ body {
     background: rgba(255, 255, 255, 0.03);
 }
 
-/* 战争日志 - 红 */
 .message-log .line.war {
     border-left-color: #ff4e50;
     background: rgba(255, 78, 80, 0.05);
@@ -161,7 +158,6 @@ body {
     font-weight: bold;
 }
 
-/* 经济日志 - 绿 */
 .message-log .line.econ {
     border-left-color: #2ecc71;
     background: rgba(46, 204, 113, 0.05);
@@ -171,7 +167,6 @@ body {
     color: #2ecc71;
 }
 
-/* 胜利日志 - 渐变 */
 .message-log .line.victory {
     border-left-width: 4px;
     border-left-color: #f9d423;
@@ -184,7 +179,6 @@ body {
     font-weight: bold;
 }
 
-/* 系统日志 - 蓝 */
 .message-log .line.system {
     border-left-color: #00f5d4;
     background: rgba(0, 245, 212, 0.05);
@@ -229,7 +223,6 @@ body {
     transition: background-color 0.4s ease;
 }
 
-/* 闪烁动效类 */
 .data-card.flash-green {
     background-color: rgba(46, 204, 113, 0.25) !important;
 }
@@ -239,7 +232,7 @@ body {
 
 .card-label {
     font-size: 0.75rem;
-    color: #45f248; /* 偏青色 */
+    color: #45f248;
     opacity: 0.6;
 }
 
@@ -266,10 +259,10 @@ body {
     color: #2ecc71;
 }
 
-/* 环世堪舆 */
+/* 环世堪舆 (绝对定位画布版) */
 .map-wrapper {
     flex: 1;
-    background: rgba(11, 12, 16, 0.8);
+    background: radial-gradient(circle, #0e1220 0%, #05070f 100%);
     border: 1px solid rgba(255, 255, 255, 0.05);
     border-radius: 6px;
     padding: 10px;
@@ -285,6 +278,7 @@ body {
     margin-bottom: 8px;
     font-size: 0.9rem;
     color: #66fcf1;
+    z-index: 10;
 }
 
 .control-btn {
@@ -305,90 +299,137 @@ body {
     box-shadow: 0 0 8px rgba(69, 243, 255, 0.5);
 }
 
+/* 2D 画布绝对容器 */
 .map-grid {
     flex: 1;
-    display: grid;
-    grid-template-columns: repeat(8, 1fr);
-    gap: 6px;
-    overflow-y: auto;
-    padding-right: 4px;
-}
-
-/* 城市格子 */
-.city-wrapper {
-    width: 100%;
-}
-
-.map_gird {
-    display: block;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-    border-radius: 4px;
-    height: 60px;
-    transition: transform 0.2s, box-shadow 0.2s;
     position: relative;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.02);
+    border-radius: 4px;
+}
+
+/* SVG 连线画布层 */
+#map-links-svg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none; /* 防止遮挡交互点击 */
+    z-index: 1;
+}
+
+/* 基础发光连线 */
+.normal-line {
+    stroke: rgba(102, 252, 241, 0.18);
+    stroke-width: 1.5px;
+    transition: stroke 0.3s;
+}
+
+/* 战区火光闪烁连线 */
+.war-line {
+    stroke: #ff4e50;
+    stroke-width: 2.2px;
+    stroke-dasharray: 4 4;
+    animation: dash 1s linear infinite;
+    filter: drop-shadow(0 0 3px #ff4e50);
+}
+
+@keyframes dash {
+    to {
+        stroke-dashoffset: -20;
+    }
+}
+
+/* 城市关卡包裹节点 - 绝对定位 */
+.city-wrapper {
+    position: absolute;
+    transform: translate(-50%, -50%); /* 精确锚定中心坐标 */
+    z-index: 5;
+}
+
+/* 精致迷你药丸舱格子 */
+.map_gird {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border: 1.5px solid rgba(255, 255, 255, 0.15);
+    border-radius: 20px;
+    height: 22px;
+    min-width: 60px;
+    padding: 0 6px;
+    transition: transform 0.2s, box-shadow 0.2s, border-color 0.2s;
+    background: rgba(11, 12, 16, 0.95);
+    cursor: pointer;
 }
 
 .map_gird:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+    transform: translate(0, -1px) scale(1.05);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.6);
+}
+
+.map_item {
+    width: 100%;
+    height: 100%;
+    font-size: 0.65rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 4px;
+    position: relative;
+}
+
+.city-name-label {
+    white-space: nowrap;
+    font-weight: 600;
+}
+
+.map_index {
+    font-size: 0.75rem;
+    font-weight: bold;
+    opacity: 0.9;
 }
 
 /* 视点高亮 */
 .map_gird.focused {
-    border: 2px solid #66fcf1 !important;
-    box-shadow: 0 0 8px rgba(102, 252, 241, 0.6);
+    border: 1.8px solid #66fcf1 !important;
+    box-shadow: 0 0 10px rgba(102, 252, 241, 0.8) !important;
     animation: pulseBorder 1.5s infinite alternate;
 }
 
 @keyframes pulseBorder {
-    0% { border-color: rgba(102, 252, 241, 0.4); }
+    0% { border-color: rgba(102, 252, 241, 0.5); }
     100% { border-color: rgba(102, 252, 241, 1); }
 }
 
 /* 战火脉冲波纹 */
 .map_gird.war-active {
     animation: warFlash 0.5s infinite alternate;
-    border: 1.5px solid #ff4e50 !important;
+    border: 1.8px solid #ff4e50 !important;
 }
 
 @keyframes warFlash {
-    0% { box-shadow: 0 0 2px rgba(255, 78, 80, 0.3); background-color: rgba(255, 78, 80, 0.1); }
-    100% { box-shadow: 0 0 12px rgba(255, 78, 80, 0.8); background-color: rgba(255, 78, 80, 0.35); }
-}
-
-.map_item {
-    height: 100%;
-    padding: 6px;
-    font-size: 0.75rem;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    position: relative;
-}
-
-.map_index {
-    align-self: flex-end;
-    font-size: 1.2rem;
-    font-weight: 800;
-    opacity: 0.25;
+    0% { box-shadow: 0 0 2px rgba(255, 78, 80, 0.3); background-color: rgba(255, 78, 80, 0.2); }
+    100% { box-shadow: 0 0 14px rgba(255, 78, 80, 0.9); background-color: rgba(255, 78, 80, 0.5); }
 }
 
 /* 势力专属颜色 */
-.blank { background: rgba(31, 40, 51, 0.4); color: #888; }
-.gird1 { background: rgba(155, 89, 182, 0.35); border-color: rgba(155, 89, 182, 0.8); color: #e8dbff; } /* 刘备 - 蜀 */
-.gird2 { background: rgba(230, 126, 34, 0.35); border-color: rgba(230, 126, 34, 0.8); color: #ffe8d6; } /* 曹操 - 魏 */
-.gird3 { background: rgba(46, 204, 113, 0.35); border-color: rgba(46, 204, 113, 0.8); color: #d6ffd8; } /* 孙权 - 吴 */
-.gird4 { background: rgba(52, 152, 219, 0.35); border-color: rgba(52, 152, 219, 0.8); color: #d6ebff; } /* 董卓 */
-.gird5 { background: rgba(231, 76, 60, 0.35); border-color: rgba(231, 76, 60, 0.8); color: #ffd6d6; }  /* 汉献帝 */
-.gird6 { background: rgba(26, 188, 156, 0.35); border-color: rgba(26, 188, 156, 0.8); color: #d6fff7; } /* 司马炎 */
-.gird7 { background: rgba(241, 196, 15, 0.35); border-color: rgba(241, 196, 15, 0.8); color: #fffdff; }  /* 吕布 */
+.blank { border-color: rgba(255, 255, 255, 0.15); color: #888; }
+.gird1 { border-color: rgba(155, 89, 182, 0.8); color: #e8dbff; } /* 刘备 - 蜀 (紫) */
+.gird2 { border-color: rgba(230, 126, 34, 0.8); color: #ffe8d6; } /* 曹操 - 魏 (橙) */
+.gird3 { border-color: rgba(46, 204, 113, 0.8); color: #d6ffd8; } /* 孙权 - 吴 (绿) */
+.gird4 { border-color: rgba(52, 152, 219, 0.8); color: #d6ebff; } /* 董卓 (蓝) */
+.gird5 { border-color: rgba(231, 76, 60, 0.8); color: #ffd6d6; }  /* 汉献帝 (红) */
+.gird6 { border-color: rgba(26, 188, 156, 0.8); color: #d6fff7; } /* 司马炎 */
+.gird7 { border-color: rgba(241, 196, 15, 0.8); color: #fffdff; }  /* 吕布 */
 
 /* Map Hover Tip */
 .tip .prompt-box {
     display: none;
     position: absolute;
-    left: 105%;
-    top: 0;
+    left: 110%;
+    top: 50%;
+    transform: translateY(-50%);
     width: 200px;
     background: rgba(19, 19, 26, 0.95);
     border: 1px solid #66fcf1;
@@ -435,7 +476,6 @@ body {
     transition: all 0.2s;
 }
 
-/* 激活的微操按钮样式 */
 .cmd-btn.active-cmd {
     opacity: 1;
     cursor: pointer;
@@ -538,6 +578,6 @@ body {
     justify-content: space-between;
     align-items: center;
     font-size: 0.75rem;
-    color: #45f248; /* 偏青色 */
+    color: #45f248;
     opacity: 0.6;
 }

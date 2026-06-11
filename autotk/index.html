@@ -61,14 +61,16 @@
                 </div>
             </div>
 
-            <!-- 环世堪舆 (地图网格) -->
+            <!-- 环世堪舆 (2D 拓扑连线地图) -->
             <div class="map-wrapper">
                 <div class="map-header">
                     <span><i class="fa fa-globe"></i> 环世堪舆</span>
                     <button id="pause" class="control-btn"><i class="fa fa-play"></i> 回合开始</button>
                 </div>
                 <div id="content" class="map-grid">
-                    <!-- 动态生成城市网格 -->
+                    <!-- SVG 动态连线画布层 -->
+                    <svg id="map-links-svg"></svg>
+                    <!-- 动态生成绝对定位城市关隘 -->
                 </div>
             </div>
 
