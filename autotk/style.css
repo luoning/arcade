@@ -141,19 +141,36 @@ body {
 
 
 /* ==========================================
- * 2. 缩小至 80% 并居中的沙盘大地图舞台
+ * 2. 16:9 宽高锁定的沙盘大地图舞台 (视口拉伸保护)
  * ========================================== */
-.main-map-stage {
+
+/* 外层铺满的居中容器 */
+.map-stage-wrapper {
     position: absolute;
-    width: 80%;
-    height: 72%; /* 高度稍降以容纳顶部和底部栏的安全带 */
-    left: 50%;
-    top: 52%;
-    transform: translate(-50%, -50%);
+    left: 0;
+    right: 0;
+    top: 48px;   /* 顶部状态栏高度 */
+    bottom: 56px; /* 底部操作台高度 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 5;
+    overflow: hidden;
+}
+
+/* 内部严格 16:9 宽高比锁定区块 */
+.main-map-stage {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    /* 使用 aspect-ratio 或 object-fit 模拟锁定 */
+    max-width: calc(100vh * 2.1);   /* 高度×2.1 限制最大宽 */
+    max-height: calc(100vw * 0.6);  /* 宽度×0.6 限制最大高 */
     background: transparent;
     overflow: hidden;
-    z-index: 5;
 }
+
+
 
 /* SVG 连线画布层 */
 #map-links-svg {

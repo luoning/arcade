@@ -114,6 +114,73 @@ let gameState = {
     history: []
 };
 
+// ==========================================
+// [第三阶段-音效] Web Audio API 8-bit 复古音效引擎
+// ==========================================
+const SFX = (() => {
+    let ctx = null;
+
+    function getCtx() {
+        if (!ctx) {
+            try {
+                ctx = new (window.AudioContext || window.webkitAudioContext)();
+            } catch (e) { return null; }
+        }
+        return ctx;
+    }
+
+    // 基础合成音 (frequency: Hz, type: sine/square/sawtooth, duration: ms)
+    function beep(frequency, type, duration, volume = 0.18) {
+        const c = getCtx();
+        if (!c) return;
+        const osc = c.createOscillator();
+        const gain = c.createGain();
+        osc.connect(gain);
+        gain.connect(c.destination);
+        osc.type = type;
+        osc.frequency.setValueAtTime(frequency, c.currentTime);
+        gain.gain.setValueAtTime(volume, c.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, c.currentTime + duration / 1000);
+        osc.start(c.currentTime);
+        osc.stop(c.currentTime + duration / 1000);
+    }
+
+    return {
+        // 战斗爆发：双音低沉打击
+        war() {
+            beep(180, "sawtooth", 80, 0.22);
+            setTimeout(() => beep(140, "sawtooth", 120, 0.18), 70);
+        },
+        // 攻城得手：上扬三级音阶
+        victory() {
+            beep(523, "square", 80);
+            setTimeout(() => beep(659, "square", 80), 90);
+            setTimeout(() => beep(784, "square", 160), 180);
+        },
+        // 天下一统：宏大五音
+        unify() {
+            [392, 523, 659, 784, 1047].forEach((f, i) => {
+                setTimeout(() => beep(f, "square", 200, 0.25), i * 130);
+            });
+        },
+        // 锦囊凝聚：清脆提示音
+        card() {
+            beep(880, "sine", 60, 0.12);
+            setTimeout(() => beep(1047, "sine", 90, 0.10), 70);
+        },
+        // 存档成功：短促双音
+        save() {
+            beep(440, "sine", 60, 0.10);
+            setTimeout(() => beep(660, "sine", 80, 0.10), 70);
+        },
+        // 施放计策
+        tactic() {
+            beep(600, "sawtooth", 50, 0.14);
+            setTimeout(() => beep(400, "sawtooth", 100, 0.10), 60);
+        }
+    };
+})();
+
 // 工具函数
 function randInt(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min;
@@ -756,6 +823,7 @@ function nextStep() {
             logMsg = `派遣兵马大肆入侵我方【${targetCity}】，但遭到驻防的【虎贲重步兵】誓死抵抗，强行守住了要塞关隘！`;
             logType = "war";
             change.army_shield = -randInt(10, 30);
+            SFX.war();
         } else {
             const isSuccess = Math.random() < 0.55;
             if (isSuccess) {
@@ -764,6 +832,7 @@ function nextStep() {
                 
                 logMsg = `挥师强攻【${targetCity}】，击溃了【${defender}】的守备部队，成功将城池夺回！`;
                 logType = "war";
+                SFX.war();
                 
                 if (defender === "刘备") {
                     change.people = -randInt(50, 200);
@@ -819,11 +888,29 @@ function nextStep() {
     renderStats(change);
     renderMap();
     
-    // 累加回合计数器并定时自动抽卡
+    // 累加回合计数器、自动抽卡、每15回合静默自动存档
     gameState.tacticRounds++;
     if (gameState.tacticRounds >= 15) {
         gameState.tacticRounds = 0;
         drawRandomCard();
+        // 自动静默存档 (每15回合触发一次，无日志干扰)
+        try {
+            const autoState = {
+                running: false, script: gameState.script, speed: gameState.speed,
+                stats: { ...gameState.stats }, cities: { ...gameState.cities },
+                cityNow: gameState.cityNow, selectedCity: gameState.selectedCity,
+                currentWar: null, cards: [...gameState.cards], activeCardIndex: null,
+                tacticRounds: 0, history: [...gameState.history]
+            };
+            localStorage.setItem("autotk_autosave", JSON.stringify(autoState));
+            // 更新自动存档状态指示
+            const statusEl = document.getElementById("autosave-status");
+            if (statusEl) {
+                const t = new Date();
+                statusEl.textContent = `自动存档: ${t.getHours().toString().padStart(2,'0')}:${t.getMinutes().toString().padStart(2,'0')}:${t.getSeconds().toString().padStart(2,'0')}`;
+                statusEl.style.color = "rgba(46, 204, 113, 0.7)";
+            }
+        } catch(e) {}
     }
     
     if (gameState.selectedCity) {
@@ -843,6 +930,7 @@ function checkVictory() {
     const isAllSame = citiesList.every(c => gameState.cities[c].union === firstOwner);
     if (isAllSame) {
         addLog("天下大势", `【${firstOwner}】占领了所有疆土，天下一统！`, "victory");
+        SFX.unify();
         window.parent.postMessage({
             type: "unlock_achievement",
             achievement: "天下一统"
@@ -904,6 +992,7 @@ function saveGame() {
     };
     try {
         localStorage.setItem("autotk_save", JSON.stringify(serializedState));
+        SFX.save();
         addLog("系统存档", "当前军政大势与国库储备已成功封存入档！", "victory");
     } catch (e) {
         addLog("存档失败", "本地存储空间不足，未能成功保存进度！", "system");
@@ -1121,6 +1210,7 @@ function drawRandomCard() {
     const pool = Object.keys(TACTICS_CONFIG);
     const cardId = randChoice(pool);
     gameState.cards.push(cardId);
+    SFX.card();
     addLog("妙计入库", `军师夜观星象，成功推演并凝聚了锦囊妙计：【${TACTICS_CONFIG[cardId].name}】！`, "victory");
     updateTacticsUI();
 }
@@ -1183,8 +1273,9 @@ function applyTactic(cityName) {
         }
     }
 
-    // 扣除资源
+    // 扣除资源并触发音效
     config.costPay();
+    SFX.tactic();
 
     // 触发效果
     if (cardId === "kongcheng") {

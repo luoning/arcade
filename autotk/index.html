@@ -50,13 +50,15 @@
         </div>
     </header>
 
-    <!-- 2. 全屏大地图主舞台 -->
-    <main class="main-map-stage" id="content">
-        <!-- SVG 动态发光地缘通路层 -->
-        <svg id="map-links-svg"></svg>
-        
-        <!-- 绝对定位的城市关隘节点将通过 JS 渲染在这里 -->
-    </main>
+    <!-- 2. 全屏大地图主舞台 (外层居中容器 + 内层宽高锁定) -->
+    <div class="map-stage-wrapper">
+        <main class="main-map-stage" id="content">
+            <!-- SVG 动态发光地缘通路层 -->
+            <svg id="map-links-svg"></svg>
+            
+            <!-- 绝对定位的城市关隘节点将通过 JS 渲染在这里 -->
+        </main>
+    </div>
 
     <!-- 3. 左下角半透明战报简讯 (朝堂风云) -->
     <section class="floating-panel war-log-panel">
@@ -100,6 +102,9 @@
         <div class="save-load-mini" style="display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
             <button id="btn_save_game" class="mini-archive-btn" style="border-color: rgba(46, 204, 113, 0.4); color: #2ecc71;"><i class="fa fa-download"></i> 归档保存</button>
             <button id="btn_load_game" class="mini-archive-btn" style="border-color: rgba(52, 152, 219, 0.4); color: #3498db;"><i class="fa fa-upload"></i> 载入进度</button>
+        </div>
+        <div id="autosave-status" style="font-size: 9px; color: rgba(102,252,241,0.4); text-align: center; margin-top: 4px; letter-spacing: 0.5px;">
+            自动存档: 未触发
         </div>
     </section>
 
