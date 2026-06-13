@@ -462,7 +462,7 @@ function makeMove(board, fromR, fromC, toR, toC, moveType) {
 // --- 国际象棋规则算法核心 ---
 
 // 获取单个棋子可移动的伪合法位置
-function getPseudoMoves(board, r, c) {
+function getPseudoMoves(board, r, c, ignoreCastling = false) {
   const piece = board[r][c];
   if (!piece) return [];
 
@@ -561,6 +561,10 @@ function getPseudoMoves(board, r, c) {
       ];
       offsets.forEach(([dr, dc]) => addMove(r + dr, c + dc));
 
+      if (ignoreCastling) {
+        break;
+      }
+
       // 王车易位条件审查 (在非将军状态下，且路径上无子且未受攻击)
       const rights = gameState.castleRights[color];
       const isKingChecked = isCheck(board, color);
@@ -642,7 +646,7 @@ function isSquareAttacked(board, targetR, targetC, defendedColor) {
     for (let c = 0; c < 8; c++) {
       const piece = board[r][c];
       if (piece && piece.startsWith(enemyColor)) {
-        const pMoves = getPseudoMoves(board, r, c);
+        const pMoves = getPseudoMoves(board, r, c, true); // 阻止易位检查导致的无限递归死循环
         const match = pMoves.find(m => m.r === targetR && m.c === targetC);
         if (match) return true;
       }
