@@ -1,0 +1,383 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@200;400;600&display=swap');
+
+:root {
+  --bg-color: #06020c;
+  --panel-bg: rgba(15, 8, 28, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f8f9fa;
+  --text-secondary: #9a8eb3;
+  --cyan-neon: #00f5d4;
+  --pink-neon: #ff007f;
+  --yellow-neon: #fee440;
+  --purple-neon: #a855f7;
+  
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+  position: relative;
+}
+
+/* CRT扫描线 */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+  z-index: 9999;
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* 顶部状态栏 */
+.header-bar {
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 10px;
+  z-index: 10;
+}
+
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(5px);
+}
+
+.icon-btn:hover {
+  color: var(--cyan-neon);
+  border-color: var(--cyan-neon);
+  background: rgba(0, 245, 212, 0.08);
+  box-shadow: 0 0 8px rgba(0, 245, 212, 0.3);
+}
+
+.icon-btn.muted #soundWave {
+  opacity: 0.2;
+}
+
+.select-menu {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 8px;
+  outline: none;
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(5px);
+  transition: all 0.2s ease;
+}
+
+.select-menu:hover {
+  border-color: var(--cyan-neon);
+  box-shadow: 0 0 8px rgba(0, 245, 212, 0.2);
+}
+
+.status-panel {
+  display: flex;
+  gap: 12px;
+}
+
+.status-box {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 2px 12px;
+  text-align: center;
+  min-width: 70px;
+  backdrop-filter: blur(5px);
+}
+
+.status-label {
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.status-value {
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 900;
+  color: var(--cyan-neon);
+  text-shadow: 0 0 4px rgba(0, 245, 212, 0.4);
+}
+
+.game-title {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  margin-bottom: 15px;
+  background: linear-gradient(to right, #fff, var(--text-secondary));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 5px rgba(0,0,0,0.5));
+  z-index: 10;
+}
+
+/* 棋盘容器 */
+.board-container {
+  width: 92vw;
+  max-width: 480px;
+  aspect-ratio: 1/1;
+  background: var(--panel-bg);
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.8), inset 0 0 20px rgba(168, 85, 247, 0.05);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  z-index: 5;
+  margin-bottom: 15px;
+}
+
+.board-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: repeat(8, 1fr);
+  width: 100%;
+  height: 100%;
+}
+
+/* 棋盘网格格子 */
+.board-cell {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background-color 0.2s ease;
+  cursor: pointer;
+}
+
+.cell-light {
+  background-color: rgba(255, 255, 255, 0.02);
+}
+
+.cell-dark {
+  background-color: rgba(15, 8, 28, 0.8);
+}
+
+/* 行走提示绿圈 */
+.move-indicator {
+  position: absolute;
+  width: 25%;
+  height: 25%;
+  border-radius: 50%;
+  background-color: var(--cyan-neon);
+  box-shadow: 0 0 10px var(--cyan-neon);
+  pointer-events: none;
+  animation: pulse 1.5s infinite;
+}
+
+.move-indicator-capture {
+  position: absolute;
+  width: 80%;
+  height: 80%;
+  border: 2px solid var(--pink-neon);
+  border-radius: 50%;
+  box-shadow: 0 0 10px var(--pink-neon);
+  pointer-events: none;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); opacity: 0.6; }
+  50% { transform: scale(1.2); opacity: 0.9; }
+  100% { transform: scale(1); opacity: 0.6; }
+}
+
+/* 棋子样式 */
+.chess-piece {
+  font-size: 2.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 3;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  cursor: pointer;
+}
+
+/* 白色霓虹棋子 */
+.piece-white {
+  color: #ffffff;
+  text-shadow: 
+    0 0 4px #fff,
+    0 0 8px var(--cyan-neon),
+    0 0 15px var(--cyan-neon);
+}
+
+/* 黑色霓虹棋子 */
+.piece-black {
+  color: #ffb7c5;
+  text-shadow: 
+    0 0 4px #ffb7c5,
+    0 0 8px var(--pink-neon),
+    0 0 15px var(--pink-neon);
+}
+
+/* 被选中与将军高亮状态 */
+.cell-selected {
+  background-color: rgba(0, 245, 212, 0.25) !important;
+  box-shadow: inset 0 0 15px rgba(0, 245, 212, 0.4);
+}
+
+.cell-check {
+  background-color: rgba(255, 0, 127, 0.3) !important;
+  animation: checkFlash 0.4s infinite alternate;
+}
+
+@keyframes checkFlash {
+  0% { box-shadow: inset 0 0 5px rgba(255, 0, 127, 0.4); }
+  100% { box-shadow: inset 0 0 25px rgba(255, 0, 127, 0.8); }
+}
+
+/* 弹窗遮罩 */
+.overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(4, 1, 9, 0.9);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+  transition: opacity 0.3s ease;
+}
+
+.overlay.hidden {
+  display: none !important;
+}
+
+.overlay-card {
+  background: rgba(18, 10, 32, 0.95);
+  border: 1px solid var(--purple-neon);
+  box-shadow: 0 0 30px rgba(168, 85, 247, 0.4);
+  border-radius: 12px;
+  padding: 24px;
+  text-align: center;
+  max-width: 340px;
+  width: 85%;
+}
+
+.overlay-card h2 {
+  font-family: var(--font-display);
+  font-size: 1.5rem;
+  color: var(--pink-neon);
+  text-shadow: 0 0 10px rgba(255, 0, 127, 0.4);
+  margin-bottom: 12px;
+}
+
+.overlay-card h3 {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  color: var(--cyan-neon);
+  text-shadow: 0 0 8px rgba(0, 245, 212, 0.3);
+  margin-bottom: 8px;
+}
+
+.overlay-card p {
+  font-size: 0.85rem;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+
+.promotion-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.promo-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  color: var(--text-primary);
+  padding: 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.promo-btn:hover {
+  border-color: var(--cyan-neon);
+  background: rgba(0, 245, 212, 0.1);
+  box-shadow: 0 0 10px rgba(0, 245, 212, 0.2);
+}
+
+.btn {
+  background: var(--pink-neon);
+  color: #fff;
+  border: none;
+  padding: 10px 24px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  transition: all 0.2s ease;
+  box-shadow: 0 0 15px rgba(255, 0, 127, 0.4);
+}
+
+.btn:hover {
+  background: #ff3399;
+  box-shadow: 0 0 25px var(--pink-neon);
+  transform: scale(1.05);
+}
+
+/* 玩法指引 */
+.help-guide {
+  text-align: center;
+  width: 100%;
+  max-width: 480px;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  line-height: 1.5;
+  z-index: 10;
+}
+
+.help-guide p {
+  margin-bottom: 4px;
+}
