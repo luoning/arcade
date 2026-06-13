@@ -1580,8 +1580,18 @@
         if (data.type === 'UNLOCK_ACHIEVEMENT') {
           ArcadeAPI.unlock(data.gameId, data.achievementId);
         } else if (data.type === 'unlock_achievement') {
-          // 兼容写法
-          ArcadeAPI.unlock('autotk', 'autotk_win');
+          // 智能兼容判定：如果传了具体成就标识，按具体游戏映射；否则默认走 autotk
+          if (data.achievement === 'chess_win') {
+            ArcadeAPI.unlock('chess', 'chess_win');
+          } else if (data.achievement === 'chess_promotion') {
+            ArcadeAPI.unlock('chess', 'chess_promotion');
+          } else if (data.achievement === 'gomoku_win') {
+            ArcadeAPI.unlock('gomoku', 'gomoku_win');
+          } else if (data.achievement === 'gomoku_perfect') {
+            ArcadeAPI.unlock('gomoku', 'gomoku_perfect');
+          } else {
+            ArcadeAPI.unlock('autotk', 'autotk_win');
+          }
         }
       }
     });
