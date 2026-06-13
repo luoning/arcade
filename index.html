@@ -1369,6 +1369,29 @@
       </div>
     </div>
 
+    <!-- gomoku (赛博五子棋) -->
+    <div class="cabinet-card" style="--cabinet-color: #ff007f; --shadow-color: rgba(255, 0, 127, 0.25);" onclick="launchGame('gomoku', 'CYBER GOMOKU', '#ff007f', 'rgba(255, 0, 127, 0.3)')">
+      <div class="cabinet-marquee">20 // GOMOKU</div>
+      <div class="cabinet-screen">
+        <div class="cabinet-icon">⚪</div>
+        <h2 class="cabinet-title">赛博五子棋</h2>
+      </div>
+      <div class="cabinet-control-panel">
+        <p class="cabinet-desc">暗系荧光线网格，落子有向外扩散的霓虹涟漪，高能评估 AI 棋手，活三冲四自动警报。</p>
+        <div class="cabinet-deck">
+          <div class="coin-slot">
+            <div class="coin-light"></div>
+            COIN
+          </div>
+          <div class="joystick-group">
+            <div class="joy-stick"></div>
+            <div class="joy-btn"></div>
+            <div class="joy-btn"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 
   <!-- 底部 -->
@@ -1456,6 +1479,10 @@
       chess: [
         { id: 'chess_win', name: '深蓝幽灵', desc: '在人机模式中成功击败国际象棋 AI' },
         { id: 'chess_promotion', name: '兵卒逆袭', desc: '在一局对决中成功将兵卒完成底部升变' }
+      ],
+      gomoku: [
+        { id: 'gomoku_win', name: '棋圣降世', desc: '在人机模式中战胜五子棋 AI 棋手' },
+        { id: 'gomoku_perfect', name: '五子连珠', desc: '在 12 手内取得极速对局胜利' }
       ]
     };
 
@@ -1478,7 +1505,8 @@
       rhythm: '霓虹节奏音轨',
       mainland: '赛博大航海',
       autotk: '三国演兵录 (Idle)',
-      chess: '赛博国际象棋'
+      chess: '赛博国际象棋',
+      gomoku: '赛博五子棋'
     };
 
     class ArcadeAchievementsAPI {
