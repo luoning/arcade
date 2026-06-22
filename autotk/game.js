@@ -90,20 +90,21 @@ const scriptUnits = window.scriptUnits || {};
 
 // 4. 运行状态
 let hasDragged = false;
+const CFG = window.GAME_CONFIG || {};
 let gameState = {
     running: false,
     timer: null,
     script: "三分天下",
-    speed: 1000, 
+    speed: CFG.speeds?.normal || 1000, 
     stats: {
-        people: 1000000,
-        avator: 576,
-        army_shield: 300, 
-        army_cavalry: 150, 
-        army_spear: 280,   
-        cash: 4875231,
-        food: 74112453,
-        means: 254
+        people: CFG.initialStats?.people || 1000000,
+        avator: CFG.initialStats?.avator || 576,
+        army_shield: CFG.initialStats?.army_shield || 300, 
+        army_cavalry: CFG.initialStats?.army_cavalry || 150, 
+        army_spear: CFG.initialStats?.army_spear || 280,   
+        cash: CFG.initialStats?.cash || 4875231,
+        food: CFG.initialStats?.food || 74112453,
+        means: CFG.initialStats?.means || 254
     },
     cities: {},
     cityNow: "新野",
@@ -122,7 +123,11 @@ let gameState = {
 const LORD_AVATAR_MAP = {
     "刘备": "assets/avatars/liubei.png",
     "曹操": "assets/avatars/caocao.png",
-    "孙权": "assets/avatars/sunquan.png"
+    "孙权": "assets/avatars/sunquan.png",
+    "董卓": "assets/avatars/dongzhuo.png",
+    "吕布": "assets/avatars/lvbu.png",
+    "袁绍": "assets/avatars/yuanshao.png",
+    "汉献帝": "assets/avatars/hanxiandi.png"
 };
 
 function getLordAvatar(lordName) {
@@ -156,15 +161,15 @@ function updateTopLordAvatar() {
 const LORD_STRATEGY_CONFIG = {
     "刘备": {
         name: "携民渡江",
-        desc: "主动技：💰12万资金。提升我方一城 25,000 繁荣度。(冷却12回合)",
+        desc: `主动技：💰${(CFG.lordSkills?.liuBei?.cashCost || 120000) / 10000}万资金。提升我方一城 ${CFG.lordSkills?.liuBei?.valueGain || 25000} 繁荣度。(冷却${CFG.lordSkills?.liuBei?.cd || 12}回合)`,
         type: "active_city",
-        cd: 12,
-        costCheck: () => gameState.stats.cash >= 120000,
-        costPay: () => { gameState.stats.cash -= 120000; },
+        cd: CFG.lordSkills?.liuBei?.cd || 12,
+        costCheck: () => gameState.stats.cash >= (CFG.lordSkills?.liuBei?.cashCost || 120000),
+        costPay: () => { gameState.stats.cash -= (CFG.lordSkills?.liuBei?.cashCost || 120000); },
         action: (cityName) => {
             if (gameState.cities[cityName]) {
-                gameState.cities[cityName].value += 25000;
-                addLog("刘备", `施展主公技【携民渡江】于【${cityName}】，大施仁政，携民渡江，该城繁荣度提升了 25,000！`, "econ");
+                gameState.cities[cityName].value += (CFG.lordSkills?.liuBei?.valueGain || 25000);
+                addLog("刘备", `施展主公技【携民渡江】于【${cityName}】，大施仁政，携民渡江，该城繁荣度提升了 ${CFG.lordSkills?.liuBei?.valueGain || 25000}！`, "econ");
                 SFX.victory();
                 return true;
             }
@@ -173,9 +178,9 @@ const LORD_STRATEGY_CONFIG = {
     },
     "孙权": {
         name: "权衡调度",
-        desc: "主动技：无消耗。瞬间将手中计策牌全部洗牌重抽。(冷却10回合)",
+        desc: `主动技：无消耗。瞬间将手中计策牌全部洗牌重抽。(冷却${CFG.lordSkills?.sunQuan?.cd || 10}回合)`,
         type: "active_card",
-        cd: 10,
+        cd: CFG.lordSkills?.sunQuan?.cd || 10,
         costCheck: () => true,
         costPay: () => {},
         action: () => {
@@ -197,15 +202,15 @@ const LORD_STRATEGY_CONFIG = {
     },
     "汉献帝": {
         name: "勤王密诏",
-        desc: "主动技：💎6珍宝。策反接壤敌方城池 5,000 繁荣度至我方。(冷却15回合)",
+        desc: `主动技：💎${CFG.lordSkills?.hanXianDi?.meansCost || 6}珍宝。策反接壤敌方城池 ${CFG.lordSkills?.hanXianDi?.stealValue || 5000} 繁荣度至我方。(冷却${CFG.lordSkills?.hanXianDi?.cd || 15}回合)`,
         type: "active_city_enemy_reachable",
-        cd: 15,
-        costCheck: () => gameState.stats.means >= 6,
-        costPay: () => { gameState.stats.means -= 6; },
+        cd: CFG.lordSkills?.hanXianDi?.cd || 15,
+        costCheck: () => gameState.stats.means >= (CFG.lordSkills?.hanXianDi?.meansCost || 6),
+        costPay: () => { gameState.stats.means -= (CFG.lordSkills?.hanXianDi?.meansCost || 6); },
         action: (cityName) => {
             const cData = gameState.cities[cityName];
             if (cData) {
-                const stealVal = Math.min(cData.value, 5000);
+                const stealVal = Math.min(cData.value, CFG.lordSkills?.hanXianDi?.stealValue || 5000);
                 cData.value -= stealVal;
                 // 均分到玩家拥有的城市中
                 const myCities = getOwnedCities("刘备");
@@ -224,17 +229,17 @@ const LORD_STRATEGY_CONFIG = {
     },
     "吕布": {
         name: "飞将袭掠",
-        desc: "主动技：🌾30万粮食。摧毁接壤敌城 35% 守兵(即繁荣度)，并使其陷入 3 回合混乱。(冷却12回合)",
+        desc: `主动技：🌾${(CFG.lordSkills?.luBu?.foodCost || 300000) / 10000}万粮食。摧毁接壤敌城 ${Math.round((CFG.lordSkills?.luBu?.damageRate || 0.35) * 100)}% 守兵(即繁荣度)，并使其陷入 3 回合混乱。(冷却${CFG.lordSkills?.luBu?.cd || 12}回合)`,
         type: "active_city_enemy_reachable",
-        cd: 12,
-        costCheck: () => gameState.stats.food >= 300000,
-        costPay: () => { gameState.stats.food -= 300000; },
+        cd: CFG.lordSkills?.luBu?.cd || 12,
+        costCheck: () => gameState.stats.food >= (CFG.lordSkills?.luBu?.foodCost || 300000),
+        costPay: () => { gameState.stats.food -= (CFG.lordSkills?.luBu?.foodCost || 300000); },
         action: (cityName) => {
             const cData = gameState.cities[cityName];
             if (cData) {
-                const loss = Math.floor(cData.value * 0.35);
-                cData.value = Math.max(2000, cData.value - loss);
-                cData.lianhuanTurns = 4; // 混乱3回合
+                const loss = Math.floor(cData.value * (CFG.lordSkills?.luBu?.damageRate || 0.35));
+                cData.value = Math.max(CFG.lordSkills?.luBu?.minValueAfter || 2000, cData.value - loss);
+                cData.lianhuanTurns = CFG.lordSkills?.luBu?.lianhuanTurns || 4;
                 addLog("吕布", `施展主公技【飞将袭掠】，飞将神威，铁骑扫荡，摧毁【${cityName}】${loss} 繁荣度并使其陷入防御瘫痪！`, "war");
                 SFX.war();
                 return true;
@@ -370,7 +375,7 @@ function initGame(scriptName) {
     gameState.cities = {};
     citiesList.forEach(c => {
         gameState.cities[c] = { 
-            value: 10000, 
+            value: CFG.city?.defaultValue || 10000, 
             union: "无主", 
             isWar: false,
             avoidWarTurns: 0,
@@ -383,7 +388,7 @@ function initGame(scriptName) {
         activeUnits[unitName].home.forEach(hCity => {
             if (gameState.cities[hCity]) {
                 gameState.cities[hCity] = { 
-                    value: 50000, 
+                    value: CFG.city?.ownedValue || 50000, 
                     union: unitName, 
                     isWar: false,
                     avoidWarTurns: 0,
@@ -395,13 +400,15 @@ function initGame(scriptName) {
 
     // 袁绍被动【名门号令】开局额外获得资金和珍宝加成
     const pLord = getPlayerLordName();
+    const initCash = CFG.initialStats?.cash || 4875231;
+    const initMeans = CFG.initialStats?.means || 254;
     if (pLord === "袁绍") {
-        gameState.stats.cash = 4875231 + 200000;
-        gameState.stats.means = 254 + 5;
+        gameState.stats.cash = initCash + (CFG.yuanShaoBonus?.cash || 200000);
+        gameState.stats.means = initMeans + (CFG.yuanShaoBonus?.means || 5);
     } else {
         // 重置为原本默认默认配置
-        gameState.stats.cash = 4875231;
-        gameState.stats.means = 254;
+        gameState.stats.cash = initCash;
+        gameState.stats.means = initMeans;
     }
 
     gameState.cityNow = activeUnits[pLord] ? activeUnits[pLord].home[0] : (activeUnits["刘备"] ? activeUnits["刘备"].home[0] : "新野");
@@ -433,7 +440,7 @@ function setAllCity(unitName) {
     const citiesList = Object.keys(cityConnections);
     citiesList.forEach(c => {
         gameState.cities[c].union = unitName;
-        gameState.cities[c].value = 100000;
+        gameState.cities[c].value = CFG.city?.maxValue || 100000;
         gameState.cities[c].isWar = false;
     });
     
@@ -850,66 +857,69 @@ function cityAction(type) {
 
     const cData = gameState.cities[cName];
     const pLord = getPlayerLordName();
-    // 董卓被动【穷兵黩武】30% 减免因子
-    const isDongDiscount = (pLord === "董卓" || (pLord === "刘备" && gameState.script === "赤壁之战")); // 赤壁剧本模拟董卓被动
-    const costMult = isDongDiscount ? 0.7 : 1.0;
+    // 董卓被动【穷兵黩武】减免因子
+    const isDongDiscount = (pLord === "董卓" || (pLord === "刘备" && gameState.script === "赤壁之战"));
+    const costMult = isDongDiscount ? (CFG.passives?.dongZhuo?.recruitDiscount || 0.7) : 1.0;
+
+    const rc = CFG.recruitment;
 
     if (type === "recruit_shield") {
-        const cashCost = Math.floor(150000 * costMult);
-        const foodCost = Math.floor(50000 * costMult);
+        const cashCost = Math.floor((rc?.shield?.cash || 150000) * costMult);
+        const foodCost = Math.floor((rc?.shield?.food || 50000) * costMult);
         if (gameState.stats.cash < cashCost || gameState.stats.food < foodCost) {
             addLog("募兵失败", `国库资金（需${cashCost/10000}万）或粮草（需${foodCost/10000}万）不足！`, "system");
             return;
         }
         gameState.stats.cash -= cashCost;
         gameState.stats.food -= foodCost;
-        gameState.stats.army_shield += 100;
-        cData.value += 3000;
+        gameState.stats.army_shield += (rc?.shield?.amount || 100);
+        cData.value += (rc?.shield?.valueGain || 3000);
         gameState.actionsLeft--;
-        addLog("增兵布守", `在【${cName}】征发钱粮，编练招募了 100 名重装【虎贲军】驻防！`, "econ");
-        renderStats({ cash: -cashCost, food: -foodCost, army_shield: 100 });
+        addLog("增兵布守", `在【${cName}】征发钱粮，编练招募了 ${rc?.shield?.amount || 100} 名重装【虎贲军】驻防！`, "econ");
+        renderStats({ cash: -cashCost, food: -foodCost, army_shield: rc?.shield?.amount || 100 });
 
     } else if (type === "recruit_spear") {
-        const cashCost = Math.floor(80000 * costMult);
-        const foodCost = Math.floor(30000 * costMult);
+        const cashCost = Math.floor((rc?.spear?.cash || 80000) * costMult);
+        const foodCost = Math.floor((rc?.spear?.food || 30000) * costMult);
         if (gameState.stats.cash < cashCost || gameState.stats.food < foodCost) {
             addLog("募兵失败", `国库资金（需${cashCost/10000}万）或粮草（需${foodCost/10000}万）不足！`, "system");
             return;
         }
         gameState.stats.cash -= cashCost;
         gameState.stats.food -= foodCost;
-        gameState.stats.army_spear += 100;
-        cData.value += 1500;
+        gameState.stats.army_spear += (rc?.spear?.amount || 100);
+        cData.value += (rc?.spear?.valueGain || 1500);
         gameState.actionsLeft--;
-        addLog("增兵布守", `在【${cName}】募民兵，编训了 100 名【精锐长枪兵】！`, "econ");
-        renderStats({ cash: -cashCost, food: -foodCost, army_spear: 100 });
+        addLog("增兵布守", `在【${cName}】募民兵，编训了 ${rc?.spear?.amount || 100} 名【精锐长枪兵】！`, "econ");
+        renderStats({ cash: -cashCost, food: -foodCost, army_spear: rc?.spear?.amount || 100 });
 
     } else if (type === "recruit_cavalry") {
-        const cashCost = Math.floor(250000 * costMult);
-        const foodCost = Math.floor(120000 * costMult);
+        const cashCost = Math.floor((rc?.cavalry?.cash || 250000) * costMult);
+        const foodCost = Math.floor((rc?.cavalry?.food || 120000) * costMult);
         if (gameState.stats.cash < cashCost || gameState.stats.food < foodCost) {
             addLog("募兵失败", `招募野象装甲兵费高，资金（需${cashCost/10000}万）或粮草（需${foodCost/10000}万）不足！`, "system");
             return;
         }
         gameState.stats.cash -= cashCost;
         gameState.stats.food -= foodCost;
-        gameState.stats.army_cavalry += 50;
-        cData.value += 5000;
+        gameState.stats.army_cavalry += (rc?.cavalry?.amount || 50);
+        cData.value += (rc?.cavalry?.valueGain || 5000);
         gameState.actionsLeft--;
-        addLog("巨兽营房", `在【${cName}】重金引进象群，训练了 50 名重装【南蛮象兵】！`, "victory");
-        renderStats({ cash: -cashCost, food: -foodCost, army_cavalry: 50 });
+        addLog("巨兽营房", `在【${cName}】重金引进象群，训练了 ${rc?.cavalry?.amount || 50} 名重装【南蛮象兵】！`, "victory");
+        renderStats({ cash: -cashCost, food: -foodCost, army_cavalry: rc?.cavalry?.amount || 50 });
 
     } else if (type === "farm") {
-        if (gameState.stats.cash < 50000) {
-            addLog("修水利失败", "资金不足（需5万金）！", "system");
+        const farmCash = CFG.economy?.farm?.cashCost || 50000;
+        if (gameState.stats.cash < farmCash) {
+            addLog("修水利失败", `资金不足（需${farmCash/10000}万金）！`, "system");
             return;
         }
-        gameState.stats.cash -= 50000;
-        cData.value += 12000;
-        gameState.stats.food += 300000;
+        gameState.stats.cash -= farmCash;
+        cData.value += (CFG.economy?.farm?.valueGain || 12000);
+        gameState.stats.food += (CFG.economy?.farm?.foodGain || 300000);
         gameState.actionsLeft--;
         addLog("修生养息", `在【${cName}】大兴民夫屯田水利，使该城繁荣度显著飙升！`, "econ");
-        renderStats({ cash: -50000, food: 300000 });
+        renderStats({ cash: -farmCash, food: CFG.economy?.farm?.foodGain || 300000 });
 
     } else if (type === "attack") {
         const myLord = getPlayerLordName();
@@ -920,13 +930,14 @@ function cityAction(type) {
             return;
         }
 
-        if (gameState.stats.army_cavalry < 30 || gameState.stats.cash < 500000) {
-            addLog("出征失败", "需要至少 30 名南蛮突击象兵作为攻坚，且战费需 50万金！", "system");
+        const atkCfg = CFG.combat?.playerAttack;
+        if (gameState.stats.army_cavalry < (atkCfg?.cavalryRequired || 30) || gameState.stats.cash < (atkCfg?.cashCost || 500000)) {
+            addLog("出征失败", `需要至少 ${atkCfg?.cavalryRequired || 30} 名南蛮突击象兵作为攻坚，且战费需 ${(atkCfg?.cashCost || 500000)/10000}万金！`, "system");
             return;
         }
 
-        gameState.stats.army_cavalry -= 30; 
-        gameState.stats.cash -= 500000;
+        gameState.stats.army_cavalry -= (atkCfg?.cavalryRequired || 30); 
+        gameState.stats.cash -= (atkCfg?.cashCost || 500000);
         gameState.actionsLeft--;
 
         cData.isWar = true;
@@ -935,11 +946,11 @@ function cityAction(type) {
         const attackerCity = randChoice(myAttackers) || myCities[0];
         gameState.currentWar = { from: attackerCity, to: cName };
         const hasLianhuan = cData.lianhuanTurns > 0;
-        const success = hasLianhuan || Math.random() < 0.75;
+        const success = hasLianhuan || Math.random() < (atkCfg?.baseSuccessRate || 0.75);
         if (success) {
             const old = cData.union;
             cData.union = myLord;
-            cData.value = Math.floor(cData.value * 0.95);
+            cData.value = Math.floor(cData.value * (CFG.city?.postConquerRetain || 0.95));
             if (hasLianhuan) {
                 cData.lianhuanTurns = 0; // 解除连环计
                 addLog("亲征大捷", `【战报】乘【${cName}】受连环计防线混乱之际，我军挥师踏平防线，不费吹灰之力强攻收复！`, "victory");
@@ -949,23 +960,24 @@ function cityAction(type) {
         } else {
             addLog("亲征受挫", `【战报】强攻【${cName}】遭遇敌坚决抵抗，突击象兵折损，被迫收兵。`, "war");
         }
-        renderStats({ army_cavalry: -30, cash: -500000 });
+        renderStats({ army_cavalry: -(atkCfg?.cavalryRequired || 30), cash: -(atkCfg?.cashCost || 500000) });
         renderMap();
         updateSelectedCityUI();
 
     } else if (type === "plot") {
-        if (gameState.stats.means < 5) {
-            addLog("破坏失败", "缺少收买提线木偶的名器珍宝（需 5 个珍宝）！", "system");
+        const plotMeans = CFG.plot?.meansCost || 5;
+        if (gameState.stats.means < plotMeans) {
+            addLog("破坏失败", `缺少收买提线木偶的名器珍宝（需 ${plotMeans} 个珍宝）！`, "system");
             return;
         }
 
-        gameState.stats.means -= 5;
-        const loss = Math.floor(cData.value * 0.5);
-        cData.value = Math.max(1000, cData.value - loss);
+        gameState.stats.means -= plotMeans;
+        const loss = Math.floor(cData.value * (CFG.plot?.valueDamageRate || 0.5));
+        cData.value = Math.max(CFG.plot?.minValueAfter || 1000, cData.value - loss);
         gameState.actionsLeft--;
 
         addLog("刺客与破坏", `暗中派死士刺客混入【${cName}】密谋纵火并收买内战，该城经济被重创！`, "war");
-        renderStats({ means: -5 });
+        renderStats({ means: -plotMeans });
         renderMap();
         updateSelectedCityUI();
     }
@@ -1074,9 +1086,9 @@ function getPlayerMaxActions() {
     let maxActions = 0;
     myCities.forEach(c => {
         const size = citySizes[c] || "medium";
-        if (size === "large") maxActions += 3;
-        else if (size === "small") maxActions += 1;
-        else maxActions += 2; // medium
+        if (size === "large") maxActions += (CFG.actions?.largeCity || 3);
+        else if (size === "small") maxActions += (CFG.actions?.smallCity || 1);
+        else maxActions += (CFG.actions?.mediumCity || 2); // medium
     });
     return maxActions;
 }
@@ -1124,15 +1136,15 @@ function nextStep() {
 
     const targetUnit = randChoice(aliveUnits);
     
-    // 刘表被动【割据避战】：刘表不主动发起对外战争，如果随机到刘表且为侵略，有 75% 概率改成休养生息
+    // 刘表被动【割据避战】：刘表不主动发起对外战争，如果随机到刘表且为侵略，有概率改成休养生息
     let forceEcon = false;
-    if (targetUnit === "刘表" && Math.random() < 0.75) {
+    if (targetUnit === "刘表" && Math.random() < (CFG.passives?.liuBiao?.avoidWarRate || 0.75)) {
         forceEcon = true;
     }
 
     const owned = getOwnedCities(targetUnit);
     const neighbours = getNeighbours(owned);
-    const isAggressive = !forceEcon && Math.random() < 0.65 && neighbours.length > 0;
+    const isAggressive = !forceEcon && Math.random() < (CFG.combat?.aiAttack?.aggressionRate || 0.65) && neighbours.length > 0;
 
     let targetCity = "";
     let change = { people: 0, avator: 0, army_shield: 0, army_cavalry: 0, army_spear: 0, cash: 0, food: 0, means: 0 };
@@ -1148,16 +1160,16 @@ function nextStep() {
         
         shuffledNeighbours.forEach(nCity => {
             const nData = gameState.cities[nCity];
-            let weight = 1000;
+            let weight = CFG.aiEvents?.aiCityWeight?.base || 1000;
             
-            weight -= Math.floor(nData.value / 250);
+            weight -= Math.floor(nData.value / (CFG.aiEvents?.aiCityWeight?.valuePenaltyPer250 ? 250 / CFG.aiEvents?.aiCityWeight?.valuePenaltyPer250 : 250));
             
             if (isCapitalCity(nCity, nData.union)) {
-                weight -= 800;
+                weight -= (CFG.aiEvents?.aiCityWeight?.capitalPenalty || 800);
             }
             
             if (nData.avoidWarTurns > 0) {
-                weight -= 5000;
+                weight -= (CFG.aiEvents?.aiCityWeight?.avoidWarPenalty || 5000);
             }
             
             if (weight > maxWeight) {
@@ -1190,89 +1202,134 @@ function nextStep() {
 
         const defender = gameState.cities[targetCity].union;
         
-        // 曹操被动【绝地反击】：防御战防御成功率提高（30% -> 60%）
-        let shieldDefendRate = 0.3;
+        // 曹操被动【绝地反击】：防御战防御成功率提高
+        let shieldDefendRate = CFG.combat?.defense?.baseShieldRate || 0.3;
         if (defender === "曹操") {
-            shieldDefendRate = 0.6;
+            shieldDefendRate = CFG.combat?.defense?.caoCaoShieldRate || 0.6;
         }
 
-        if (defender === pLord && gameState.stats.army_shield > 100 && Math.random() < shieldDefendRate) {
+        const shieldMin = CFG.combat?.defense?.shieldMin || 100;
+        if (defender === pLord && gameState.stats.army_shield > shieldMin && Math.random() < shieldDefendRate) {
             logMsg = `派遣兵马大肆入侵我方【${targetCity}】，但遭到驻防的【虎贲重步兵】誓死抵抗，强行守住了要塞关隘！`;
             logType = "war";
-            change.army_shield = -randInt(10, 30);
+            change.army_shield = -randInt(
+                CFG.combat?.postDefense?.shieldLossMin || 10,
+                CFG.combat?.postDefense?.shieldLossMax || 30
+            );
             SFX.war();
         } else {
-            const isSuccess = Math.random() < 0.55;
+            const isSuccess = Math.random() < (CFG.combat?.aiAttack?.baseSuccessRate || 0.55);
             if (isSuccess) {
                 gameState.cities[targetCity].union = targetUnit;
-                gameState.cities[targetCity].value = Math.max(5000, Math.floor(gameState.cities[targetCity].value * 0.7));
+                gameState.cities[targetCity].value = Math.max(
+                    CFG.city?.aiConquerMin || 5000,
+                    Math.floor(gameState.cities[targetCity].value * (CFG.city?.aiConquerRetain || 0.7))
+                );
                 
                 logMsg = `挥师强攻【${targetCity}】，击溃了【${defender}】的守备部队，成功将城池夺回！`;
                 logType = "war";
                 SFX.war();
                 
                 if (defender === pLord) {
-                    change.people = -randInt(50, 200);
-                    change.army_spear = -randInt(5, 15);
+                    change.people = -randInt(
+                        CFG.combat?.postFailedAttack?.peopleLossMin || 50,
+                        CFG.combat?.postFailedAttack?.peopleLossMax || 200
+                    );
+                    change.army_spear = -randInt(
+                        CFG.combat?.postFailedAttack?.spearLossMin || 5,
+                        CFG.combat?.postFailedAttack?.spearLossMax || 15
+                    );
                 }
             } else {
                 logMsg = `袭击强攻【${targetCity}】失利，遭遇坚固拒马城墙，只得撤兵。`;
                 logType = "normal";
 
                 // 司马炎被动【三分归一】：强攻被击退时，不会因为混乱损耗兵力与人口
-                if (targetUnit === "司马炎") {
+                if (targetUnit === "司马炎" && CFG.passives?.siMaYan?.noRetreatLoss) {
                     logMsg += ` (【司马炎】施展三分归一，全军安然撤回无损折)`;
                 }
             }
         }
 
-        change.cash = randInt(-6000, 1000);
-        change.food = randInt(-20000, 2000);
+        change.cash = randInt(
+            CFG.aiEvents?.warCashMin || -6000,
+            CFG.aiEvents?.warCashMax || 1000
+        );
+        change.food = randInt(
+            CFG.aiEvents?.warFoodMin || -20000,
+            CFG.aiEvents?.warFoodMax || 2000
+        );
     } else {
         targetCity = randChoice(owned);
         const randEvent = Math.random();
         const pLord = getPlayerLordName();
 
-        if (randEvent < 0.45) {
-            const addedFood = randInt(20000, 100000);
-            gameState.cities[targetCity].value += randInt(2000, 8000);
+        if (randEvent < (CFG.aiEvents?.econThreshold || 0.45)) {
+            const addedFood = randInt(
+                CFG.aiEvents?.foodGainMin || 20000,
+                CFG.aiEvents?.foodGainMax || 100000
+            );
+            gameState.cities[targetCity].value += randInt(
+                CFG.aiEvents?.valueGainMin || 2000,
+                CFG.aiEvents?.valueGainMax || 8000
+            );
             logMsg = `在【${targetCity}】修筑水利，全境麦浪滚滚，粮食丰登。`;
             logType = "econ";
             change.food = addedFood;
-            change.cash = randInt(5000, 20000);
-        } else if (randEvent < 0.75) {
-            const recruitCount = randInt(5, 15);
+            change.cash = randInt(
+                CFG.aiEvents?.cashGainMin || 5000,
+                CFG.aiEvents?.cashGainMax || 20000
+            );
+        } else if (randEvent < (CFG.aiEvents?.recruitThreshold || 0.75)) {
+            const recruitCount = randInt(
+                CFG.aiEvents?.recruitCountMin || 5,
+                CFG.aiEvents?.recruitCountMax || 15
+            );
             logMsg = `在【${targetCity}】开设校场募集乡勇，获得 10 名长枪步兵入伍。`;
             if (targetUnit === pLord) {
                 change.army_spear = recruitCount;
             }
-            change.people = randInt(20, 200);
+            change.people = randInt(
+                CFG.aiEvents?.peopleGainMin || 20,
+                CFG.aiEvents?.peopleGainMax || 200
+            );
         } else {
             logMsg = `派遣偏师在【${targetCity}】郊野深山行军，意外掘出了一箱上古珍宝。`;
             logType = "econ";
-            change.means = randInt(1, 3);
-            change.cash = randInt(2000, 8000);
+            change.means = randInt(
+                CFG.aiEvents?.meansGainMin || 1,
+                CFG.aiEvents?.meansGainMax || 3
+            );
+            change.cash = randInt(
+                CFG.aiEvents?.meansCashMin || 2000,
+                CFG.aiEvents?.meansCashMax || 8000
+            );
         }
     }
 
-    // 刘表被动【割据避战】繁荣自然增长率：每回合所有城市略微增加繁荣，刘表势力增加 50%
+    // 刘表被动【割据避战】繁荣自然增长率：每回合所有城市略微增加繁荣，刘表势力增加
     Object.keys(gameState.cities).forEach(cName => {
         const cData = gameState.cities[cName];
         if (cData.union !== "无主") {
-            let valGrowth = randInt(150, 400);
+            let valGrowth = randInt(
+                CFG.city?.growth?.min || 150,
+                CFG.city?.growth?.max || 400
+            );
             if (cData.union === "刘表") {
-                valGrowth = Math.floor(valGrowth * 1.5);
+                valGrowth = Math.floor(valGrowth * (CFG.passives?.liuBiao?.growthBonus || 1.5));
             }
-            cData.value = Math.min(100000, cData.value + valGrowth);
+            cData.value = Math.min(CFG.city?.maxValue || 100000, cData.value + valGrowth);
         }
     });
 
-    // 董卓被动【穷兵黩武】每5回合城市由于暴虐损耗 3% 繁荣度
-    if (gameState.tacticRounds > 0 && gameState.tacticRounds % 5 === 0) {
+    // 董卓被动【穷兵黩武】每隔一定回合城市由于暴虐损耗繁荣度
+    const dongInterval = CFG.passives?.dongZhuo?.decayInterval || 5;
+    const dongRate = CFG.passives?.dongZhuo?.decayRate || 0.97;
+    if (gameState.tacticRounds > 0 && gameState.tacticRounds % dongInterval === 0) {
         Object.keys(gameState.cities).forEach(cName => {
             const cData = gameState.cities[cName];
             if (cData.union === "董卓") {
-                cData.value = Math.max(2000, Math.floor(cData.value * 0.97));
+                cData.value = Math.max(CFG.city?.minValue || 2000, Math.floor(cData.value * dongRate));
             }
         });
     }
@@ -1293,16 +1350,16 @@ function nextStep() {
     renderStats(change);
     renderMap();
     
-    // 累加回合计数器、自动抽卡、每15回合静默自动存档
+    // 累加回合计数器、自动抽卡、自动存档
     gameState.tacticRounds++;
-    if (gameState.tacticRounds >= 15) {
+    if (gameState.tacticRounds >= (CFG.autoSave?.interval || 15)) {
         gameState.tacticRounds = 0;
         drawRandomCard();
         // 自动静默存档 (每15回合触发一次，无日志干扰)
         try {
             const autoState = {
                 running: false, script: gameState.script, speed: gameState.speed,
-                stats: { ...gameState.stats }, cities: { ...gameState.cities },
+                stats: { ...gameState.stats }, cities: JSON.parse(JSON.stringify(gameState.cities)),
                 cityNow: gameState.cityNow, selectedCity: gameState.selectedCity,
                 currentWar: null, cards: [...gameState.cards], activeCardIndex: null,
                 tacticRounds: 0, lordSkillCD: gameState.lordSkillCD, history: [...gameState.history]
@@ -1387,7 +1444,7 @@ function saveGame() {
         script: gameState.script,
         speed: gameState.speed,
         stats: { ...gameState.stats },
-        cities: { ...gameState.cities },
+        cities: JSON.parse(JSON.stringify(gameState.cities)),
         cityNow: gameState.cityNow,
         selectedCity: gameState.selectedCity,
         currentWar: gameState.currentWar,
@@ -1473,8 +1530,9 @@ function initMapZoomAndPan() {
     if (!wrapper || !stage) return;
 
     let zoom = 1.0;
-    const minZoom = 0.5;
-    const maxZoom = 2.5;
+    const minZoom = CFG.mapZoom?.min || 0.5;
+    const maxZoom = CFG.mapZoom?.max || 2.5;
+    const zoomStep = CFG.mapZoom?.step || 0.08;
     
     let isDragging = false;
     let startX = 0;
@@ -1495,9 +1553,9 @@ function initMapZoomAndPan() {
         
         const prevZoom = zoom;
         if (e.deltaY < 0) {
-            zoom = Math.min(maxZoom, zoom + 0.08);
+            zoom = Math.min(maxZoom, zoom + zoomStep);
         } else {
-            zoom = Math.max(minZoom, zoom - 0.08);
+            zoom = Math.max(minZoom, zoom - zoomStep);
         }
         
         // 缩放修正公式
@@ -1630,9 +1688,9 @@ window.onload = function() {
 
 
     const speedButtons = [
-        { id: "speed_1x", ms: 1000 },
-        { id: "speed_2x", ms: 400 },
-        { id: "speed_5x", ms: 150 }
+        { id: "speed_1x", ms: CFG.speeds?.normal || 1000 },
+        { id: "speed_2x", ms: CFG.speeds?.fast || 400 },
+        { id: "speed_5x", ms: CFG.speeds?.ultra || 150 }
     ];
     speedButtons.forEach(sb => {
         const el = document.getElementById(sb.id);
@@ -1912,8 +1970,8 @@ function triggerLordCardSkill() {
 
 // 定时抽取随机锦囊卡牌
 function drawRandomCard() {
-    if (gameState.cards.length >= 3) {
-        addLog("锦囊堆叠", "军师牌库已满 (最多3张)，无法凝聚更多的妙计！", "system");
+    if (gameState.cards.length >= (CFG.autoSave?.maxCards || 3)) {
+        addLog("锦囊堆叠", `军师牌库已满 (最多${CFG.autoSave?.maxCards || 3}张)，无法凝聚更多的妙计！`, "system");
         return;
     }
     const pool = Object.keys(TACTICS_CONFIG);
@@ -1989,21 +2047,21 @@ function applyTactic(cityName) {
 
     // 触发效果
     if (cardId === "kongcheng") {
-        cData.avoidWarTurns = 6; // 设置免战保护回合 (下回合扣除，实质有 5 回合)
-        addLog("空城高悬", `【计策】在【${cityName}】城头大设空城计！获得 5 回合免战保护，敌军不可犯！`, "victory");
+        cData.avoidWarTurns = CFG.tactics?.kongcheng?.avoidWarTurns || 6;
+        addLog("空城高悬", `【计策】在【${cityName}】城头大设空城计！获得 ${(CFG.tactics?.kongcheng?.avoidWarTurns || 6) - 1} 回合免战保护，敌军不可犯！`, "victory");
     } else if (cardId === "huoshao") {
-        const loss = Math.floor(cData.value * 0.5);
-        cData.value = Math.max(2000, cData.value - loss);
+        const loss = Math.floor(cData.value * (CFG.tactics?.huoshao?.damageRate || 0.5));
+        cData.value = Math.max(CFG.tactics?.huoshao?.minValueAfter || 2000, cData.value - loss);
         cData.isWar = false;
         if (gameState.currentWar && (gameState.currentWar.from === cityName || gameState.currentWar.to === cityName)) {
             gameState.currentWar = null; // 扑灭战火连线
         }
         addLog("火烧连营", `【计策】顺风纵火突袭【${cityName}】，重创守军，其城市繁荣度惨遭腰斩！`, "war");
     } else if (cardId === "dongfeng") {
-        gameState.stats.food += 600000;
-        addLog("借得东风", `【计策】在【${cityName}】借东风天降甘霖，后勤获得 60万 石粮草补给！`, "econ");
+        gameState.stats.food += (CFG.tactics?.dongfeng?.foodGain || 600000);
+        addLog("借得东风", `【计策】在【${cityName}】借东风天降甘霖，后勤获得 ${(CFG.tactics?.dongfeng?.foodGain || 600000) / 10000}万 石粮草补给！`, "econ");
     } else if (cardId === "lianhuan") {
-        cData.lianhuanTurns = 4; // 设置连环计弱化回合 (实质 3 回合)
+        cData.lianhuanTurns = CFG.tactics?.lianhuan?.lianhuanTurns || 4;
         addLog("连锁战船", `【计策】对【${cityName}】巧授连环计，敌方阵营铁锁连环，我军对其强攻成功率提升至 100%！`, "victory");
     }
 
