@@ -54,11 +54,11 @@ gameState.cities["新野"] = {
     garrison: {
         auxiliary: 1000,   // 本地徭役役夫/预备兵数量
         
-        // 四大核心兵科
-        sword: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD" },
-        spear_halberd: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD" },
-        bow_crossbow: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD" },
-        cavalry: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD" }
+        // 四大核心兵科 (带训练体系及特种兵升格标记)
+        sword: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD", doctrine: "DOC_STANDARD", special_unit: "none" },
+        spear_halberd: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD", doctrine: "DOC_STANDARD", special_unit: "none" },
+        bow_crossbow: { level: 1, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD", doctrine: "DOC_STANDARD", special_unit: "none" },
+        cavalry: { level: 2, count: 0, armor: "ARM_NONE", weapon: "WEP_STANDARD", doctrine: "DOC_STANDARD", special_unit: "none" }
     },
     
     // 🛠️ 郡县重装战争防具与攻器
