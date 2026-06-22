@@ -288,6 +288,25 @@
             const attL = parseInt(document.getElementById("attLevel").value);
             const attF = document.getElementById("attFaction").value;
 
+            const attName = getUnitHistoricalName(attB, attA, attW, attD, attF);
+            const attStats = calculateSingleUnitStats(attB, attA, attW, attD, attL);
+            document.getElementById("attPreviewName").textContent = attName;
+            document.getElementById("attPreviewStats").innerHTML = `单兵战力: ⚔️${attStats.attack} / 🛡️${attStats.defense} | 行军机动: 🐎${attStats.speed}`;
+
+            // B. 守方预览
+            const defB = document.getElementById("defBranch").value;
+            const defA = document.getElementById("defArmor").value;
+            const defW = document.getElementById("defWeapon").value;
+            const defD = document.getElementById("defDoctrine").value;
+            const defL = parseInt(document.getElementById("defLevel").value);
+            const defF = document.getElementById("defFaction").value;
+
+            const defName = getUnitHistoricalName(defB, defA, defW, defD, defF);
+            const defStats = calculateSingleUnitStats(defB, defA, defW, defD, defL);
+            document.getElementById("defPreviewName").textContent = defName;
+            document.getElementById("defPreviewStats").innerHTML = `单兵战力: ⚔️${defStats.attack} / 🛡️${defStats.defense} | 行军机动: 🐎${defStats.speed}`;
+        }
+
         // 前端过滤不合法的装备选项，避免产生跨兵科非法搭配
         function filterEquipmentOptions(prefix) {
             const branch = document.getElementById(prefix + "Branch").value;
