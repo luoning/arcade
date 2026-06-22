@@ -288,6 +288,86 @@
             const attL = parseInt(document.getElementById("attLevel").value);
             const attF = document.getElementById("attFaction").value;
 
+        // 前端过滤不合法的装备选项，避免产生跨兵科非法搭配
+        function filterEquipmentOptions(prefix) {
+            const branch = document.getElementById(prefix + "Branch").value;
+            const weaponSelect = document.getElementById(prefix + "Weapon");
+            const armorSelect = document.getElementById(prefix + "Armor");
+            const levelSelect = document.getElementById(prefix + "Level");
+
+            // A. 等级上下限控制
+            const level = parseInt(levelSelect.value);
+            if (branch === "SWD") { // 短兵 1~3级
+                Array.from(levelSelect.options).forEach(opt => {
+                    const val = parseInt(opt.value);
+                    opt.disabled = val > 3;
+                });
+                if (level > 3) levelSelect.value = "3";
+            } else if (branch === "LNC") { // 长兵 1~4级
+                Array.from(levelSelect.options).forEach(opt => opt.disabled = false);
+            } else if (branch === "RNG") { // 远射 1~3级
+                Array.from(levelSelect.options).forEach(opt => {
+                    const val = parseInt(opt.value);
+                    opt.disabled = val > 3;
+                });
+                if (level > 3) levelSelect.value = "3";
+            } else if (branch === "CAV") { // 突骑 2~4级
+                Array.from(levelSelect.options).forEach(opt => {
+                    const val = parseInt(opt.value);
+                    opt.disabled = val < 2;
+                });
+                if (level < 2) levelSelect.value = "2";
+            }
+
+            // B. 护甲选择限制 (突骑独占具装)
+            Array.from(armorSelect.options).forEach(opt => {
+                if (opt.value === "ARM_具装") {
+                    opt.disabled = branch !== "CAV";
+                }
+            });
+            if (armorSelect.value === "ARM_具装" && branch !== "CAV") {
+                armorSelect.value = "ARM_扎甲";
+            }
+
+            // C. 兵刃远射限制 (大黄弩与连弩仅限 RNG，马槊仅限 CAV)
+            Array.from(weaponSelect.options).forEach(opt => {
+                const val = opt.value;
+                if (val === "WEP_马槊") {
+                    opt.disabled = branch !== "CAV";
+                } else if (val === "WEP_大黄弩" || val === "WEP_连弩") {
+                    opt.disabled = branch !== "RNG" && (branch !== "CAV" || val !== "WEP_大黄弩"); // 骑弓可带大黄弩
+                } else {
+                    // 普通武器、钢铤、劈山斧不适用于 RNG
+                    opt.disabled = branch === "RNG";
+                }
+            });
+
+            // 修正非法武器值
+            const activeOpt = weaponSelect.options[weaponSelect.selectedIndex];
+            if (activeOpt && activeOpt.disabled) {
+                if (branch === "RNG") {
+                    weaponSelect.value = "WEP_大黄弩";
+                } else if (branch === "CAV") {
+                    weaponSelect.value = "WEP_马槊";
+                } else {
+                    weaponSelect.value = "WEP_STANDARD";
+                }
+            }
+        }
+
+        function updatePreviews() {
+            // 先行过滤合法性
+            filterEquipmentOptions("att");
+            filterEquipmentOptions("def");
+
+            // A. 攻方预览
+            const attB = document.getElementById("attBranch").value;
+            const attA = document.getElementById("attArmor").value;
+            const attW = document.getElementById("attWeapon").value;
+            const attD = document.getElementById("attDoctrine").value;
+            const attL = parseInt(document.getElementById("attLevel").value);
+            const attF = document.getElementById("attFaction").value;
+
             const attName = getUnitHistoricalName(attB, attA, attW, attD, attF);
             const attStats = calculateSingleUnitStats(attB, attA, attW, attD, attL);
             document.getElementById("attPreviewName").textContent = attName;
