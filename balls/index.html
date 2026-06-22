@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Balls - 霓虹粒子打砖块</title>
+  <meta name="description" content="一个视觉极其炸裂、带粒子火花与8-bit合成音效的在线打砖块游戏。支持键盘与鼠标/触屏控制，带道具升级。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2220%22 width=%2280%22 height=%2220%22 rx=%225%22 fill=%22%2300f5d4%22/><circle cx=%2250%22 cy=%2270%22 r=%2215%22 fill=%22%23ff007f%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部控制头栏 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="stats-container">
+      <div class="stat-box">
+        <div class="stat-label">Score</div>
+        <div id="scoreVal" class="stat-value">0</div>
+      </div>
+      <div class="stat-box lives">
+        <div class="stat-label">Lives</div>
+        <div id="livesVal" class="stat-value">3</div>
+      </div>
+      <div class="stat-box level">
+        <div class="stat-label">Level</div>
+        <div id="levelVal" class="stat-value">1</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">Balls</h1>
+
+  <!-- 主画布卡片 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="480" height="600"></canvas>
+    
+    <!-- 游戏开始遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">NEON BREAKER</h2>
+      <p>控制弹球打破所有的发光霓虹砖块！砖块粉碎会有超爽的粒子火花飞溅！</p>
+      <button id="startBtn" class="btn">开始破防</button>
+    </div>
+
+    <!-- 游戏通关遮罩 -->
+    <div id="gameWinOverlay" class="overlay hidden">
+      <h2 class="win-text">STAGE CLEAR</h2>
+      <p>砖墙已经被你夷为平地！难度升级，准备迎接更快的下落速度！</p>
+      <button id="nextLevelBtn" class="btn">进入下一关</button>
+    </div>
+
+    <!-- 游戏结束遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="over-text">GAME OVER</h2>
+      <p>球漏光了！挡板被攻破。要不再试一次？</p>
+      <button id="restartBtn" class="btn btn-pink">再干一局</button>
+    </div>
+  </main>
+
+  <!-- 说明区 -->
+  <footer class="help-guide">
+    <p>键盘使用 <span class="badge">A / D</span> 或 <span class="badge">&larr; / &rarr;</span> 左右移动挡板。</p>
+    <p>新球或复活时，按 <span class="badge">空格键</span> 或<strong>点击屏幕/画布</strong>即可发射弹球！</p>
+    <p>也支持<strong>鼠标滑动</strong>或<strong>手机单指左右拖拽</strong>，挡板会平滑跟手移动。</p>
+    <p>击碎砖块有概率掉落发光道具，接住可开启<strong>三倍弹球</strong>或<strong>防漏防护网</strong>！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Neon Rhythm - 霓虹节奏音轨</title>
+  <meta name="description" content="一个炫酷的赛博霓虹节奏打击游戏，支持 D/F/J/K 按键，实时 Web Audio 复古音符合成。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2280%22 height=%2280%22 rx=%2210%22 fill=%22%23ff007f%22/><text x=%2250%22 y=%2265%22 font-size=%2250%22 font-family=%22Orbitron%22 fill=%22%23fff%22 text-anchor=%22middle%22>R</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部状态栏 -->
+  <header class="header-bar">
+    <div style="display:flex; gap:8px;">
+      <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="stats-container">
+      <div class="stat-box shield">
+        <div class="stat-label">SHIELD</div>
+        <div id="shieldVal" class="stat-value">100%</div>
+      </div>
+      <div class="stat-box score">
+        <div class="stat-label">SCORE</div>
+        <div id="scoreVal" class="stat-value">00000</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">NEON RHYTHM</h1>
+
+  <!-- 游戏主容器 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="400" height="500"></canvas>
+    
+    <!-- 连击提示浮层 -->
+    <div id="comboContainer" class="combo-container hidden">
+      <div id="comboCount" class="combo-count">0</div>
+      <div class="combo-text">COMBO</div>
+    </div>
+
+    <!-- 击打判定文字浮层 -->
+    <div id="judgmentText" class="judgment-text"></div>
+
+    <!-- 开始遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">NEON RHYTHM</h2>
+      <p>跟随节奏拍击落下的霓虹音轨能量块！</p>
+      <p>操作键位：左半边 <span class="badge">D</span> / <span class="badge">F</span>，右半边 <span class="badge">J</span> / <span class="badge">K</span>。</p>
+      <p>支持屏幕底部虚拟打击区域，触控点击即打！护盾归零则系统熔毁。</p>
+      <button id="startBtn" class="btn btn-pink">启动系统 (START)</button>
+    </div>
+
+    <!-- 结算遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="gg-text">CORE MELTDOWN</h2>
+      <p>音轨失同步，核心系统已熔熔毁。</p>
+      <div class="clear-stats">
+        <div>最终得分: <span id="finalScore" class="highlight">00000</span></div>
+      </div>
+      <button id="restartBtn" class="btn btn-green">系统重置 (RESTART)</button>
+    </div>
+  </main>
+
+  <!-- 底部虚拟敲击打击垫 -->
+  <section class="hit-pads">
+    <button class="pad-btn" id="padD" data-key="d">D</button>
+    <button class="pad-btn" id="padF" data-key="f">F</button>
+    <button class="pad-btn" id="padJ" data-key="j">J</button>
+    <button class="pad-btn" id="padK" data-key="k">K</button>
+  </section>
+
+  <footer class="help-guide">
+    <p>完美对齐底部发光线时拍击，长按或单点皆可。连击可获得更高得分加成！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

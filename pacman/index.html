@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Cyber Pacman - 赛博吃豆人</title>
+  <meta name="description" content="一个发光霓虹赛博吃豆人游戏，具有智能幽灵 AI、超频吞噬状态和 Web Audio 8-bit 复古合成音效。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><circle cx=%2250%22 cy=%2250%22 r=%2240%22 fill=%22%23fee440%22/><path d=%22M50 50 L90 30 A 40 40 0 0 1 90 70 Z%22 fill=%22%23000%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部数据看板 -->
+  <header class="header-bar">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+    
+    <div class="stats-container">
+      <div class="stat-box score">
+        <div class="stat-label">SCORE</div>
+        <div id="scoreVal" class="stat-value">0</div>
+      </div>
+      <div class="stat-box phase">
+        <div class="stat-label">STAGE</div>
+        <div id="stageVal" class="stat-value">1</div>
+      </div>
+      <div class="stat-box energy">
+        <div class="stat-label">LIVES</div>
+        <div id="livesVal" class="stat-value">❤❤❤</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">CYBER PACMAN</h1>
+
+  <!-- 画布卡片容器 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="560" height="620"></canvas>
+    
+    <!-- 游戏开始遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">CYBER PACMAN</h2>
+      <p>键盘方向键控制发光吃豆人移动！</p>
+      <p>避开霓虹幽灵，吃光迷宫里所有的发光能量豆！</p>
+      <p>吃掉四个角落的<strong>超频大药丸</strong>可以进入限时反噬模式，吞噬幽灵气化为碎屑粒子！</p>
+      <button id="startBtn" class="btn">载入 ROM</button>
+    </div>
+
+    <!-- 游戏胜利遮罩 -->
+    <div id="victoryOverlay" class="overlay hidden">
+      <h2 class="victory-text">STAGE CLEAR</h2>
+      <p>核心网格已清理完毕，已重置磁流矩阵！</p>
+      <button id="nextBtn" class="btn btn-green">进入下一关</button>
+    </div>
+
+    <!-- 游戏结束 GG 遮罩 -->
+    <div id="gameOverOverlay" class="overlay hidden">
+      <h2 class="over-text">SYSTEM OFFLINE</h2>
+      <p>核心电力耗尽！已与主脑断开同步。</p>
+      <div class="clear-stats">
+        <div>最终得分: <span id="failScoreVal" class="highlight">0</span></div>
+      </div>
+      <button id="restartBtn" class="btn btn-pink">重建矩阵</button>
+    </div>
+  </main>
+
+  <footer class="help-guide">
+    <p>键盘使用 <span class="badge">&larr; / &uarr; / &rarr; / &darr;</span> 或 <span class="badge">W / A / S / D</span> 引导吃豆人。</p>
+    <p>支持移动端/鼠标在画布上向<strong>上下左右滑动手指</strong>进行手势遥控！</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

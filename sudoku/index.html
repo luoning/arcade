@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Neon Sudoku - 霓虹数独</title>
+  <meta name="description" content="一个发光霓虹赛博数独游戏，支持实时错误高亮校验、彩虹通关脉冲和 Web Audio 8-bit 合成音效。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2280%22 height=%2280%22 rx=%2210%22 fill=%22%239d4edd%22/><text x=%2250%22 y=%2265%22 font-size=%2250%22 font-family=%22Orbitron%22 fill=%22%23fff%22 text-anchor=%22middle%22>9</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部状态看板 -->
+  <header class="header-bar">
+    <div style="display:flex; gap:8px;">
+      <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+      <button id="clearCellBtn" class="icon-btn highlight-btn" title="擦除选中的格">
+        <span>❌ ERASE</span>
+      </button>
+      <button id="resetLevelBtn" class="icon-btn" title="重新开始本关">
+        <span>🔄 RESET</span>
+      </button>
+    </div>
+    
+    <div class="stats-container">
+      <div class="stat-box level">
+        <div class="stat-label">LEVEL</div>
+        <div id="levelVal" class="stat-value">EASY</div>
+      </div>
+      <div class="stat-box timer">
+        <div class="stat-label">TIME</div>
+        <div id="timerVal" class="stat-value">00:00</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">NEON SUDOKU</h1>
+
+  <!-- 画布视口 -->
+  <main class="canvas-wrapper">
+    <canvas id="gameCanvas" width="450" height="450"></canvas>
+    
+    <!-- 开始难度选择遮罩 -->
+    <div id="startOverlay" class="overlay">
+      <h2 class="start-text">NEON SUDOKU</h2>
+      <p>点击选择九宫格中的发光空缺位置，使用下方虚拟字盘或键盘录入数字！</p>
+      <p>行、列、宫中如有**冲突的数字，对应区域将亮起红光警示**！</p>
+      <p>输入正确无误填满九宫格，即可引发彩虹色流光溢出通关！</p>
+      <div class="mode-select">
+        <button id="easyBtn" class="btn btn-green">简单模式 (EASY)</button>
+        <button id="mediumBtn" class="btn btn-yellow">中等超频 (MED)</button>
+        <button id="hardBtn" class="btn btn-pink">地狱熔毁 (HARD)</button>
+      </div>
+    </div>
+
+    <!-- 通关遮罩 -->
+    <div id="victoryOverlay" class="overlay hidden">
+      <h2 class="victory-text">MATRIX RESOLVED</h2>
+      <p>恭喜！数独矩阵已完美稳态，彩虹核心数据已同步。</p>
+      <div class="clear-stats">
+        <div>通关用时: <span id="successTimeVal" class="highlight">00:00</span></div>
+      </div>
+      <button id="restartBtn" class="btn btn-green">再挑战一局</button>
+    </div>
+  </main>
+
+  <!-- 底部虚拟数字盘 -->
+  <section class="num-pad">
+    <button class="num-btn" data-val="1">1</button>
+    <button class="num-btn" data-val="2">2</button>
+    <button class="num-btn" data-val="3">3</button>
+    <button class="num-btn" data-val="4">4</button>
+    <button class="num-btn" data-val="5">5</button>
+    <button class="num-btn" data-val="6">6</button>
+    <button class="num-btn" data-val="7">7</button>
+    <button class="num-btn" data-val="8">8</button>
+    <button class="num-btn" data-val="9">9</button>
+  </section>
+
+  <footer class="help-guide">
+    <p>点击宫格后，可直接按键盘数字键 <span class="badge">1 - 9</span> 填入，按 <span class="badge">Backspace</span> 或 <span class="badge">0</span> 擦除。</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

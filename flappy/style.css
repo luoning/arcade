@@ -1,0 +1,279 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@200;400;600&display=swap');
+
+:root {
+  --bg-color: #040108;
+  --panel-bg: rgba(12, 5, 20, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f8f9fa;
+  --text-secondary: #9a8eb3;
+  --cyan-neon: #00f5d4;
+  --pink-neon: #ff007f;
+  --yellow-neon: #fee440;
+  --blue-neon: #00bbf9;
+  
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+  position: relative;
+}
+
+/* CRT扫描线 */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
+  z-index: 9999;
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* 顶栏 */
+.header-bar {
+  width: 100%;
+  max-width: 400px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 5px;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--cyan-neon);
+  border-color: var(--cyan-neon);
+  background: rgba(0, 245, 212, 0.08);
+  box-shadow: 0 0 8px rgba(0, 245, 212, 0.3);
+}
+
+.icon-btn.muted #soundWave {
+  opacity: 0.2;
+}
+
+.stats-container {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-box {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 4px 14px;
+  text-align: center;
+  min-width: 76px;
+  backdrop-filter: blur(5px);
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--cyan-neon);
+  text-shadow: 0 0 6px rgba(0, 245, 212, 0.4);
+}
+
+/* 标题 */
+.game-title {
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-align: center;
+  background: linear-gradient(to right, var(--blue-neon), var(--cyan-neon));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 6px rgba(0, 187, 249, 0.3));
+}
+
+/* 画布包壳 */
+.canvas-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(0, 187, 249, 0.15);
+  background: #010003;
+  border: 2px solid rgba(0, 187, 249, 0.25);
+  width: 100%;
+  max-width: 400px;
+  aspect-ratio: 400 / 560;
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: #000;
+}
+
+/* 覆盖面板 */
+.overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(3, 1, 6, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 24px;
+  text-align: center;
+  transition: opacity 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.start-text {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--blue-neon);
+  text-shadow: 0 0 15px rgba(0, 187, 249, 0.5);
+  margin-bottom: 18px;
+  letter-spacing: 3px;
+}
+
+.over-text {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--pink-neon);
+  text-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+  margin-bottom: 18px;
+  letter-spacing: 2.5px;
+}
+
+.overlay p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 320px;
+  margin-bottom: 12px;
+}
+
+.overlay strong {
+  color: #fff;
+}
+
+.btn {
+  background: transparent;
+  border: 2px solid var(--blue-neon);
+  color: #fff;
+  padding: 8px 24px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 14px;
+  box-shadow: 0 0 8px rgba(0, 187, 249, 0.2);
+}
+
+.btn:hover {
+  background: var(--blue-neon);
+  color: #05020c;
+  box-shadow: 0 0 20px var(--blue-neon);
+}
+
+.btn-pink {
+  border-color: var(--pink-neon);
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.2);
+}
+.btn-pink:hover {
+  background: var(--pink-neon);
+  color: #fff;
+  box-shadow: 0 0 20px var(--pink-neon);
+}
+
+.clear-stats {
+  margin: 14px 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.highlight {
+  color: var(--cyan-neon);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.help-guide {
+  width: 100%;
+  max-width: 400px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 1.1rem;
+  }
+  .overlay {
+    padding: 15px;
+  }
+  .start-text, .over-text {
+    font-size: 1.4rem;
+  }
+}

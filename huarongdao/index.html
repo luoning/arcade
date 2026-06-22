@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>华容道 - 赛博三国版</title>
+  <meta name="description" content="一个视觉惊艳、带8-bit复古音效的现代华容道游戏。支持鼠标与手机触屏拖动，带有智能滑动辅助。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2280%22 height=%2280%22 rx=%2215%22 fill=%22%23ff007f%22/><text x=%2250%22 y=%2268%22 font-size=%2250%22 font-family=%22ZCOOL KuaiLe%22 font-weight=%22bold%22 text-anchor=%22middle%22 fill=%22%23ffffff%22>曹</text></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部控制头栏 -->
+  <header class="header-bar">
+    <div class="controls">
+      <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+      
+      <!-- 阵型切换 -->
+      <select id="layoutSelect" class="select-menu" aria-label="Select layout">
+        <option value="hengdao">横刀立马 (经典)</option>
+        <option value="zhihui">指挥若定 (较难)</option>
+        <option value="shudao">将拥蜀道 (较难)</option>
+        <option value="fengyuan">左右逢源 (中等)</option>
+        <option value="binglin">兵临城下 (简单)</option>
+      </select>
+      
+      <button id="resetBtn" class="icon-btn" title="重新开始" aria-label="Reset game">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+        </svg>
+      </button>
+    </div>
+    
+    <div class="score-box">
+      <div class="score-label">Steps</div>
+      <div id="stepsVal" class="score-value">0</div>
+    </div>
+  </header>
+
+  <h1 class="game-title">华容道</h1>
+
+  <!-- 棋盘主卡片 -->
+  <main class="board-container" id="boardContainer">
+    
+    <!-- 逃脱出口指示区 (位于 4x5 棋盘底部的中间两格范围) -->
+    <div class="exit-glow"></div>
+    
+    <!-- 棋子渲染与交互网格 -->
+    <div class="board-grid" id="boardGrid">
+      <!-- JS 会把棋子 DOM 塞到这里 -->
+    </div>
+
+    <!-- 逃出升天胜利遮罩 -->
+    <div id="winOverlay" class="overlay hidden">
+      <h2 class="win-text">曹操脱逃！</h2>
+      <p>恭喜！你帮助曹操突破关羽重重包围，顺利逃出了华容道！</p>
+      <button id="winResetBtn" class="btn">再战一局</button>
+    </div>
+    
+  </main>
+
+  <!-- 玩法帮助 -->
+  <footer class="help-guide">
+    <p>直接<strong>拖拽</strong>角色到空位上，或是<strong>点击</strong>有相邻空位的角色进行滑行。</p>
+    <p>我们的目标是：把大块头 <strong>“曹操”</strong> 移动到<strong>底端中门出口</strong>处脱逃。</p>
+  </footer>
+
+  <script src="levels.js"></script>
+  <script src="game.js"></script>
+</body>
+</html>

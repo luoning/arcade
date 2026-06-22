@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Neon Snooker & Billiards - 霓虹斯诺克台球</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <!-- 游戏主容器 -->
+  <div class="game-container">
+    
+    <!-- 顶栏状态面板 HUD -->
+    <header class="hud-header">
+      <div class="game-title">NEON SNOOKER</div>
+      <div class="mode-indicator" id="current-mode-txt">模式: 未选择</div>
+    </header>
+
+    <!-- 斯诺克得分面板 (仅在对战模式显示) -->
+    <div id="snooker-scoreboard" class="scoreboard-panel hidden">
+      <div class="player-score P1">
+        <div class="player-name">PLAYER 1 (您)</div>
+        <div class="score-val" id="p1-score">0</div>
+      </div>
+      <div class="match-info">
+        <div id="turn-indicator" class="turn-txt">当前回合: PLAYER 1</div>
+        <div id="target-ball-txt" class="target-ball-status">目标球: 红球 (Red)</div>
+        <div id="foul-alert" class="foul-alert-txt"></div>
+      </div>
+      <div class="player-score P2">
+        <div class="player-name" id="p2-name-label">AI 棋手 (DEEP RED)</div>
+        <div class="score-val" id="p2-score">0</div>
+      </div>
+    </div>
+
+    <!-- 关卡/计时面板 (用于单人/雷区/限时模式) -->
+    <div id="arcade-scoreboard" class="scoreboard-panel hidden">
+      <div class="arcade-stat">
+        <span class="label">SCORE</span>
+        <span class="val" id="arcade-score">0</span>
+      </div>
+      <div class="arcade-stat">
+        <span class="label" id="timer-label">TIME LEFT</span>
+        <span class="val text-neon-cyan" id="arcade-timer">60s</span>
+      </div>
+      <div class="arcade-stat">
+        <span class="label">REMAINING</span>
+        <span class="val" id="arcade-balls-left">15</span>
+      </div>
+    </div>
+
+    <!-- 游戏台球桌 Canvas -->
+    <main class="table-area">
+      <canvas id="billiardsCanvas" width="840" height="478"></canvas>
+      
+      <!-- 控制面板区域：包含蓄力条与击球位置（旋转）选择器 -->
+      <div class="controls-panel">
+        <div class="power-section">
+          <div class="power-bar-container">
+            <div class="power-bar-fill" id="power-bar"></div>
+            <div class="power-txt">蓄力进度 (POWER)</div>
+          </div>
+        </div>
+        
+        <div class="spin-section">
+          <div class="spin-pad-container">
+            <div class="spin-pad" id="spin-pad" title="拖动红点调整击球点 (偏塞与拉推杆)">
+              <div class="spin-center-line-h"></div>
+              <div class="spin-center-line-v"></div>
+              <div class="spin-cursor" id="spin-cursor"></div>
+            </div>
+            <div class="spin-info">
+              <div class="spin-label">击球偏差 (SPIN)</div>
+              <div class="spin-values" id="spin-vals-txt">推拉: 0.0 | 偏塞: 0.0</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="action-hint" class="action-hint">移动鼠标调整角度，在右侧面板拖动红点控制旋转，按住左键蓄力，松开击球</div>
+    </main>
+
+  </div>
+
+  <!-- 游戏模式选择弹窗 (Overlay) -->
+  <div id="mode-modal" class="overlay modal-active">
+    <div class="dialog-box">
+      <h2 class="dialog-title">NEON BILLIARDS</h2>
+      <p class="dialog-subtitle">投币启动 // SELECT SNOOKER GAME MODE</p>
+      
+      <div class="mode-list">
+        <button class="mode-btn" onclick="selectGameMode('snooker_ai')">
+          <span class="mode-icon">🤖</span>
+          <div class="mode-details">
+            <span class="title">斯诺克对战 (VS AI)</span>
+            <span class="desc">对阵赛博 AI 选手，经典斯诺克红彩交替与犯规罚分规则。</span>
+          </div>
+        </button>
+        
+        <button class="mode-btn" onclick="selectGameMode('snooker_pvp')">
+          <span class="mode-icon">👥</span>
+          <div class="mode-details">
+            <span class="title">斯诺克双人 (Local PvP)</span>
+            <span class="desc">本地同屏对决。红球进完打彩色，犯规罚分换人，决胜台面。</span>
+          </div>
+        </button>
+
+        <button class="mode-btn" onclick="selectGameMode('minefield')">
+          <span class="mode-icon">💥</span>
+          <div class="mode-details">
+            <span class="title">激光雷区挑战 (Minefield)</span>
+            <span class="desc">单人闯关。击球进袋，但需躲避发光的随机霓虹水雷，碰到即爆炸重置！</span>
+          </div>
+        </button>
+
+        <button class="mode-btn" onclick="selectGameMode('time_attack')">
+          <span class="mode-icon">⏱️</span>
+          <div class="mode-details">
+            <span class="title">限时狂飙 (Time Attack)</span>
+            <span class="desc">开局60秒。每进一红球+5s，彩球加倍时间，挑战时间倒计时的极限。</span>
+          </div>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- 结算与 Game Over 弹窗 -->
+  <div id="game-over-overlay" class="overlay hidden">
+    <div class="dialog-box text-center">
+      <h1 class="dead-title" id="over-title">🏆 比赛结束 // MATCH OVER</h1>
+      <p id="over-desc">得分情况...</p>
+      <div class="btn-group">
+        <button onclick="restartGame()" class="action-btn">重新开始</button>
+        <button onclick="openModeSelect()" class="action-btn btn-secondary">选择其他模式</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="game.js"></script>
+</body>
+</html>

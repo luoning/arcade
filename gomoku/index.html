@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>赛博五子棋 - Cyber Gomoku</title>
+  <meta name="description" content="一个视觉炸裂、带有 8-bit 合成音效与智能 AI 棋手的赛博霓虹五子棋游戏。">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部状态栏与控制面板 -->
+  <header class="header-bar">
+    <div class="controls">
+      <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+          <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+        </svg>
+      </button>
+
+      <select id="modeSelect" class="select-menu" aria-label="Select game mode">
+        <option value="vs_ai">人机演兵 (VS AI)</option>
+        <option value="pvp">同屏对攻 (PvP)</option>
+      </select>
+
+      <button id="resetBtn" class="icon-btn" title="重开一局" aria-label="Reset game">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+        </svg>
+      </button>
+    </div>
+
+    <div class="status-panel">
+      <div class="status-box">
+        <div class="status-label">执子 (Turn)</div>
+        <div id="turnVal" class="status-value">BLACK</div>
+      </div>
+      <div class="status-box">
+        <div class="status-label">手步 (Steps)</div>
+        <div id="stepsVal" class="status-value">0</div>
+      </div>
+    </div>
+  </header>
+
+  <h1 class="game-title">赛博五子棋</h1>
+
+  <!-- 五子棋棋盘主体 -->
+  <main class="board-container" id="boardContainer">
+    <!-- 背景网格线，由 JS 渲染以防缩放对齐偏差 -->
+    <div class="board-grid-bg" id="boardGridBg"></div>
+    
+    <!-- 交互落子点网格层 -->
+    <div class="board-grid" id="boardGrid"></div>
+
+    <!-- 终局遮罩 (胜利/和局) -->
+    <div id="gameoverOverlay" class="overlay hidden">
+      <div class="overlay-card">
+        <h2 id="winText">五子连珠</h2>
+        <p id="winDesc">黑子达成连线，统领天下！</p>
+        <button id="restartBtn" class="btn">再战一局</button>
+      </div>
+    </div>
+  </main>
+
+  <footer class="help-guide">
+    <p>点击网格交叉点进行落子。黑子先行。</p>
+    <p>人机模式下，AI 将在玩家落子后自动运算防守或进攻。</p>
+  </footer>
+
+  <script src="game.js"></script>
+</body>
+</html>

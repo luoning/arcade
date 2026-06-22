@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Bomb - 霓虹街机扫雷</title>
+  <meta name="description" content="一个视觉现代、带8-bit复古音效的在线扫雷游戏。支持初、中、高难度切换，防首次踩雷，支持插旗排雷。">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect x=%2210%22 y=%2210%22 width=%2280%22 height=%2280%22 rx=%2215%22 fill=%22%23ff007f%22/><circle cx=%2250%22 cy=%2250%22 r=%2220%22 fill=%22%2300f5d4%22/></svg>">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- 顶部辅助工具栏 -->
+  <header style="margin-bottom: 15px;">
+    <button id="muteBtn" class="icon-btn" title="开关音效" aria-label="Mute sound">
+      <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"></polygon>
+        <path id="soundWave" d="M15.54 8.46a5 5 0 0 1 0 7.07M19.07 4.93a10 10 0 0 1 0 14.14"></path>
+      </svg>
+    </button>
+  </header>
+
+  <h1 class="game-title">Bomb</h1>
+
+  <main class="game-container">
+    
+    <!-- 头部难度与选项 -->
+    <header class="header-controls">
+      <nav class="difficulty-selector" aria-label="Difficulty Selector">
+        <button class="diff-btn active" data-level="easy">初级</button>
+        <button class="diff-btn" data-level="medium">中级</button>
+        <button class="diff-btn" data-level="hard">高级</button>
+      </nav>
+    </header>
+
+    <!-- 状态显示条 -->
+    <section class="status-bar" aria-label="Game Status">
+      <div class="counter-box">
+        <span class="counter-label">Mines</span>
+        <span id="minesCount" class="counter-value">010</span>
+      </div>
+      
+      <button id="statusFace" class="status-face-btn" title="点击重新开始" aria-label="Restart Game">
+        :-)
+      </button>
+      
+      <div class="counter-box">
+        <span class="counter-label">Time</span>
+        <span id="gameTimer" class="counter-value timer">000</span>
+      </div>
+    </section>
+
+    <!-- 扫雷棋盘视口 -->
+    <div class="board-viewport">
+      <div id="mineBoard" class="mine-board" role="grid" aria-label="Minesweeper Board">
+        <!-- JS 动态灌入格子 -->
+      </div>
+    </div>
+
+    <!-- 帮助指南 -->
+    <section class="help-section" aria-labelledby="help-title">
+      <h2 id="help-title" class="help-section h3">扫雷行动指南</h2>
+      <p><span class="help-badge">鼠标左键</span> / <span class="help-badge">点按</span> : 挖开安全区</p>
+      <p><span class="help-badge">鼠标右键</span> / <span class="help-badge">长按</span> : 插旗/取消标记</p>
+      <p><span class="help-badge">双击已展开数字</span> : 周围已标记地雷数相符时，可一键展开其余安全区</p>
+    </section>
+
+  </main>
+
+  <script src="game.js"></script>
+</body>
+</html>

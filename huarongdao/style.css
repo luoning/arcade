@@ -1,0 +1,400 @@
+/* 华容道 赛博三国霓虹风 样式 */
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@300;400;600&family=ZCOOL+KuaiLe&display=swap');
+
+:root {
+  --bg-color-1: #06040d;
+  --bg-color-2: #02050f;
+  --panel-bg: rgba(18, 12, 32, 0.6);
+  --border-color: rgba(255, 255, 255, 0.08);
+  
+  /* 角色霓虹色设定 */
+  --color-caocao: #ff007f;   /* 绯红 */
+  --color-guanyu: #39ff14;   /* 翠绿 */
+  --color-general: #00bbf9;  /* 幽蓝 */
+  --color-soldier: #9d4edd;  /* 暗紫 */
+  
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-chinese: 'ZCOOL KuaiLe', 'Microsoft YaHei', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: var(--font-body);
+  background: linear-gradient(135deg, var(--bg-color-1), var(--bg-color-2));
+  color: #f8f9fa;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+  overflow: hidden;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* 霓虹背景光圈 */
+body::before, body::after {
+  content: '';
+  position: absolute;
+  width: 380px;
+  height: 380px;
+  border-radius: 50%;
+  filter: blur(130px);
+  z-index: -1;
+  opacity: 0.16;
+  pointer-events: none;
+}
+
+body::before {
+  background: var(--color-caocao);
+  top: 15%;
+  left: 10%;
+}
+
+body::after {
+  background: var(--color-guanyu);
+  bottom: 15%;
+  right: 10%;
+}
+
+.header-bar {
+  display: flex;
+  width: 100%;
+  max-width: 360px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.game-title {
+  font-family: var(--font-chinese);
+  font-size: 2.4rem;
+  letter-spacing: 4px;
+  background: linear-gradient(to right, var(--color-caocao), var(--color-guanyu), var(--color-general));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  filter: drop-shadow(0 2px 8px rgba(255, 0, 127, 0.3));
+}
+
+/* 顶栏控件 */
+.controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+/* 下拉菜单 */
+.select-menu {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 8px;
+  outline: none;
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  cursor: pointer;
+}
+
+.select-menu option {
+  background: #0f0a1c;
+}
+
+.icon-btn {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid var(--border-color);
+  color: #adb5bd;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--color-guanyu);
+  border-color: var(--color-guanyu);
+}
+
+/* 步数显示板 */
+.score-box {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 6px 14px;
+  text-align: center;
+}
+
+.score-label {
+  font-size: 0.6rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #adb5bd;
+}
+
+.score-value {
+  font-family: var(--font-display);
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--color-guanyu);
+  text-shadow: 0 0 5px rgba(57, 255, 20, 0.3);
+}
+
+/* 棋盘主卡片 (精准贴合 1122x1402 比例) */
+.board-container {
+  position: relative;
+  width: 100%;
+  max-width: 440px; /* 从 360px 放大至 440px */
+  height: 550px; /* 440 * (1402/1122) = 550px */
+  background-image: url('card/pool.png');
+  background-size: 100% 100%;
+  background-position: center;
+  background-repeat: no-repeat;
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+  padding: 0;
+  overflow: hidden;
+}
+
+/* 棋子绝对定位网格容器：
+   根据背景图比例，扣除顶部龙形标志、底部箭头区域以及左右边框，
+   将真正的 4x5 活动网格精准限制在正中间区域，实现像素级对齐。 */
+.board-grid {
+  position: absolute;
+  left: 11.5%;
+  top: 9.5%;
+  width: 77%;
+  height: 75%;
+}
+
+/* 出口指示呼吸灯 (精准对齐底部中间两格区域) */
+.exit-glow {
+  position: absolute;
+  bottom: 2.5%;
+  left: 30.75%;
+  width: 38.5%;
+  height: 8px;
+  background: var(--color-caocao);
+  box-shadow: 0 -2px 15px 4px var(--color-caocao);
+  border-radius: 4px;
+  animation: exit-breath 2s infinite alternate;
+  z-index: 1;
+}
+
+@keyframes exit-breath {
+  0% { opacity: 0.4; }
+  100% { opacity: 1; }
+}
+
+/* 华容道棋子通用样式 */
+.character-tile {
+  position: absolute;
+  cursor: grab;
+  touch-action: none;
+  z-index: 2;
+  transition: transform 0.1s ease-out;
+}
+
+/* 棋子被按住/拖拽时的样式 */
+.character-tile.dragging {
+  cursor: grabbing;
+  z-index: 10;
+  transition: none;
+}
+
+/* 棋子内部带有霓虹边框的卡片 */
+.tile-inner {
+  position: absolute;
+  top: 2px;     /* 留出2px缝隙，使卡片之间具有合理的微调空隙，视觉更有层次 */
+  left: 2px;
+  right: 2px;
+  bottom: 2px;
+  border-radius: 6px; /* 微圆角，完美吻合切图本身的内圆角设计 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  
+  /* 隐藏叠加的文字：卡片切图已自带发光中文字体，无需重复渲染 */
+  font-size: 0;
+  color: transparent;
+  
+  transition: all 0.2s ease;
+  overflow: hidden;
+  
+  /* 100% 贴合，完整保留卡片四周发光的霓虹边框与机械装甲纹路 */
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-position: center center;
+}
+
+/* 曹操 (2x2) */
+.tile-caocao .tile-inner {
+  background-image: url('card/cc.png');
+}
+.tile-caocao:hover .tile-inner,
+.tile-caocao.dragging .tile-inner {
+  filter: brightness(1.2);
+  box-shadow: 0 0 15px var(--color-caocao);
+}
+
+/* 关羽 (2x1 横) */
+.tile-guanyu .tile-inner {
+  background-image: url('card/gy.png');
+}
+.tile-guanyu:hover .tile-inner,
+.tile-guanyu.dragging .tile-inner {
+  filter: brightness(1.2);
+  box-shadow: 0 0 15px var(--color-guanyu);
+}
+
+/* 将领 (1x2 竖：张飞、赵云、马超、黄忠) */
+.tile-general:hover .tile-inner,
+.tile-general.dragging .tile-inner {
+  filter: brightness(1.2);
+  box-shadow: 0 0 15px var(--color-general);
+}
+
+/* 各将领切图绑定 */
+.tile-zhangfei .tile-inner {
+  background-image: url('card/zf.png');
+}
+.tile-zhaoyun .tile-inner {
+  background-image: url('card/zy.png');
+}
+.tile-machao .tile-inner {
+  background-image: url('card/mc.png');
+}
+.tile-huangzhong .tile-inner {
+  background-image: url('card/hz.png');
+}
+
+/* 卒 (1x1) */
+.tile-soldier .tile-inner {
+  background-image: url('card/z.png');
+}
+.tile-soldier:hover .tile-inner,
+.tile-soldier.dragging .tile-inner {
+  filter: brightness(1.25);
+  box-shadow: 0 0 12px var(--color-soldier);
+}
+
+/* 玩法指南 */
+.help-guide {
+  margin-top: 15px;
+  text-align: center;
+  max-width: 360px;
+  width: 100%;
+  font-size: 0.75rem;
+  line-height: 1.6;
+  color: #adb5bd;
+}
+
+.help-guide strong {
+  color: #fff;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 1px 5px;
+  border-radius: 4px;
+}
+
+/* 遮罩面板 (胜利) */
+.overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 20px;
+  background: rgba(6, 4, 13, 0.92);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 20;
+  transition: opacity 0.3s ease;
+  text-align: center;
+  padding: 20px;
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.overlay h2 {
+  font-family: var(--font-chinese);
+  font-size: 2.5rem;
+  color: var(--color-caocao);
+  text-shadow: 0 0 20px rgba(255, 0, 127, 0.6);
+  margin-bottom: 12px;
+  letter-spacing: 2px;
+}
+
+.overlay p {
+  color: #adb5bd;
+  font-size: 0.95rem;
+  margin-bottom: 25px;
+  max-width: 260px;
+}
+
+/* 霓虹按钮 */
+.btn {
+  font-family: var(--font-chinese);
+  font-size: 1rem;
+  letter-spacing: 2px;
+  color: #fff;
+  background: transparent;
+  border: 2px solid var(--color-guanyu);
+  padding: 8px 24px;
+  border-radius: 30px;
+  cursor: pointer;
+  outline: none;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+  transition: all 0.2s ease;
+}
+
+.btn:hover {
+  background: var(--color-guanyu);
+  color: #06040d;
+  box-shadow: 0 0 18px rgba(57, 255, 20, 0.6);
+  transform: translateY(-2px);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+@media (max-width: 480px) {
+  body {
+    padding: 10px;
+  }
+  
+  .game-title {
+    font-size: 2rem;
+  }
+  
+  .board-container {
+    max-width: 330px;
+    height: 412px; /* 330 * (1402/1122) = 412.5px */
+  }
+}

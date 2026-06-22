@@ -1,0 +1,353 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Outfit:wght@200;400;600&display=swap');
+
+:root {
+  --bg-color: #030107;
+  --panel-bg: rgba(10, 4, 18, 0.75);
+  --border-color: rgba(255, 255, 255, 0.08);
+  --text-primary: #f8f9fa;
+  --text-secondary: #9a8eb3;
+  --cyan-neon: #00f5d4;
+  --pink-neon: #ff007f;
+  --yellow-neon: #fee440;
+  --green-neon: #39ff14;
+  
+  --font-display: 'Orbitron', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-color);
+  color: var(--text-primary);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding: 10px;
+  position: relative;
+  transition: background 0.3s ease;
+}
+
+/* 昼夜交替反转黑白过滤器样式 */
+body.day-mode {
+  --bg-color: #f0f0f5;
+  --text-primary: #120e24;
+  --text-secondary: #5a547a;
+  --panel-bg: rgba(230, 230, 240, 0.85);
+  --border-color: rgba(0, 0, 0, 0.08);
+}
+
+/* CRT扫描线 */
+body::before {
+  content: " ";
+  display: block;
+  position: fixed;
+  top: 0; left: 0; bottom: 0; right: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.15) 50%);
+  z-index: 9999;
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+
+/* 顶栏 */
+.header-bar {
+  width: 100%;
+  max-width: 640px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  padding: 0 5px;
+}
+
+.icon-btn {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.icon-btn:hover {
+  color: var(--green-neon);
+  border-color: var(--green-neon);
+  background: rgba(57, 255, 20, 0.08);
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.3);
+}
+
+.icon-btn.muted #soundWave {
+  opacity: 0.2;
+}
+
+.stats-container {
+  display: flex;
+  gap: 12px;
+}
+
+.stat-box {
+  background: var(--panel-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 10px;
+  padding: 4px 14px;
+  text-align: center;
+  min-width: 90px;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
+}
+
+.stat-label {
+  font-family: var(--font-display);
+  font-size: 0.65rem;
+  color: var(--text-secondary);
+  letter-spacing: 1px;
+  margin-bottom: 2px;
+}
+
+.stat-value {
+  font-family: var(--font-display);
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--green-neon);
+  text-shadow: 0 0 6px rgba(57, 255, 20, 0.4);
+}
+
+.day-mode .stat-value {
+  color: #2b9348;
+  text-shadow: none;
+}
+
+/* 标题 */
+.game-title {
+  font-family: var(--font-display);
+  font-size: 1.4rem;
+  font-weight: 900;
+  letter-spacing: 4px;
+  text-align: center;
+  background: linear-gradient(to right, var(--green-neon), var(--cyan-neon));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 8px;
+  filter: drop-shadow(0 0 6px rgba(57, 255, 20, 0.3));
+}
+
+.day-mode .game-title {
+  background: #2b9348;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  color: #2b9348;
+  filter: none;
+}
+
+/* 画布包壳 */
+.canvas-wrapper {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.8), 0 0 20px rgba(57, 255, 20, 0.15);
+  background: #010002;
+  border: 2px solid rgba(57, 255, 20, 0.25);
+  width: 100%;
+  max-width: 640px;
+  aspect-ratio: 2 / 1;
+}
+
+.day-mode .canvas-wrapper {
+  background: #f8f8fa;
+  border-color: #2b9348;
+  box-shadow: 0 8px 30px rgba(0,0,0,0.15);
+}
+
+#gameCanvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: transparent;
+}
+
+/* 遮罩面板 */
+.overlay {
+  position: absolute;
+  top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(3, 1, 6, 0.95);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+  padding: 24px;
+  text-align: center;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(8px);
+}
+
+.day-mode .overlay {
+  background: rgba(240, 240, 245, 0.96);
+}
+
+.overlay.hidden {
+  opacity: 0;
+  pointer-events: none;
+}
+
+.start-text {
+  font-family: var(--font-display);
+  font-size: 2rem;
+  font-weight: 900;
+  color: var(--green-neon);
+  text-shadow: 0 0 15px rgba(57, 255, 20, 0.5);
+  margin-bottom: 18px;
+  letter-spacing: 3px;
+}
+
+.day-mode .start-text {
+  color: #2b9348;
+  text-shadow: none;
+}
+
+.over-text {
+  font-family: var(--font-display);
+  font-size: 1.8rem;
+  font-weight: 900;
+  color: var(--pink-neon);
+  text-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+  margin-bottom: 18px;
+  letter-spacing: 2.5px;
+}
+
+.day-mode .over-text {
+  color: #d90429;
+  text-shadow: none;
+}
+
+.overlay p {
+  font-size: 0.82rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  max-width: 420px;
+  margin-bottom: 12px;
+}
+
+.overlay strong {
+  color: #fff;
+}
+.day-mode .overlay strong {
+  color: #000;
+}
+
+.btn {
+  background: transparent;
+  border: 2px solid var(--green-neon);
+  color: #fff;
+  padding: 8px 24px;
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-top: 14px;
+  box-shadow: 0 0 8px rgba(57, 255, 20, 0.2);
+}
+
+.btn:hover {
+  background: var(--green-neon);
+  color: #05020c;
+  box-shadow: 0 0 20px var(--green-neon);
+}
+
+.day-mode .btn {
+  border-color: #2b9348;
+  color: #2b9348;
+}
+.day-mode .btn:hover {
+  background: #2b9348;
+  color: #fff;
+}
+
+.btn-pink {
+  border-color: var(--pink-neon);
+  box-shadow: 0 0 8px rgba(255, 0, 127, 0.2);
+}
+.btn-pink:hover {
+  background: var(--pink-neon);
+  color: #fff;
+  box-shadow: 0 0 20px var(--pink-neon);
+}
+
+.day-mode .btn-pink {
+  border-color: #d90429;
+  color: #d90429;
+}
+.day-mode .btn-pink:hover {
+  background: #d90429;
+  color: #fff;
+}
+
+.clear-stats {
+  margin: 14px 0;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+}
+
+.highlight {
+  color: var(--cyan-neon);
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+.day-mode .highlight {
+  color: #0077b6;
+}
+
+.help-guide {
+  width: 100%;
+  max-width: 640px;
+  margin-top: 10px;
+  text-align: center;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.badge {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--border-color);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #fff;
+  font-family: var(--font-display);
+}
+
+.day-mode .badge {
+  background: rgba(0, 0, 0, 0.05);
+  color: #000;
+}
+
+@media (max-width: 480px) {
+  .game-title {
+    font-size: 1.1rem;
+  }
+  .overlay {
+    padding: 15px;
+  }
+  .start-text, .over-text {
+    font-size: 1.4rem;
+  }
+}
