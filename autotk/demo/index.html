@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>汉末三国「部众矩阵与军备演进」模型测试台</title>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background: #0b0c10;
+            color: #c5c6c7;
+            margin: 0;
+            padding: 20px;
+        }
+        h1, h2, h3 {
+            color: #66fcf1;
+            text-align: center;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+        .panel {
+            background: #1f2833;
+            border: 1px solid #45f2eb30;
+            border-radius: 8px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+        }
+        .form-group {
+            margin-bottom: 12px;
+        }
+        label {
+            display: block;
+            margin-bottom: 6px;
+            font-size: 0.85rem;
+            color: #45f3ff;
+            font-weight: bold;
+        }
+        select, input {
+            width: 100%;
+            padding: 8px;
+            background: #0b0c10;
+            color: #fff;
+            border: 1px solid rgba(102,252,241,0.3);
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+        .result-box {
+            background: #0b0c10;
+            border-left: 4px solid #66fcf1;
+            padding: 12px;
+            margin-top: 15px;
+            border-radius: 0 4px 4px 0;
+        }
+        .unit-preview-card {
+            background: #111;
+            border: 1.5px solid rgba(102,252,241,0.2);
+            border-radius: 6px;
+            padding: 10px;
+            margin-top: 8px;
+        }
+        .battle-simulation {
+            grid-column: 1 / span 2;
+            background: #1f2833;
+            border: 1.5px solid #ff4e5050;
+        }
+        button {
+            background: linear-gradient(135deg, #45f3ff, #0d9488);
+            border: none;
+            color: #000;
+            font-weight: bold;
+            padding: 10px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        button:hover {
+            box-shadow: 0 0 10px rgba(102,252,241,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <h1>⚔️ 三国部众制式与军备演进测试沙盒</h1>
+    <p style="text-align: center; color: #888;">验证由「基础兵科 × 护甲制式 × 兵刃远射 × 训练体系」矩阵实时生成的历史融合称谓与战力属性向量</p>
+
+    <div class="container">
+        <!-- 1. 左侧配置器：攻方部众 -->
+        <div class="panel">
+            <h2>🚩 进攻军营整备</h2>
+            <div id="attackerConfig">
+                <div class="form-group">
+                    <label>势力主公属性</label>
+                    <select id="attFaction">
+                        <option value="none">寻常群雄</option>
+                        <option value="曹操">曹操 (魏武)</option>
+                        <option value="刘备">刘备 (大德)</option>
+                        <option value="袁绍">袁绍 (名门)</option>
+                        <option value="吕布">吕布 (飞将)</option>
+                        <option value="孙权">孙权 (丹阳)</option>
+                        <option value="公孙瓒">公孙瓒 (白马)</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label>基础兵科</label>
+                    <select id="attBranch">
+                        <option value="SWD">SWD (短兵/刀盾系)</option>
+                        <option value="LNC" selected>LNC (长兵/矛戟系)</option>
+                        <option value="RNG">RNG (远射/弓弩系)</option>
+                        <option value="CAV">CAV (突骑/骑兵系)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>等级阶级</label>
+                    <select id="attLevel">
+                        <option value="1">一阶 (新卒)</option>
+                        <option value="2">二阶 (悍卒)</option>
+                        <option value="3" selected>三阶 (精兵)</option>
+                        <option value="4">四阶 (锐士)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>护甲制式</label>
+                    <select id="attArmor">
+                        <option value="ARM_NONE">ARM_NONE (无甲/布衣)</option>
+                        <option value="ARM_LEATHER">ARM_LEATHER (犀皮革甲)</option>
+                        <option value="ARM_扎甲" selected>ARM_扎甲 (铁扎甲)</option>
+                        <option value="ARM_具装">ARM_具装 (战马具装)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>兵刃远射制式</label>
+                    <select id="attWeapon">
+                        <option value="WEP_STANDARD">WEP_STANDARD (普通枪刃)</option>
+                        <option value="WEP_鋼铤" selected>WEP_鋼铤 (百炼钢铤)</option>
+                        <option value="WEP_劈山斧">WEP_劈山斧 (重劈大斧)</option>
+                        <option value="WEP_大黄弩">WEP_大黄弩 (擘张大黄)</option>
+                        <option value="WEP_连弩">WEP_连弩 (诸葛元戎)</option>
+                        <option value="WEP_马槊">WEP_马槊 (骑兵马槊)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>训练体系</label>
+                    <select id="attDoctrine">
+                        <option value="DOC_STANDARD">DOC_STANDARD (寻常训法)</option>
+                        <option value="DOC_OFFENSIVE" selected>DOC_OFFENSIVE (攻坚先登)</option>
+                        <option value="DOC_DEFENSIVE">DOC_DEFENSIVE (牙门固守)</option>
+                        <option value="DOC_SKIRMISH">DOC_SKIRMISH (袭掠飞骑)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>编练部众数量</label>
+                    <input type="number" id="attCount" value="500" min="1" max="10000" />
+                </div>
+            </div>
+
+            <div class="result-box">
+                <span style="font-weight: bold; color:#66fcf1;">融合解析预览：</span>
+                <div class="unit-preview-card">
+                    <div style="font-size: 1.1rem; color: #fff; font-weight: bold;" id="attPreviewName">--</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px; color: #888;" id="attPreviewStats">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 2. 右侧配置器：防守守军 -->
+        <div class="panel">
+            <h2>🛡️ 郡防守军整备</h2>
+            <div id="defenderConfig">
+                <div class="form-group">
+                    <label>势力主公属性</label>
+                    <select id="defFaction">
+                        <option value="none">寻常群雄</option>
+                        <option value="曹操">曹操 (魏武)</option>
+                        <option value="刘备" selected>刘备 (大德)</option>
+                        <option value="袁绍">袁绍 (名门)</option>
+                        <option value="孙权">孙权 (丹阳)</option>
+                        <option value="孟获">孟获 (藤甲军)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>基础兵科</label>
+                    <select id="defBranch">
+                        <option value="SWD">SWD (短兵/刀盾系)</option>
+                        <option value="LNC" selected>LNC (长兵/矛戟系)</option>
+                        <option value="RNG">RNG (远射/弓弩系)</option>
+                        <option value="CAV">CAV (突骑/骑兵系)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>等级阶级</label>
+                    <select id="defLevel">
+                        <option value="1">一阶 (新卒)</option>
+                        <option value="2">二阶 (悍卒)</option>
+                        <option value="3" selected>三阶 (精兵)</option>
+                        <option value="4">四阶 (锐士)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>护甲制式</label>
+                    <select id="defArmor">
+                        <option value="ARM_NONE">ARM_NONE (无甲/布衣)</option>
+                        <option value="ARM_LEATHER">ARM_LEATHER (犀皮革甲)</option>
+                        <option value="ARM_扎甲" selected>ARM_扎甲 (铁扎甲)</option>
+                        <option value="ARM_具装">ARM_具装 (战马具装)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>兵刃远射制式</label>
+                    <select id="defWeapon">
+                        <option value="WEP_STANDARD">WEP_STANDARD (普通枪刃)</option>
+                        <option value="WEP_鋼铤" selected>WEP_鋼铤 (百炼钢铤)</option>
+                        <option value="WEP_劈山斧">WEP_劈山斧 (重劈大斧)</option>
+                        <option value="WEP_大黄弩">WEP_大黄弩 (擘张大黄)</option>
+                        <option value="WEP_连弩">WEP_连弩 (诸葛元戎)</option>
+                        <option value="WEP_马槊">WEP_马槊 (骑兵马槊)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>训练体系</label>
+                    <select id="defDoctrine">
+                        <option value="DOC_STANDARD">DOC_STANDARD (寻常训法)</option>
+                        <option value="DOC_OFFENSIVE">DOC_OFFENSIVE (攻坚先登)</option>
+                        <option value="DOC_DEFENSIVE" selected>DOC_DEFENSIVE (牙门固守)</option>
+                        <option value="DOC_SKIRMISH">DOC_SKIRMISH (袭掠飞骑)</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label>守军部众数量</label>
+                    <input type="number" id="defCount" value="600" min="1" max="10000" />
+                </div>
+
+                <div class="form-group">
+                    <label>郡县防御繁荣度 (0 ~ 100000)</label>
+                    <input type="number" id="defCityValue" value="50000" min="0" max="100000" />
+                </div>
+            </div>
+
+            <div class="result-box">
+                <span style="font-weight: bold; color:#66fcf1;">融合解析预览：</span>
+                <div class="unit-preview-card">
+                    <div style="font-size: 1.1rem; color: #fff; font-weight: bold;" id="defPreviewName">--</div>
+                    <div style="font-size: 0.8rem; margin-top: 5px; color: #888;" id="defPreviewStats">--</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 3. 底部：文明式战斗对决模拟 -->
+        <div class="panel battle-simulation">
+            <h2>⚔️ 军事对决胜率结算</h2>
+            <div style="display: flex; justify-content: space-around; margin: 15px 0;">
+                <div>攻方总算战力：<span id="attPowerVal" style="color: #66fcf1; font-size:1.5rem; font-weight:bold;">0</span></div>
+                <div>守方总防战力：<span id="defPowerVal" style="color: #ff4e50; font-size:1.5rem; font-weight:bold;">0</span></div>
+            </div>
+            <div style="margin: 20px 0; text-align: center;">
+                <div style="font-size: 1.2rem; margin-bottom: 8px;">强攻破关胜率：</div>
+                <div style="font-size: 3rem; font-weight: 900; color: #45f3ff;" id="winRateVal">0%</div>
+            </div>
+            <button onclick="calculateBattle()">敲响战鼓：推演决战结果</button>
+        </div>
+    </div>
+
+    <script src="military_model.js"></script>
+    <script>
+        function updatePreviews() {
+            // A. 攻方预览
+            const attB = document.getElementById("attBranch").value;
+            const attA = document.getElementById("attArmor").value;
+            const attW = document.getElementById("attWeapon").value;
+            const attD = document.getElementById("attDoctrine").value;
+            const attL = parseInt(document.getElementById("attLevel").value);
+            const attF = document.getElementById("attFaction").value;
+
+            const attName = getUnitHistoricalName(attB, attA, attW, attD, attF);
+            const attStats = calculateSingleUnitStats(attB, attA, attW, attD, attL);
+            document.getElementById("attPreviewName").textContent = attName;
+            document.getElementById("attPreviewStats").innerHTML = `单兵战力: ⚔️${attStats.attack} / 🛡️${attStats.defense} | 行军机动: 🐎${attStats.speed}`;
+
+            // B. 守方预览
+            const defB = document.getElementById("defBranch").value;
+            const defA = document.getElementById("defArmor").value;
+            const defW = document.getElementById("defWeapon").value;
+            const defD = document.getElementById("defDoctrine").value;
+            const defL = parseInt(document.getElementById("defLevel").value);
+            const defF = document.getElementById("defFaction").value;
+
+            const defName = getUnitHistoricalName(defB, defA, defW, defD, defF);
+            const defStats = calculateSingleUnitStats(defB, defA, defW, defD, defL);
+            document.getElementById("defPreviewName").textContent = defName;
+            document.getElementById("defPreviewStats").innerHTML = `单兵战力: ⚔️${defStats.attack} / 🛡️${defStats.defense} | 行军机动: 🐎${defStats.speed}`;
+        }
+
+        function calculateBattle() {
+            updatePreviews();
+
+            const attB = document.getElementById("attBranch").value;
+            const attA = document.getElementById("attArmor").value;
+            const attW = document.getElementById("attWeapon").value;
+            const attD = document.getElementById("attDoctrine").value;
+            const attL = parseInt(document.getElementById("attLevel").value);
+            const attCount = parseInt(document.getElementById("attCount").value);
+
+            const defB = document.getElementById("defBranch").value;
+            const defA = document.getElementById("defArmor").value;
+            const defW = document.getElementById("defWeapon").value;
+            const defD = document.getElementById("defDoctrine").value;
+            const defL = parseInt(document.getElementById("defLevel").value);
+            const defCount = parseInt(document.getElementById("defCount").value);
+            const defCityVal = parseInt(document.getElementById("defCityValue").value);
+
+            const attacker = {
+                troops: [{ branch: attB, armor: attA, weapon: attW, doctrine: attD, level: attL, count: attCount }],
+                engines: { chongche: 0, piliche: 0 }
+            };
+
+            const defender = {
+                troops: [{ branch: defB, armor: defA, weapon: defW, doctrine: defD, level: defL, count: defCount }],
+                engines: { quanti: 0, mushou: 0 },
+                cityValue: defCityVal
+            };
+
+            const report = runBattleSimulation(attacker, defender);
+            document.getElementById("attPowerVal").textContent = report.attPower;
+            document.getElementById("defPowerVal").textContent = report.defPower;
+            document.getElementById("winRateVal").textContent = report.winRate + "%";
+        }
+
+        // 监听更改事件
+        document.querySelectorAll("select, input").forEach(el => {
+            el.addEventListener("change", updatePreviews);
+        });
+
+        // 初始运行一次
+        updatePreviews();
+    </script>
+</body>
+</html>
